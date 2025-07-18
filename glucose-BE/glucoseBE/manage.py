@@ -18,8 +18,10 @@ def main():
             "forget to activate a virtual environment?"
         ) from exc
 
-    if os.getenv('MY_DJANGO_RELOAD') is None:
-        os.environ['MY_DJANGO_RELOAD'] = ''
+    # prevent django migrate show qrcode
+    # prevent django auto-reload show qrcode again
+    if sys.argv[1] == 'runserver' and os.getenv('MY_DJANGO_RELOAD') is None:
+        os.environ['MY_DJANGO_RELOAD'] = 'true'
         Thread(target=show, daemon=True).start()
 
     execute_from_command_line(sys.argv)
