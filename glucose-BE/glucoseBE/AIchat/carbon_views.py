@@ -27,7 +27,9 @@ set_seed(42)  # 設定固定種子
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-model = models.resnet18(pretrained=False)
+# model = models.resnet18(pretrained=False)  ## pretrained parameter is deprecated, and maybe removed in future
+model = models.resnet18(weights=None)  # new version test
+
 model.fc = nn.Sequential(
     nn.Linear(model.fc.in_features, hidden_units),
     nn.ReLU(),
