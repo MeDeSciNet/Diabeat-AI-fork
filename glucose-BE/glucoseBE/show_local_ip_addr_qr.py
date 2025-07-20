@@ -35,7 +35,7 @@ def show():
     label.pack(side='bottom', anchor='e', padx=10)
 
     def listener(_):
-        ip = box.get()
+        ip = 'Diabeat ' + box.get()  # prefix identifier
 
         buffer = BytesIO()
 

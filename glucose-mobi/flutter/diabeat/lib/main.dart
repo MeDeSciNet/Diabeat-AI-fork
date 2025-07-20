@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dynamic_color/dynamic_color.dart';
-import 'home_page.dart';
+import 'home.dart';
 
 void main() {
   runApp(const MainApp());
@@ -10,7 +10,7 @@ class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
   @override
-  Widget build(context) => DynamicColorBuilder(
+  Widget build(_) => DynamicColorBuilder(
     builder: (lightDynamic, darkDynamic) {
       lightDynamic =
           lightDynamic?.harmonized() ??
@@ -27,7 +27,7 @@ class MainApp extends StatelessWidget {
           );
 
       return MaterialApp(
-        home: const HomePage(),
+        home: const Home(),
         theme: ThemeData(useMaterial3: true, colorScheme: lightDynamic),
         darkTheme: ThemeData(useMaterial3: true, colorScheme: darkDynamic),
       );
