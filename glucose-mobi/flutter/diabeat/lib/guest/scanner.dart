@@ -1,6 +1,7 @@
-import 'dart:developer';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:path_provider/path_provider.dart';
 
 class ScannerPage extends StatelessWidget {
   const ScannerPage({super.key});
@@ -20,14 +21,25 @@ class ScannerPage extends StatelessWidget {
                   aspectRatio: 9 / 16,
                   child: MobileScanner(
                     controller: controller,
-                    onDetect: (barcodes) {
+                    onDetect: (barcodes) async {
                       final addrs = barcodes.barcodes.where(
                         (element) =>
                             element.rawValue?.startsWith('Diabeat ') ?? false,
                       );
 
                       if (addrs.isNotEmpty) {
-                        log(addrs.first.rawValue!.split(' ')[1]);
+                        await controller.pause();
+
+                        final addr = addrs.first.rawValue!.split(' ')[1];
+
+                        final cacheDir = await getTemporaryDirectory();
+                        final file = File('${cacheDir.path}/addr.txt');
+                        await file.writeAsString('$addr\n');
+
+                        // idk
+                        if (context.mounted) {
+                          Navigator.pop(context);
+                        }
                       }
                     },
                   ),
