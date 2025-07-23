@@ -3,6 +3,7 @@ import 'guest/guest.dart';
 import 'record/record.dart';
 import 'chart/chart.dart';
 import 'account/account.dart';
+import 'util.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -27,9 +28,9 @@ class _HomeState extends State<Home> {
             body: IndexedStack(
               index: _index,
               children: [
-                const RecordPage(),
-                _navigator((_) => const ChartPage()),
-                _navigator((_) => const AccountPage()),
+                navigator((_) => const RecordPage()),
+                navigator((_) => const ChartPage()),
+                navigator((_) => const AccountPage()),
               ],
             ),
             bottomNavigationBar: BottomNavigationBar(
@@ -57,7 +58,4 @@ class _HomeState extends State<Home> {
             ),
           ),
         );
-
-  Navigator _navigator(Widget Function(BuildContext) builder) =>
-      Navigator(onGenerateRoute: (_) => MaterialPageRoute(builder: builder));
 }
