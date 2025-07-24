@@ -9,6 +9,7 @@ import torch.nn as nn
 import numpy as np
 import random
 from torchvision import models
+from pathlib import Path
 
 # 載入模型
 hidden_units = 512
@@ -36,7 +37,8 @@ model.fc = nn.Sequential(
     nn.Dropout(dropout_rate),
     nn.Linear(hidden_units, 1)
 )
-model.load_state_dict(torch.load('AIchat/dish_model1.pth', map_location=device))
+grandparent = Path(__file__).parent.parent
+model.load_state_dict(torch.load(grandparent / 'AIchat/dish_model1.pth', map_location=device))
 model = model.to(device)
 model.eval()
 

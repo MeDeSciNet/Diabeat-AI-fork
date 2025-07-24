@@ -6,6 +6,7 @@ import torch.nn as nn
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+from pathlib import Path
 
 # 定義神經網路架構，需與訓練時相同
 class DiabetesNet(nn.Module):
@@ -22,7 +23,8 @@ class DiabetesNet(nn.Module):
         return x
 
 # 載入前處理器（使用訓練時儲存的 preprocessor）
-preprocessor = joblib.load('AIchat/preprocessor.joblib')
+grandparent = Path(__file__).parent.parent
+preprocessor = joblib.load(grandparent / 'AIchat/preprocessor.joblib')
 
 # 利用一筆 dummy 資料推算前處理後的特徵數量
 dummy_data = pd.DataFrame([{
@@ -39,7 +41,7 @@ input_dim = preprocessor.transform(dummy_data).shape[1]
 
 # 載入模型參數
 model = DiabetesNet(input_dim=input_dim)
-model.load_state_dict(torch.load('AIchat/diabetes_model.pth', map_location=torch.device('cpu')))
+model.load_state_dict(torch.load(grandparent / 'AIchat/diabetes_model.pth', map_location=torch.device('cpu')))
 model.eval()
 
 @api_view(['POST'])
