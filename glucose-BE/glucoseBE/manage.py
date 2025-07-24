@@ -3,7 +3,7 @@
 import os
 import sys
 from threading import Thread
-from show_local_ip_addr_qr import show
+from addr_qr import App
 
 
 def main():
@@ -22,7 +22,7 @@ def main():
     # prevent django auto-reload show qrcode again
     if sys.argv[1] == 'runserver' and os.getenv('MY_DJANGO_RELOAD') is None:
         os.environ['MY_DJANGO_RELOAD'] = 'true'
-        Thread(target=show, daemon=True).start()
+        Thread(target=App.run, daemon=True).start()
 
     execute_from_command_line(sys.argv)
 
