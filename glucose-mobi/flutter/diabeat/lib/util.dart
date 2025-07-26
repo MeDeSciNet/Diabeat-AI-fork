@@ -1,18 +1,5 @@
 import 'package:flutter/material.dart';
 
-MaterialPageRoute _route(Widget Function(BuildContext) builder) =>
-    MaterialPageRoute(builder: builder);
-
-Navigator navigator(Widget Function(BuildContext) builder) =>
-    Navigator(onGenerateRoute: (_) => _route(builder));
-
-Future<void> navigate(
-  BuildContext context,
-  Widget Function(BuildContext) builder,
-) async {
-  await Navigator.push(context, _route(builder));
-}
-
 class BtnStyleExt {
   BtnStyleExt._();
 
@@ -28,13 +15,23 @@ class BtnStyleExt {
 
   static ButtonStyle get dialogPos => FilledButton.styleFrom(
     shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.horizontal(right: Radius.circular(10)),
+      borderRadius: BorderRadius.horizontal(
+        right: Radius.circular(10000), // casual big number,
+      ),
     ),
+  );
+
+  static ButtonStyle dialogNeu(BuildContext context) => FilledButton.styleFrom(
+    backgroundColor: ColorScheme.of(context).secondaryContainer,
+    foregroundColor: ColorScheme.of(context).onSecondaryContainer,
+    shape: const RoundedRectangleBorder(),
   );
 
   static ButtonStyle get dialogNeg => OutlinedButton.styleFrom(
     shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.horizontal(left: Radius.circular(10)),
+      borderRadius: BorderRadius.horizontal(
+        left: Radius.circular(10000), // casual big number,
+      ),
     ),
   );
 }

@@ -1,6 +1,8 @@
+import 'dart:developer';
+import 'package:diabeat/routes/connection/request.dart';
+import 'package:diabeat/util.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import '../guest/scanner.dart';
-import '../util.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -10,41 +12,78 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
+  final _emailCtrl = TextEditingController();
+  final _passwordCtrl = TextEditingController();
 
-  String? _emailError;
-  String? _passwordError;
+  String? _emailErr;
+  String? _passwordErr;
   bool _obscure = true;
   bool _rememberMe = true;
   bool _submitted = false;
+  bool _onJob = false;
 
   @override
   void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
+    _emailCtrl.dispose();
+    _passwordCtrl.dispose();
     super.dispose();
   }
 
   void _validateEmail() {
-    final email = _emailController.text;
+    final email = _emailCtrl.text;
 
     if (email.isEmpty) {
-      _emailError = '電子信箱不能為空';
+      _emailErr = '電子信箱不能為空';
     } else if (!email.contains('@')) {
-      _emailError = '電子信箱格式不正確';
+      _emailErr = '電子信箱格式不正確';
     } else {
-      _emailError = null;
+      _emailErr = null;
     }
   }
 
   void _validatePassword() {
-    final password = _passwordController.text;
-    _passwordError = password.isEmpty ? '密碼不能為空' : null;
+    final password = _passwordCtrl.text;
+    _passwordErr = password.isEmpty ? '密碼不能為空' : null;
+  }
+
+  Future<void> _tryLogIn() async {
+    setState(() {
+      _submitted = true;
+      _validateEmail();
+      _validatePassword();
+    });
+
+    if (_emailErr != null || _passwordErr != null) return;
+
+    setState(() => _onJob = true);
+
+    try {
+      final res = await Request.logIn(
+        context,
+        email: _emailCtrl.text,
+        password: _passwordCtrl.text,
+      );
+
+      // log('[] access: ${res.data!['access']}');
+      // log('[] refresh: ${res.data!['refresh']}');
+      // log('[] user: ${res.data!['username']}');
+
+      if (!mounted) return;
+      Navigator.pop(context);
+      await Navigator.pushReplacementNamed(context, '/home');
+    } on DioException catch (e) {
+      // add ui response
+      if (e.response != null) {
+        log('錯誤狀態碼: ${e.response!.statusCode}');
+        log('錯誤訊息: ${e.response!.data}');
+      }
+    } finally {
+      setState(() => _onJob = false);
+    }
   }
 
   @override
-  Widget build(context) => Scaffold(
+  Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
       leading: IconButton(
         onPressed: () {
@@ -67,15 +106,15 @@ class _LoginPageState extends State<LoginPage> {
             ),
             const Spacer(flex: 1),
             TextField(
-              controller: _emailController,
+              controller: _emailCtrl,
               keyboardType: TextInputType.emailAddress,
               textInputAction: TextInputAction.next,
               decoration: InputDecoration(
                 labelText: '電子信箱',
-                errorText: _emailError,
+                errorText: _emailErr,
                 border: const OutlineInputBorder(),
               ),
-              onChanged: (_) {
+              onChanged: (value) {
                 if (_submitted) {
                   setState(_validateEmail);
                 }
@@ -83,12 +122,12 @@ class _LoginPageState extends State<LoginPage> {
             ),
             const SizedBox(height: 20),
             TextField(
-              controller: _passwordController,
+              controller: _passwordCtrl,
               keyboardType: TextInputType.visiblePassword,
               textInputAction: TextInputAction.done,
               decoration: InputDecoration(
                 labelText: '密碼',
-                errorText: _passwordError,
+                errorText: _passwordErr,
                 border: const OutlineInputBorder(),
                 suffixIcon: IconButton(
                   onPressed: () {
@@ -100,7 +139,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               obscureText: _obscure,
-              onChanged: (_) {
+              onChanged: (value) {
                 if (_submitted) {
                   setState(_validatePassword);
                 }
@@ -117,19 +156,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
             const Spacer(flex: 2),
             FilledButton(
-              onPressed: () {
-                setState(() {
-                  _submitted = true;
-                  _validateEmail();
-                  _validatePassword();
-                });
-
-                if (_emailError == null && _passwordError == null) {
-                  // TODO: determine has saved host
-
-                  DisconnectedDialog.show(context);
-                }
-              },
+              onPressed: _onJob ? null : _tryLogIn,
               style: BtnStyleExt.mainFilled,
               child: const Text('登入'),
             ),
