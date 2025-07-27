@@ -16,6 +16,7 @@ class CustomLoginView(APIView):
                 return Response({
                     'refresh': str(refresh),
                     'access': str(refresh.access_token),
+                    'username': str(user.username),  # new field
                     'message': "request successful",
                     "success": True                  
                 }, status=status.HTTP_200_OK )
