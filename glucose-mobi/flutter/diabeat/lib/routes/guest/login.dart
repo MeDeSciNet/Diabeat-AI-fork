@@ -45,7 +45,7 @@ class _LoginPageState extends AuthState<LoginPage> {
 
       if (!mounted) return;
       Navigator.pop(context);
-      await Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushReplacementNamed(context, '/home');
       //
     } on DioException catch (e) {
       setState(() {

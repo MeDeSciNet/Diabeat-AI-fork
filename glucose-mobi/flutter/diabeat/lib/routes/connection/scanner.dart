@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:diabeat/routes/connection/request.dart';
 import 'package:diabeat/util.dart';
 import 'package:flutter/material.dart';
@@ -21,23 +20,20 @@ class ScannerPage extends StatelessWidget {
     final addr = addrs.first.rawValue!.split(' ')[1];
     final res = await _ConfirmScanDialog.show(context, addr);
 
-    if (res == null) {
-      await _controller.start();
-      return;
-    }
+    if (!context.mounted) return;
+    switch (res) {
+      case null:
+        _controller.start();
+        break;
 
-    if (res == '!exit') {
-      if (context.mounted) {
+      case '!exit':
         Navigator.pop(context, null);
-      }
-      return;
-    }
+        break;
 
-    // res == '!ok'
-    await Request.setAddr(addr);
-    if (context.mounted) {
-      Navigator.pop(context, '!ok');
-      log('okokok');
+      case '!ok':
+        Navigator.pop(context, '!ok');
+        Request.setAddr(addr);
+        break;
     }
   }
 
@@ -54,8 +50,8 @@ class ScannerPage extends StatelessWidget {
                   aspectRatio: 9 / 16,
                   child: MobileScanner(
                     controller: _controller,
-                    onDetect: (barcodes) async {
-                      await _detect(context, barcodes);
+                    onDetect: (barcodes) {
+                      _detect(context, barcodes);
                     },
                   ),
                 ),
@@ -94,10 +90,9 @@ class _SliderWidgetState extends State<_SliderWidget> {
   Widget build(BuildContext context) {
     return Slider(
       value: _scale,
-      onChanged: (value) async {
+      onChanged: (value) {
         setState(() => _scale = value);
-
-        await widget.controller.setZoomScale(_scale);
+        widget.controller.setZoomScale(_scale);
       },
       year2023: false, // deprecated
     );

@@ -7,15 +7,15 @@ class Prefs {
     return await _prefs.getString('addr');
   }
 
-  static Future<void> setAddr(String value) async {
-    await _prefs.setString('addr', value);
+  static void setAddr(String value) {
+    _prefs.setString('addr', value);
   }
 
   static Future<String?> getEmail() async {
     return await _prefs.getString('email');
   }
 
-  static Future<void> setEmail(String value) async {
-    await _prefs.setString('email', value);
+  static void setEmail(String value) {
+    _prefs.setString('email', value);
   }
 }

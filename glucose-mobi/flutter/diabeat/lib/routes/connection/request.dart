@@ -34,9 +34,9 @@ class Request {
     }
   }
 
-  static Future<void> setAddr(String value) async {
+  static void setAddr(String value) {
     _dio.options.baseUrl = 'http://$value:8000/api';
-    await Prefs.setAddr(value);
+    Prefs.setAddr(value);
   }
 
   //
@@ -72,7 +72,7 @@ class Request {
     );
 
     if (remeberMe) {
-      await Prefs.setEmail(email);
+      Prefs.setEmail(email);
     }
   }
 
@@ -98,7 +98,7 @@ class Request {
     );
 
     if (remeberMe) {
-      await Prefs.setEmail(email);
+      Prefs.setEmail(email);
     }
   }
 

@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:diabeat/util.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -31,16 +30,16 @@ class GuestPage extends StatelessWidget {
                 ),
               ),
               FilledButton(
-                onPressed: () async {
-                  await Navigator.pushNamed(context, '/guest/login');
+                onPressed: () {
+                  Navigator.pushNamed(context, '/guest/login');
                 },
                 style: BtnStyleExt.mainFilled,
                 child: const Text('登入'),
               ),
               const SizedBox(height: 10),
               OutlinedButton(
-                onPressed: () async {
-                  await Navigator.pushNamed(context, '/guest/register');
+                onPressed: () {
+                  Navigator.pushNamed(context, '/guest/register');
                 },
                 style: BtnStyleExt.mainOutlined,
                 child: const Text('註冊'),
@@ -52,7 +51,7 @@ class GuestPage extends StatelessWidget {
     );
   }
 
-  Future<void> _launchRepo() async {
-    await launchUrl(Uri.parse('https://github.com/MeDeSciNet/Diabeat-AI-fork'));
+  void _launchRepo() {
+    launchUrl(Uri.parse('https://github.com/MeDeSciNet/Diabeat-AI-fork'));
   }
 }

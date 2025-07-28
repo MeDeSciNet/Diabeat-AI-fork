@@ -1,3 +1,4 @@
+import 'package:diabeat/routes/connection/request.dart';
 import 'package:flutter/material.dart';
 
 class AccountPage extends StatelessWidget {
@@ -6,7 +7,13 @@ class AccountPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: FilledButton(onPressed: () {}, child: Text('Account')),
+      child: FilledButton(
+        onPressed: () {
+          Request.logOut();
+          Navigator.pushReplacementNamed(context, '/guest');
+        },
+        child: const Text('登出'),
+      ),
     );
   }
 }

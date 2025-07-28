@@ -49,7 +49,7 @@ class _RegisterPageState extends AuthState<RegisterPage> {
 
       if (!mounted) return;
       Navigator.pop(context);
-      await Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushReplacementNamed(context, '/home');
       //
     } on DioException catch (e) {
       setState(() {
