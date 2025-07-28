@@ -1,14 +1,20 @@
+import 'package:diabeat/routes/connection/prefs.dart';
 import 'package:dio/dio.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:diabeat/util.dart';
 import 'package:flutter/material.dart';
 
 typedef JsonMap = Map<String, dynamic>;
 
+typedef _Session = ({
+  String email,
+  String username,
+  String accessToken,
+  String refreshToken,
+});
+
 class Request {
   Request._();
-  static final _prefs = SharedPreferencesAsync();
-  static final Dio _dio = Dio(
+  static final _dio = Dio(
     BaseOptions(
       sendTimeout: const Duration(seconds: 1),
       validateStatus: (status) {
@@ -16,55 +22,88 @@ class Request {
       },
     ),
   );
-  static late String? _addr;
+  static _Session? _session;
+  static String get email => _session!.email;
+  static String get username => _session!.username;
 
   static Future<void> init() async {
-    _addr = await _prefs.getString('addr');
+    final addr = await Prefs.getAddr();
 
-    if (_addr != null) {
-      _dio.options.baseUrl = 'http://$_addr:8000/api';
+    if (addr != null) {
+      _dio.options.baseUrl = 'http://$addr:8000/api';
     }
   }
 
   static Future<void> setAddr(String value) async {
-    _addr = value;
     _dio.options.baseUrl = 'http://$value:8000/api';
-    await _prefs.setString('addr', value);
+    await Prefs.setAddr(value);
   }
 
-  static Future<void> _tryConnect(BuildContext context) async {
-    if (_addr != null) return;
+  //
+  //
+  //
+
+  static Future<void> _checkConnection(BuildContext context) async {
+    if (_dio.options.baseUrl.isNotEmpty) return;
 
     if (await _DisconnectedDialog.show(context) == null) {
-      throw DisconnectedException();
+      throw CancelConnectionException();
     }
   }
 
-  static Future<Response<JsonMap>> logIn(
+  static Future<void> logIn(
     BuildContext context, {
     required String email,
     required String password,
+    required bool remeberMe,
   }) async {
-    await _tryConnect(context);
+    await _checkConnection(context);
 
-    return await _dio.post<JsonMap>(
+    final res = await _dio.post<JsonMap>(
       '/token/',
       data: {'username_or_email': email, 'password': password},
     );
+
+    _session = (
+      email: email,
+      username: res.data!['username'],
+      accessToken: res.data!['access'],
+      refreshToken: res.data!['refresh'],
+    );
+
+    if (remeberMe) {
+      await Prefs.setEmail(email);
+    }
   }
 
-  static Future<Response<JsonMap>> register(
+  static Future<void> register(
     BuildContext context, {
     required String email,
     required String username,
     required String password,
+    required bool remeberMe,
   }) async {
-    await _tryConnect(context);
+    await _checkConnection(context);
 
-    return await _dio.post<JsonMap>(
+    final res = await _dio.post<JsonMap>(
       '/register/',
       data: {'email': email, 'username': username, 'password': password},
     );
+
+    _session = (
+      email: email,
+      username: username,
+      accessToken: res.data!['access'],
+      refreshToken: res.data!['refresh'],
+    );
+
+    if (remeberMe) {
+      await Prefs.setEmail(email);
+    }
+  }
+
+  static void logOut() {
+    _session = null;
   }
 }
 
@@ -127,4 +166,4 @@ class _DisconnectedDialog extends StatelessWidget {
   }
 }
 
-class DisconnectedException implements Exception {}
+class CancelConnectionException implements Exception {}
