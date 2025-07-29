@@ -60,9 +60,9 @@ class Request {
       }
     }
 
-    bool loop = true;
-    while (loop) {
-      loop = false;
+    bool retry;
+    do {
+      retry = false;
 
       try {
         return await builder();
@@ -74,7 +74,7 @@ class Request {
             if (!context.mounted) rethrow;
             switch (await _TimeoutDialog.show(context, e.type.toString())) {
               case _TimeoutDialogNav.retry:
-                loop = true;
+                retry = true;
                 break;
 
               default:
@@ -85,9 +85,7 @@ class Request {
             rethrow;
         }
       }
-    }
-
-    throw Unreachable(); // this should not happen !
+    } while (retry);
   }
 
   static Future<void> logIn(
@@ -153,8 +151,6 @@ class Request {
 /* */
 
 class CancelConnectionException implements Exception {}
-
-class Unreachable implements Exception {}
 
 enum _DisconnectedDialogNav { ok }
 
