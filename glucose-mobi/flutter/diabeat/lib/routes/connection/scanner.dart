@@ -3,9 +3,10 @@ import 'package:diabeat/util.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+enum ScannerPageNav { ok }
+
 class ScannerPage extends StatelessWidget {
   ScannerPage({super.key});
-
   final _controller = MobileScannerController(formats: [BarcodeFormat.qrCode]);
 
   Future<void> _detect(BuildContext context, BarcodeCapture barcodes) async {
@@ -18,21 +19,18 @@ class ScannerPage extends StatelessWidget {
 
     if (!context.mounted) return;
     final addr = addrs.first.rawValue!.split(' ')[1];
-    final res = await _ConfirmScanDialog.show(context, addr);
-
-    if (!context.mounted) return;
-    switch (res) {
-      case null:
-        _controller.start();
+    switch (await _ConfirmScanDialog.show(context, addr)) {
+      case _ConfirmScanDialogNav.leave:
+        Navigator.pop(context);
         break;
 
-      case '!exit':
-        Navigator.pop(context, null);
-        break;
-
-      case '!ok':
-        Navigator.pop(context, '!ok');
+      case _ConfirmScanDialogNav.ok:
         Request.setAddr(addr);
+        Navigator.pop(context, ScannerPageNav.ok);
+        break;
+
+      default:
+        _controller.start();
         break;
     }
   }
@@ -57,7 +55,7 @@ class ScannerPage extends StatelessWidget {
                 ),
                 IconButton(
                   onPressed: () {
-                    Navigator.pop(context);
+                    Navigator.pop(context, null);
                   },
                   icon: const Icon(Icons.arrow_back_ios_new_rounded),
                 ),
@@ -99,9 +97,10 @@ class _SliderWidgetState extends State<_SliderWidget> {
   }
 }
 
+enum _ConfirmScanDialogNav { leave, ok }
+
 class _ConfirmScanDialog extends StatelessWidget {
   const _ConfirmScanDialog._(this._addr);
-
   final String _addr;
 
   static Future show(BuildContext context, String addr) async {
@@ -126,38 +125,20 @@ class _ConfirmScanDialog extends StatelessWidget {
             style: const TextStyle(fontSize: 16),
           ),
           const SizedBox(height: 20),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () {
-                    Navigator.pop(context, '!exit');
-                  },
-                  style: BtnStyleExt.dialogNeg,
-                  child: const Text('返回'),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: FilledButton.tonal(
-                  onPressed: () {
-                    Navigator.pop(context, null);
-                  },
-                  style: BtnStyleExt.dialogNeu(context),
-                  child: const Text('重試'),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: FilledButton(
-                  onPressed: () {
-                    Navigator.pop(context, '!ok');
-                  },
-                  style: BtnStyleExt.dialogPos,
-                  child: const Text('確定'),
-                ),
-              ),
-            ],
+          DialogButtons.ternary(
+            context,
+            text1: '退出',
+            onPressed1: () {
+              Navigator.pop(context, _ConfirmScanDialogNav.leave);
+            },
+            text2: '重試',
+            onPressed2: () {
+              Navigator.pop(context);
+            },
+            text3: '確定',
+            onPressed3: () {
+              Navigator.pop(context, _ConfirmScanDialogNav.ok);
+            },
           ),
         ],
       ),

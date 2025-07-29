@@ -1,3 +1,4 @@
+import 'package:diabeat/util.dart';
 import 'package:flutter/material.dart';
 
 abstract class AuthState<T extends StatefulWidget> extends State<T> {
@@ -70,6 +71,16 @@ abstract class AuthState<T extends StatefulWidget> extends State<T> {
       },
       title: const Text('記住我'),
       controlAffinity: ListTileControlAffinity.leading,
+    );
+  }
+
+  OutlinedButton buildScanButton() {
+    return OutlinedButton(
+      onPressed: () {
+        Navigator.pushNamed(context, '/connection/scanner');
+      },
+      style: PageButtons.outlined,
+      child: const Icon(Icons.qr_code_scanner),
     );
   }
 

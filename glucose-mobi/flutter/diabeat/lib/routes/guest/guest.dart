@@ -33,7 +33,7 @@ class GuestPage extends StatelessWidget {
                 onPressed: () {
                   Navigator.pushNamed(context, '/guest/login');
                 },
-                style: BtnStyleExt.mainFilled,
+                style: PageButtons.filled,
                 child: const Text('登入'),
               ),
               const SizedBox(height: 10),
@@ -41,7 +41,7 @@ class GuestPage extends StatelessWidget {
                 onPressed: () {
                   Navigator.pushNamed(context, '/guest/register');
                 },
-                style: BtnStyleExt.mainOutlined,
+                style: PageButtons.outlined,
                 child: const Text('註冊'),
               ),
             ],

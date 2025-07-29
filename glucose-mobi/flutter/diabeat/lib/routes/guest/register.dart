@@ -32,11 +32,10 @@ class _RegisterPageState extends AuthState<RegisterPage> {
       validateEmail();
       _validateUsername();
       validatePassword();
+      waiting = emailErr == null && _usernameErr == null && passwordErr == null;
     });
 
-    if (emailErr != null || _usernameErr != null || passwordErr != null) return;
-
-    setState(() => waiting = true);
+    if (!waiting) return;
 
     try {
       await Request.register(
@@ -44,7 +43,7 @@ class _RegisterPageState extends AuthState<RegisterPage> {
         email: emailCtrl.text,
         username: _usernameCtrl.text,
         password: passwordCtrl.text,
-        remeberMe: rememberMe,
+        rememberMe: rememberMe,
       );
 
       if (!mounted) return;
@@ -55,6 +54,7 @@ class _RegisterPageState extends AuthState<RegisterPage> {
       setState(() {
         final data = e.response!.data;
 
+        // fix
         if (data['email'] != null) {
           emailErr = '此 Email 已被使用';
         }
@@ -113,10 +113,18 @@ class _RegisterPageState extends AuthState<RegisterPage> {
               const SizedBox(height: 20),
               buildRememberMeCheckbox(),
               const Spacer(flex: 2),
-              FilledButton(
-                onPressed: waiting ? null : _tryRegister,
-                style: BtnStyleExt.mainFilled,
-                child: const Text('註冊'),
+              Row(
+                children: [
+                  buildScanButton(),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: waiting ? null : _tryRegister,
+                      style: PageButtons.filled,
+                      child: const Text('註冊'),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

@@ -1,4 +1,5 @@
 import 'package:diabeat/routes/connection/prefs.dart';
+import 'package:diabeat/routes/connection/scanner.dart';
 import 'package:dio/dio.dart';
 import 'package:diabeat/util.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +17,9 @@ class Request {
   Request._();
   static final _dio = Dio(
     BaseOptions(
-      sendTimeout: const Duration(seconds: 1),
+      connectTimeout: const Duration(seconds: 1),
+      sendTimeout: const Duration(seconds: 3),
+      receiveTimeout: const Duration(seconds: 3),
       validateStatus: (status) {
         return status != null && status >= 200 && status < 300;
       },
@@ -39,29 +42,66 @@ class Request {
     Prefs.setAddr(value);
   }
 
-  //
-  //
-  //
+  /* */
+  /* */
+  /* */
 
-  static Future<void> _checkConnection(BuildContext context) async {
-    if (_dio.options.baseUrl.isNotEmpty) return;
+  static Future<Response<T>> _handle<T>(
+    BuildContext context,
+    Future<Response<T>> Function() builder,
+  ) async {
+    if (_dio.options.baseUrl.isEmpty) {
+      switch (await _DisconnectedDialog.show(context)) {
+        case _DisconnectedDialogNav.ok:
+          break;
 
-    if (await _DisconnectedDialog.show(context) == null) {
-      throw CancelConnectionException();
+        default:
+          throw CancelConnectionException();
+      }
     }
+
+    bool loop = true;
+    while (loop) {
+      loop = false;
+
+      try {
+        return await builder();
+      } on DioException catch (e) {
+        switch (e.type) {
+          case DioExceptionType.connectionTimeout:
+          case DioExceptionType.sendTimeout:
+          case DioExceptionType.receiveTimeout:
+            if (!context.mounted) rethrow;
+            switch (await _TimeoutDialog.show(context, e.type.toString())) {
+              case _TimeoutDialogNav.retry:
+                loop = true;
+                break;
+
+              default:
+                rethrow;
+            }
+
+          default:
+            rethrow;
+        }
+      }
+    }
+
+    throw Unreachable(); // this should not happen !
   }
 
   static Future<void> logIn(
     BuildContext context, {
     required String email,
     required String password,
-    required bool remeberMe,
+    required bool rememberMe,
   }) async {
-    await _checkConnection(context);
-
-    final res = await _dio.post<JsonMap>(
-      '/token/',
-      data: {'username_or_email': email, 'password': password},
+    final res = await _handle<JsonMap>(
+      context,
+      () => _dio.post(
+        '/token/',
+        data: {'username_or_email': email, 'password': password},
+      ),
     );
 
     _session = (
@@ -71,7 +111,7 @@ class Request {
       refreshToken: res.data!['refresh'],
     );
 
-    if (remeberMe) {
+    if (rememberMe) {
       Prefs.setEmail(email);
     }
   }
@@ -81,13 +121,14 @@ class Request {
     required String email,
     required String username,
     required String password,
-    required bool remeberMe,
+    required bool rememberMe,
   }) async {
-    await _checkConnection(context);
-
-    final res = await _dio.post<JsonMap>(
-      '/register/',
-      data: {'email': email, 'username': username, 'password': password},
+    final res = await _handle<JsonMap>(
+      context,
+      () => _dio.post(
+        '/register/',
+        data: {'email': email, 'username': username, 'password': password},
+      ),
     );
 
     _session = (
@@ -97,7 +138,7 @@ class Request {
       refreshToken: res.data!['refresh'],
     );
 
-    if (remeberMe) {
+    if (rememberMe) {
       Prefs.setEmail(email);
     }
   }
@@ -107,20 +148,33 @@ class Request {
   }
 }
 
+/* */
+/* */
+/* */
+
+class CancelConnectionException implements Exception {}
+
+class Unreachable implements Exception {}
+
+enum _DisconnectedDialogNav { ok }
+
 class _DisconnectedDialog extends StatelessWidget {
   const _DisconnectedDialog._();
 
   static Future show(BuildContext context) async {
-    var res = await showDialog(
+    final nav = await showDialog(
       context: context,
       builder: (context) => const _DisconnectedDialog._(),
     );
 
-    if (res == null || !context.mounted) {
-      return null;
-    }
-
-    return await Navigator.pushNamed(context, '/connection/scanner');
+    return switch (nav) {
+      _DisconnectedDialogNav.ok when context.mounted =>
+        switch (await Navigator.pushNamed(context, '/connection/scanner')) {
+          ScannerPageNav.ok => _DisconnectedDialogNav.ok,
+          _ => null,
+        },
+      _ => null,
+    };
   }
 
   @override
@@ -137,28 +191,15 @@ class _DisconnectedDialog extends StatelessWidget {
             style: TextStyle(fontSize: 16),
           ),
           const SizedBox(height: 20),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () {
-                    Navigator.pop(context, null);
-                  },
-                  style: BtnStyleExt.dialogNeg,
-                  child: const Text('取消'),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: FilledButton(
-                  onPressed: () {
-                    Navigator.pop(context, '!scan');
-                  },
-                  style: BtnStyleExt.dialogPos,
-                  child: const Text('掃描'),
-                ),
-              ),
-            ],
+          DialogButtons.binary(
+            text1: '取消',
+            onPressed1: () {
+              Navigator.pop(context, null);
+            },
+            text2: '連接',
+            onPressed2: () {
+              Navigator.pop(context, _DisconnectedDialogNav.ok);
+            },
           ),
         ],
       ),
@@ -166,4 +207,59 @@ class _DisconnectedDialog extends StatelessWidget {
   }
 }
 
-class CancelConnectionException implements Exception {}
+/* */
+/* */
+/* */
+
+enum _TimeoutDialogNav { retry, _scan }
+
+class _TimeoutDialog extends StatelessWidget {
+  const _TimeoutDialog._(this.type);
+  final String type;
+
+  static Future show(BuildContext context, String type) async {
+    final nav = await showDialog(
+      context: context,
+      builder: (context) => _TimeoutDialog._(type),
+    );
+
+    return switch (nav) {
+      _TimeoutDialogNav.retry => _TimeoutDialogNav.retry,
+      _TimeoutDialogNav._scan when context.mounted =>
+        switch (await Navigator.pushNamed(context, '/connection/scanner')) {
+          ScannerPageNav.ok => _TimeoutDialogNav.retry,
+          _ => null,
+        },
+      _ => null,
+    };
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Center(child: Text('請求狀態')),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(type),
+          DialogButtons.ternary(
+            context,
+            text1: '取消',
+            onPressed1: () {
+              Navigator.pop(context, null);
+            },
+            text2: '重試',
+            onPressed2: () {
+              Navigator.pop(context, _TimeoutDialogNav.retry);
+            },
+            text3: '連接',
+            onPressed3: () {
+              Navigator.pop(context, _TimeoutDialogNav._scan);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}

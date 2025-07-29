@@ -29,18 +29,17 @@ class _LoginPageState extends AuthState<LoginPage> {
       submitted = true;
       validateEmail();
       validatePassword();
+      waiting = emailErr == null && passwordErr == null;
     });
 
-    if (emailErr != null || passwordErr != null) return;
-
-    setState(() => waiting = true);
+    if (!waiting) return;
 
     try {
       await Request.logIn(
         context,
         email: emailCtrl.text,
         password: passwordCtrl.text,
-        remeberMe: rememberMe,
+        rememberMe: rememberMe,
       );
 
       if (!mounted) return;
@@ -49,14 +48,21 @@ class _LoginPageState extends AuthState<LoginPage> {
       //
     } on DioException catch (e) {
       setState(() {
-        final errMsg = e.response!.data['non_field_errors'][0];
-
-        if (errMsg == 'Email does not exist.') {
-          emailErr = 'Email 不存在';
-        } else if (errMsg == 'Incorrect password.') {
-          passwordErr = '密碼錯誤';
-        }
         waiting = false;
+
+        switch (e.type) {
+          case DioExceptionType.badResponse:
+            final errMsg = e.response!.data['non_field_errors'][0];
+            if (errMsg == 'Email does not exist.') {
+              emailErr = 'Email 不存在';
+            } else if (errMsg == 'Incorrect password.') {
+              passwordErr = '密碼錯誤';
+            }
+            break;
+
+          default:
+            break;
+        }
       });
     } on CancelConnectionException {
       setState(() => waiting = false);
@@ -69,9 +75,9 @@ class _LoginPageState extends AuthState<LoginPage> {
       appBar: AppBar(
         leading: IconButton(
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pop(context, null);
           },
-          icon: const Icon(Icons.arrow_back_ios_new_rounded),
+          icon: const Icon(Icons.arrow_back_ios_new),
         ),
       ),
       body: SafeArea(
@@ -93,10 +99,18 @@ class _LoginPageState extends AuthState<LoginPage> {
               const SizedBox(height: 20),
               buildRememberMeCheckbox(),
               const Spacer(flex: 2),
-              FilledButton(
-                onPressed: waiting ? null : _tryLogIn,
-                style: BtnStyleExt.mainFilled,
-                child: const Text('登入'),
+              Row(
+                children: [
+                  buildScanButton(),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: waiting ? null : _tryLogIn,
+                      style: PageButtons.filled,
+                      child: const Text('登入'),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
