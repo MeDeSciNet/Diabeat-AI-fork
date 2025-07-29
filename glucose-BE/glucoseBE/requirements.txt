@@ -14,3 +14,4 @@ pandas
 joblib
 scikit-learn==1.6.0
 qrcode
+
