@@ -6,12 +6,7 @@ import 'package:flutter/material.dart';
 
 typedef JsonMap = Map<String, dynamic>;
 
-typedef _Session = ({
-  String email,
-  String username,
-  String accessToken,
-  String refreshToken,
-});
+typedef _Session = ({String username, String accessToken, String refreshToken});
 
 class Request {
   Request._();
@@ -26,15 +21,21 @@ class Request {
     ),
   );
   static _Session? _session;
-  static String get email => _session!.email;
-  static String get username => _session!.username;
+
+  static bool get loggedIn => _session != null;
 
   static Future<void> init() async {
     final addr = await Prefs.getAddr();
-
     if (addr != null) {
       _dio.options.baseUrl = 'http://$addr:8000/api';
     }
+
+    final oldRefreshToken = await Prefs.getEncryptedRefreshToken();
+    if (oldRefreshToken != null) {
+      await refresh(oldRefreshToken);
+    }
+
+    _dio.interceptors.add(_AuthInterceptor(_dio, () => _session!.accessToken));
   }
 
   static void setAddr(String value) {
@@ -42,50 +43,55 @@ class Request {
     Prefs.setAddr(value);
   }
 
-  /* */
-  /* */
-  /* */
+  static void logOut() {
+    _session = null;
+  }
 
-  static Future<Response<T>> _handle<T>(
-    BuildContext context,
-    Future<Response<T>> Function() builder,
-  ) async {
-    if (_dio.options.baseUrl.isEmpty) {
-      switch (await _DisconnectedDialog.show(context)) {
-        case _DisconnectedDialogNav.ok:
-          break;
+  static Future<void> refresh([String? oldRefreshToken]) async {
+    oldRefreshToken ??= _session!.refreshToken;
 
-        default:
-          throw CancelConnectionException();
-      }
+    final res = await _dio.post<JsonMap>(
+      '/token/refresh/',
+      data: {'refresh': oldRefreshToken},
+    );
+    final data = res.data!;
+
+    _session = (
+      username: data['username'],
+      accessToken: data['access'],
+      refreshToken: data['refresh'],
+    );
+  }
+
+  static Future<void> _tryConnect(BuildContext context) async {
+    if (_dio.options.baseUrl.isNotEmpty) return;
+
+    switch (await _DisconnectedDialog.show(context)) {
+      case _DisconnectedDialogNav.ok:
+        return;
+
+      default:
+        throw CancelConnectionException();
     }
+  }
 
-    bool retry;
-    do {
-      retry = false;
+  static void _setSessionAndPrefs({
+    required String email,
+    required String username,
+    required String accessToken,
+    required String refreshToken,
+    required bool rememberMe,
+  }) {
+    _session = (
+      username: username,
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+    );
 
-      try {
-        return await builder();
-      } on DioException catch (e) {
-        switch (e.type) {
-          case DioExceptionType.connectionTimeout:
-          case DioExceptionType.sendTimeout:
-          case DioExceptionType.receiveTimeout:
-            if (!context.mounted) rethrow;
-            switch (await _TimeoutDialog.show(context, e.type.toString())) {
-              case _TimeoutDialogNav.retry:
-                retry = true;
-                break;
-
-              default:
-                rethrow;
-            }
-
-          default:
-            rethrow;
-        }
-      }
-    } while (retry);
+    if (rememberMe) {
+      Prefs.setEmail(email);
+      Prefs.setEncryptedRefreshToken(refreshToken);
+    }
   }
 
   static Future<void> logIn(
@@ -94,24 +100,21 @@ class Request {
     required String password,
     required bool rememberMe,
   }) async {
-    final res = await _handle<JsonMap>(
-      context,
-      () => _dio.post(
-        '/token/',
-        data: {'username_or_email': email, 'password': password},
-      ),
+    await _tryConnect(context);
+
+    final res = await _dio.post(
+      '/token/',
+      data: {'username_or_email': email, 'password': password},
+      options: Options(extra: {'context': context}),
     );
 
-    _session = (
+    _setSessionAndPrefs(
       email: email,
       username: res.data!['username'],
       accessToken: res.data!['access'],
       refreshToken: res.data!['refresh'],
+      rememberMe: rememberMe,
     );
-
-    if (rememberMe) {
-      Prefs.setEmail(email);
-    }
   }
 
   static Future<void> register(
@@ -121,28 +124,103 @@ class Request {
     required String password,
     required bool rememberMe,
   }) async {
-    final res = await _handle<JsonMap>(
-      context,
-      () => _dio.post(
-        '/register/',
-        data: {'email': email, 'username': username, 'password': password},
-      ),
+    await _tryConnect(context);
+
+    final res = await _dio.post(
+      '/register/',
+      data: {'email': email, 'username': username, 'password': password},
+      options: Options(extra: {'context': context}),
     );
 
-    _session = (
+    _setSessionAndPrefs(
       email: email,
       username: username,
       accessToken: res.data!['access'],
       refreshToken: res.data!['refresh'],
+      rememberMe: rememberMe,
     );
-
-    if (rememberMe) {
-      Prefs.setEmail(email);
-    }
   }
 
-  static void logOut() {
-    _session = null;
+  static Future<void> postRecord(
+    BuildContext context, {
+    required double glucose,
+    double? carbohydrate,
+    double? exercise,
+    double? insulin,
+  }) async {
+    await _dio.post(
+      '/records/',
+      data: {
+        'blood_glucose': glucose,
+        'carbohydrate_intake': carbohydrate,
+        'exercise_duration': exercise,
+        'insulin_injection': insulin,
+      },
+      options: Options(extra: {'context': context}),
+    );
+  }
+}
+
+class _AuthInterceptor extends Interceptor {
+  _AuthInterceptor(this.dio, this.getAccessToken);
+
+  final Dio dio;
+  final String Function() getAccessToken;
+  final _nonAuthPaths = const ['/register/', '/token/', '/token/refresh/'];
+
+  @override
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    if (!_nonAuthPaths.contains(options.path)) {
+      options.headers['Authorization'] = 'Bearer ${getAccessToken()}';
+    }
+
+    super.onRequest(options, handler);
+  }
+
+  @override
+  Future<void> onError(
+    DioException err,
+    ErrorInterceptorHandler handler,
+  ) async {
+    Future<void> retry() async {
+      handler.resolve(await dio.fetch(err.requestOptions));
+    }
+
+    switch (err.type) {
+      case DioExceptionType.connectionTimeout:
+      case DioExceptionType.sendTimeout:
+      case DioExceptionType.receiveTimeout:
+        {
+          final context = err.requestOptions.extra['context'] as BuildContext;
+          if (!context.mounted) break;
+
+          final nav = await _TimeoutDialog.show(context, err.type);
+          switch (nav) {
+            case _TimeoutDialogNav.retry:
+              await retry();
+              return;
+
+            default:
+              break;
+          }
+          break;
+        }
+
+      case DioExceptionType.badResponse:
+        {
+          if (err.response?.statusCode == 401) {
+            await Request.refresh();
+            await retry();
+            return;
+          }
+          break;
+        }
+
+      default:
+        break;
+    }
+
+    super.onError(err, handler);
   }
 }
 
@@ -157,7 +235,7 @@ enum _DisconnectedDialogNav { ok }
 class _DisconnectedDialog extends StatelessWidget {
   const _DisconnectedDialog._();
 
-  static Future show(BuildContext context) async {
+  static Future<dynamic> show(BuildContext context) async {
     final nav = await showDialog(
       context: context,
       builder: (context) => const _DisconnectedDialog._(),
@@ -211,9 +289,12 @@ enum _TimeoutDialogNav { retry, _scan }
 
 class _TimeoutDialog extends StatelessWidget {
   const _TimeoutDialog._(this.type);
-  final String type;
+  final DioExceptionType type;
 
-  static Future show(BuildContext context, String type) async {
+  static Future<dynamic> show(
+    BuildContext context,
+    DioExceptionType type,
+  ) async {
     final nav = await showDialog(
       context: context,
       builder: (context) => _TimeoutDialog._(type),
@@ -238,7 +319,7 @@ class _TimeoutDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(type),
+          Text(type.toString()),
           DialogButtons.ternary(
             context,
             text1: '取消',

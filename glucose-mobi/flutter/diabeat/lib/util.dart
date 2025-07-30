@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class PageButtons {
   PageButtons._();
@@ -60,13 +61,7 @@ class DialogButtons {
         Expanded(
           child: FilledButton(
             onPressed: onPressed2,
-            style: FilledButton.styleFrom(
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.horizontal(
-                  right: Radius.circular(10000),
-                ),
-              ),
-            ),
+            style: _rightButtonStyle(),
             child: Text(text2),
           ),
         ),
@@ -88,13 +83,7 @@ class DialogButtons {
         Expanded(
           child: OutlinedButton(
             onPressed: onPressed1,
-            style: OutlinedButton.styleFrom(
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.horizontal(
-                  left: Radius.circular(10000),
-                ),
-              ),
-            ),
+            style: _leftButtonStyle(),
             child: Text(text1),
           ),
         ),
@@ -116,5 +105,22 @@ class DialogButtons {
         ),
       ],
     );
+  }
+}
+
+class NonNegativeNumberFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    if (newValue.text.isEmpty) return newValue;
+
+    final value = double.tryParse(newValue.text);
+    if (value == null || value < 0) {
+      return oldValue;
+    }
+
+    return newValue;
   }
 }

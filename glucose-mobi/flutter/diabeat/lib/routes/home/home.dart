@@ -23,7 +23,7 @@ class _HomeState extends State<Home> {
     child: Scaffold(
       body: IndexedStack(
         index: _index,
-        children: [const RecordPage(), const ChartPage(), const AccountPage()],
+        children: const [RecordPage(), ChartPage(), AccountPage()],
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _index,

@@ -9,30 +9,32 @@ class ScannerPage extends StatelessWidget {
   ScannerPage({super.key});
   final _controller = MobileScannerController(formats: [BarcodeFormat.qrCode]);
 
-  Future<void> _detect(BuildContext context, BarcodeCapture barcodes) async {
-    final addrs = barcodes.barcodes.where(
-      (element) => element.rawValue?.startsWith('Diabeat ') ?? false,
-    );
+  void Function(BarcodeCapture) _detect(BuildContext context) {
+    return (BarcodeCapture barcodes) async {
+      final addrs = barcodes.barcodes.where(
+        (element) => element.rawValue?.startsWith('Diabeat ') ?? false,
+      );
 
-    if (addrs.isEmpty) return;
-    await _controller.stop(); // pause() has stupid bug
+      if (addrs.isEmpty) return;
+      await _controller.stop(); // pause() has stupid bug
 
-    if (!context.mounted) return;
-    final addr = addrs.first.rawValue!.split(' ')[1];
-    switch (await _ConfirmScanDialog.show(context, addr)) {
-      case _ConfirmScanDialogNav.leave:
-        Navigator.pop(context);
-        break;
+      if (!context.mounted) return;
+      final addr = addrs.first.rawValue!.split(' ')[1];
+      switch (await _ConfirmScanDialog.show(context, addr)) {
+        case _ConfirmScanDialogNav.leave:
+          Navigator.pop(context);
+          break;
 
-      case _ConfirmScanDialogNav.ok:
-        Request.setAddr(addr);
-        Navigator.pop(context, ScannerPageNav.ok);
-        break;
+        case _ConfirmScanDialogNav.ok:
+          Request.setAddr(addr);
+          Navigator.pop(context, ScannerPageNav.ok);
+          break;
 
-      default:
-        _controller.start();
-        break;
-    }
+        default:
+          _controller.start();
+          break;
+      }
+    };
   }
 
   @override
@@ -48,16 +50,14 @@ class ScannerPage extends StatelessWidget {
                   aspectRatio: 9 / 16,
                   child: MobileScanner(
                     controller: _controller,
-                    onDetect: (barcodes) {
-                      _detect(context, barcodes);
-                    },
+                    onDetect: _detect(context),
                   ),
                 ),
                 IconButton(
                   onPressed: () {
-                    Navigator.pop(context, null);
+                    Navigator.pop(context);
                   },
-                  icon: const Icon(Icons.arrow_back_ios_new_rounded),
+                  icon: const Icon(Icons.arrow_back_ios_new),
                 ),
               ],
             ),

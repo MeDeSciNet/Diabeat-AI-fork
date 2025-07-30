@@ -35,7 +35,7 @@ class _MainApp extends StatelessWidget {
             );
 
         return MaterialApp(
-          initialRoute: '/guest', // TODO
+          initialRoute: Request.loggedIn ? '/home' : '/guest',
           routes: {
             '/guest': (context) => const GuestPage(),
             '/guest/login': (context) => const LoginPage(),

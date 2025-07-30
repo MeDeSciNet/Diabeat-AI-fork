@@ -22,8 +22,7 @@ class _RegisterPageState extends AuthState<RegisterPage> {
   }
 
   void _validateUsername() {
-    final username = _usernameCtrl.text;
-    _usernameErr = username.isEmpty ? 'Username 不能為空' : null;
+    _usernameErr = _usernameCtrl.text.isEmpty ? 'Username 不能為空' : null;
   }
 
   Future<void> _tryRegister() async {
@@ -76,7 +75,7 @@ class _RegisterPageState extends AuthState<RegisterPage> {
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: Icon(Icons.arrow_back_ios_new_rounded),
+          icon: Icon(Icons.arrow_back_ios_new),
         ),
       ),
       body: SafeArea(
