@@ -45,6 +45,7 @@ class Request {
 
   static void logOut() {
     _session = null;
+    Prefs.delEncryptedRefreshToken();
   }
 
   static Future<void> refresh([String? oldRefreshToken]) async {

@@ -30,4 +30,8 @@ class Prefs {
   static void setEncryptedRefreshToken(String value) {
     _encryptedPrefs.write(key: 'refresh_token', value: value);
   }
+
+  static void delEncryptedRefreshToken() {
+    _encryptedPrefs.delete(key: 'refresh_token');
+  }
 }
