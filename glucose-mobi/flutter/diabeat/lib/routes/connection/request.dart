@@ -22,46 +22,44 @@ class Request {
   );
   static _Session? _session;
 
-  static bool get loggedIn => _session != null;
+  static Future<bool> init() async {
+    _dio.interceptors.add(_AuthInterceptor(_dio, () => _session!.accessToken));
 
-  static Future<void> init() async {
     final addr = await Prefs.getAddr();
-    if (addr != null) {
-      _dio.options.baseUrl = 'http://$addr:8000/api';
+    if (addr == null) {
+      return false;
     }
+    _dio.options.baseUrl = 'http://$addr:8000/api';
 
     final oldRefreshToken = await Prefs.getEncryptedRefreshToken();
-    if (oldRefreshToken != null) {
-      await refresh(oldRefreshToken);
+    if (oldRefreshToken == null) {
+      return false;
     }
 
-    _dio.interceptors.add(_AuthInterceptor(_dio, () => _session!.accessToken));
+    try {
+      await refresh(oldRefreshToken: oldRefreshToken);
+      return true;
+    } on DioException {
+      return false;
+    }
   }
 
-  static void setAddr(String value) {
-    _dio.options.baseUrl = 'http://$value:8000/api';
-    Prefs.setAddr(value);
+  static void _saveSession({
+    required String username,
+    required String accessToken,
+    required String refreshToken,
+  }) {
+    _session = (
+      username: username,
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+    );
+    Prefs.writeEncryptedRefreshToken(refreshToken);
   }
 
-  static void logOut() {
+  static void delSession() {
     _session = null;
     Prefs.delEncryptedRefreshToken();
-  }
-
-  static Future<void> refresh([String? oldRefreshToken]) async {
-    oldRefreshToken ??= _session!.refreshToken;
-
-    final res = await _dio.post<JsonMap>(
-      '/token/refresh/',
-      data: {'refresh': oldRefreshToken},
-    );
-    final data = res.data!;
-
-    _session = (
-      username: data['username'],
-      accessToken: data['access'],
-      refreshToken: data['refresh'],
-    );
   }
 
   static Future<void> _tryConnect(BuildContext context) async {
@@ -76,45 +74,64 @@ class Request {
     }
   }
 
-  static void _setSessionAndPrefs({
-    required String email,
-    required String username,
-    required String accessToken,
-    required String refreshToken,
-    required bool rememberMe,
-  }) {
-    _session = (
-      username: username,
-      accessToken: accessToken,
-      refreshToken: refreshToken,
-    );
+  static void saveConnection(String value) {
+    _dio.options.baseUrl = 'http://$value:8000/api';
+    Prefs.writeAddr(value);
+  }
 
-    if (rememberMe) {
-      Prefs.setEmail(email);
-      Prefs.setEncryptedRefreshToken(refreshToken);
-    }
+  /* */
+  /* */
+  /* ===== request ===== */
+
+  static Options makeTimeoutOpt(BuildContext context) {
+    return Options(
+      extra: {
+        'when_timeout': () async {
+          // return <dynamic>
+
+          if (!context.mounted) return null;
+          return await _TimeoutDialog.show(context);
+        },
+      },
+    );
+  }
+
+  static Future<void> refresh({String? oldRefreshToken, Options? opt}) async {
+    oldRefreshToken ??= _session!.refreshToken;
+
+    final res = await _dio.post<JsonMap>(
+      '/token/refresh/',
+      data: {'refresh': oldRefreshToken},
+      options: opt,
+    );
+    final data = res.data!;
+
+    _saveSession(
+      username: data['username'],
+      accessToken: data['access'],
+      refreshToken: data['refresh'],
+    );
   }
 
   static Future<void> logIn(
     BuildContext context, {
     required String email,
     required String password,
-    required bool rememberMe,
   }) async {
+    final extraOpt = makeTimeoutOpt(context);
     await _tryConnect(context);
 
-    final res = await _dio.post(
+    final res = await _dio.post<JsonMap>(
       '/token/',
       data: {'username_or_email': email, 'password': password},
-      options: Options(extra: {'context': context}),
+      options: extraOpt,
     );
+    final data = res.data!;
 
-    _setSessionAndPrefs(
-      email: email,
-      username: res.data!['username'],
-      accessToken: res.data!['access'],
-      refreshToken: res.data!['refresh'],
-      rememberMe: rememberMe,
+    _saveSession(
+      username: data['username'],
+      accessToken: data['access'],
+      refreshToken: data['refresh'],
     );
   }
 
@@ -123,22 +140,21 @@ class Request {
     required String email,
     required String username,
     required String password,
-    required bool rememberMe,
   }) async {
+    final extraOpt = makeTimeoutOpt(context);
     await _tryConnect(context);
 
-    final res = await _dio.post(
+    final res = await _dio.post<JsonMap>(
       '/register/',
       data: {'email': email, 'username': username, 'password': password},
-      options: Options(extra: {'context': context}),
+      options: extraOpt,
     );
+    final data = res.data!;
 
-    _setSessionAndPrefs(
-      email: email,
+    _saveSession(
       username: username,
-      accessToken: res.data!['access'],
-      refreshToken: res.data!['refresh'],
-      rememberMe: rememberMe,
+      accessToken: data['access'],
+      refreshToken: data['refresh'],
     );
   }
 
@@ -157,8 +173,24 @@ class Request {
         'exercise_duration': exercise,
         'insulin_injection': insulin,
       },
-      options: Options(extra: {'context': context}),
+      options: makeTimeoutOpt(context),
     );
+  }
+
+  static Future<double> predictCarbohydrate(BuildContext context) async {
+    // final formData = FormData.fromMap({
+    //   'image': MultipartFile.fromFile(filePath),
+    // });
+
+    final formData = null;
+
+    final res = await _dio.post<JsonMap>(
+      '/predict/',
+      data: formData,
+      options: makeTimeoutOpt(context),
+    );
+
+    return double.parse(res.data!['predicted_value']);
   }
 }
 
@@ -167,14 +199,13 @@ class _AuthInterceptor extends Interceptor {
 
   final Dio dio;
   final String Function() getAccessToken;
-  final _nonAuthPaths = const ['/register/', '/token/', '/token/refresh/'];
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    if (!_nonAuthPaths.contains(options.path)) {
+    final nonAuthPaths = const ['/register/', '/token/', '/token/refresh/'];
+    if (!nonAuthPaths.contains(options.path)) {
       options.headers['Authorization'] = 'Bearer ${getAccessToken()}';
     }
-
     super.onRequest(options, handler);
   }
 
@@ -192,11 +223,11 @@ class _AuthInterceptor extends Interceptor {
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
         {
-          final context = err.requestOptions.extra['context'] as BuildContext;
-          if (!context.mounted) break;
+          final action =
+              err.requestOptions.extra['when_timeout']
+                  as Future<dynamic> Function()?;
 
-          final nav = await _TimeoutDialog.show(context, err.type);
-          switch (nav) {
+          switch (await action?.call()) {
             case _TimeoutDialogNav.retry:
               await retry();
               return;
@@ -269,7 +300,7 @@ class _DisconnectedDialog extends StatelessWidget {
           DialogButtons.binary(
             text1: '取消',
             onPressed1: () {
-              Navigator.pop(context, null);
+              Navigator.pop(context);
             },
             text2: '連接',
             onPressed2: () {
@@ -289,16 +320,12 @@ class _DisconnectedDialog extends StatelessWidget {
 enum _TimeoutDialogNav { retry, _scan }
 
 class _TimeoutDialog extends StatelessWidget {
-  const _TimeoutDialog._(this.type);
-  final DioExceptionType type;
+  const _TimeoutDialog._();
 
-  static Future<dynamic> show(
-    BuildContext context,
-    DioExceptionType type,
-  ) async {
+  static Future<dynamic> show(BuildContext context) async {
     final nav = await showDialog(
       context: context,
-      builder: (context) => _TimeoutDialog._(type),
+      builder: (context) => const _TimeoutDialog._(),
     );
 
     return switch (nav) {
@@ -320,12 +347,12 @@ class _TimeoutDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(type.toString()),
+          const Text('連線逾時'),
           DialogButtons.ternary(
             context,
             text1: '取消',
             onPressed1: () {
-              Navigator.pop(context, null);
+              Navigator.pop(context);
             },
             text2: '重試',
             onPressed2: () {

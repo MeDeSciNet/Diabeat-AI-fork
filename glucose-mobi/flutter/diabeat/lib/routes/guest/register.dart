@@ -42,7 +42,6 @@ class _RegisterPageState extends AuthState<RegisterPage> {
         email: emailCtrl.text,
         username: _usernameCtrl.text,
         password: passwordCtrl.text,
-        rememberMe: rememberMe,
       );
 
       if (!mounted) return;
@@ -109,8 +108,6 @@ class _RegisterPageState extends AuthState<RegisterPage> {
               ),
               const SizedBox(height: 20),
               buildPasswordField(),
-              const SizedBox(height: 20),
-              buildRememberMeCheckbox(),
               const Spacer(flex: 2),
               Row(
                 children: [

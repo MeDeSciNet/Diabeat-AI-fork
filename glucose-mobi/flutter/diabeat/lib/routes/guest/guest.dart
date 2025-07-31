@@ -1,3 +1,5 @@
+import 'package:diabeat/routes/connection/prefs.dart';
+import 'package:diabeat/routes/connection/request.dart';
 import 'package:diabeat/util.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -7,6 +9,8 @@ class GuestPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    _tryLogIn(context); // sync call
+
     return Material(
       child: SafeArea(
         child: Padding(
@@ -49,6 +53,19 @@ class GuestPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _tryLogIn(BuildContext context) async {
+    final oldRefreshToken = await Prefs.getEncryptedRefreshToken();
+
+    if (oldRefreshToken == null || !context.mounted) return;
+    await Request.refresh(
+      oldRefreshToken: oldRefreshToken,
+      opt: Request.makeTimeoutOpt(context),
+    );
+
+    if (!context.mounted) return;
+    Navigator.pushReplacementNamed(context, '/home');
   }
 
   void _launchRepo() {

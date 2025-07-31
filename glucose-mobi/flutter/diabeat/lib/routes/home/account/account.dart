@@ -9,7 +9,7 @@ class AccountPage extends StatelessWidget {
     return Center(
       child: FilledButton(
         onPressed: () {
-          Request.logOut();
+          Request.delSession();
           Navigator.pushReplacementNamed(context, '/guest');
         },
         child: const Text('登出'),

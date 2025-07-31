@@ -26,7 +26,7 @@ class ScannerPage extends StatelessWidget {
           break;
 
         case _ConfirmScanDialogNav.ok:
-          Request.setAddr(addr);
+          Request.saveConnection(addr);
           Navigator.pop(context, ScannerPageNav.ok);
           break;
 

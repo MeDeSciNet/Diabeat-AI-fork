@@ -83,6 +83,12 @@ class _RecordPageState extends State<RecordPage> {
     }
   }
 
+  Future<void> _tryPredict() async {
+    // go take picutre
+    final predictedValue = await Request.predictCarbohydrate(context);
+    _carbohydrateMeta.value = predictedValue;
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -142,9 +148,7 @@ class _RecordPageState extends State<RecordPage> {
                       ),
                       const SizedBox(width: 10),
                       FilledButton(
-                        onPressed: () {
-                          //
-                        },
+                        onPressed: _tryPredict,
                         style: FilledButton.styleFrom(
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(5),
@@ -201,6 +205,9 @@ class _UnsignedDoubleFieldMeta {
   final focusNode = FocusNode();
 
   double? get value => double.tryParse(ctrl.text);
+  set value(double? value) {
+    ctrl.text = value?.toString() ?? '';
+  }
 
   void dispose() {
     ctrl.dispose();

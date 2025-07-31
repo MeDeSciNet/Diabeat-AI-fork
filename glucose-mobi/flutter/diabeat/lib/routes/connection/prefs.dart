@@ -11,23 +11,15 @@ class Prefs {
     return await _prefs.getString('addr');
   }
 
-  static void setAddr(String value) {
+  static void writeAddr(String value) {
     _prefs.setString('addr', value);
-  }
-
-  static Future<String?> getEmail() async {
-    return await _prefs.getString('email');
-  }
-
-  static void setEmail(String value) {
-    _prefs.setString('email', value);
   }
 
   static Future<String?> getEncryptedRefreshToken() async {
     return await _encryptedPrefs.read(key: 'refresh_token');
   }
 
-  static void setEncryptedRefreshToken(String value) {
+  static void writeEncryptedRefreshToken(String value) {
     _encryptedPrefs.write(key: 'refresh_token', value: value);
   }
 

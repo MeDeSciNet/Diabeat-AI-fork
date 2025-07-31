@@ -1,4 +1,3 @@
-import 'package:diabeat/routes/connection/prefs.dart';
 import 'package:diabeat/routes/connection/request.dart';
 import 'package:diabeat/routes/guest/auth_state.dart';
 import 'package:diabeat/util.dart';
@@ -13,17 +12,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends AuthState<LoginPage> {
-  @override
-  void initState() {
-    () async {
-      final email = await Prefs.getEmail();
-      if (email != null) {
-        emailCtrl.text = email;
-      }
-    }(); // sync call
-    super.initState();
-  }
-
   Future<void> _tryLogIn() async {
     setState(() {
       submitted = true;
@@ -39,7 +27,6 @@ class _LoginPageState extends AuthState<LoginPage> {
         context,
         email: emailCtrl.text,
         password: passwordCtrl.text,
-        rememberMe: rememberMe,
       );
 
       if (!mounted) return;
@@ -96,8 +83,6 @@ class _LoginPageState extends AuthState<LoginPage> {
               buildEmailField(),
               const SizedBox(height: 20),
               buildPasswordField(),
-              const SizedBox(height: 20),
-              buildRememberMeCheckbox(),
               const Spacer(flex: 2),
               Row(
                 children: [

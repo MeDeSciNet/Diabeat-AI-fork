@@ -7,7 +7,6 @@ abstract class AuthState<T extends StatefulWidget> extends State<T> {
   String? emailErr;
   String? passwordErr;
   bool _passwordObscured = true;
-  bool rememberMe = true;
   bool submitted = false;
   bool waiting = false;
 
@@ -63,17 +62,6 @@ abstract class AuthState<T extends StatefulWidget> extends State<T> {
     );
   }
 
-  CheckboxListTile buildRememberMeCheckbox() {
-    return CheckboxListTile(
-      value: rememberMe,
-      onChanged: (value) {
-        setState(() => rememberMe = value!);
-      },
-      title: const Text('記住我'),
-      controlAffinity: ListTileControlAffinity.leading,
-    );
-  }
-
   OutlinedButton buildScanButton() {
     return OutlinedButton(
       onPressed: () {
@@ -85,11 +73,12 @@ abstract class AuthState<T extends StatefulWidget> extends State<T> {
   }
 
   void validateEmail() {
+    final regex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
     final email = emailCtrl.text;
 
     if (email.isEmpty) {
       emailErr = 'Email 不能為空';
-    } else if (!email.contains('@')) {
+    } else if (!regex.hasMatch(email)) {
       emailErr = 'Email 格式不正確';
     } else {
       emailErr = null;
