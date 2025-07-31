@@ -37,7 +37,7 @@ class Request {
     }
 
     try {
-      await refresh(oldRefreshToken: oldRefreshToken);
+      await refresh();
       return true;
     } on DioException {
       return false;
@@ -57,7 +57,7 @@ class Request {
     Prefs.writeEncryptedRefreshToken(refreshToken);
   }
 
-  static void delSession() {
+  static void deleteSession() {
     _session = null;
     Prefs.delEncryptedRefreshToken();
   }
@@ -83,7 +83,7 @@ class Request {
   /* */
   /* ===== request ===== */
 
-  static Options makeTimeoutOpt(BuildContext context) {
+  static Options _makeTimeoutOpt(BuildContext context) {
     return Options(
       extra: {
         'when_timeout': () async {
@@ -96,8 +96,17 @@ class Request {
     );
   }
 
-  static Future<void> refresh({String? oldRefreshToken, Options? opt}) async {
-    oldRefreshToken ??= _session!.refreshToken;
+  static Future<void> refresh([BuildContext? context]) async {
+    Options? opt;
+    String oldRefreshToken;
+
+    if (_session == null) {
+      opt = _makeTimeoutOpt(context!);
+      oldRefreshToken = (await Prefs.getEncryptedRefreshToken())!;
+    } else {
+      assert(context != null, 'You should not pass context here !');
+      oldRefreshToken = _session!.refreshToken;
+    }
 
     final res = await _dio.post<JsonMap>(
       '/token/refresh/',
@@ -118,7 +127,7 @@ class Request {
     required String email,
     required String password,
   }) async {
-    final extraOpt = makeTimeoutOpt(context);
+    final extraOpt = _makeTimeoutOpt(context);
     await _tryConnect(context);
 
     final res = await _dio.post<JsonMap>(
@@ -141,7 +150,7 @@ class Request {
     required String username,
     required String password,
   }) async {
-    final extraOpt = makeTimeoutOpt(context);
+    final extraOpt = _makeTimeoutOpt(context);
     await _tryConnect(context);
 
     final res = await _dio.post<JsonMap>(
@@ -173,7 +182,7 @@ class Request {
         'exercise_duration': exercise,
         'insulin_injection': insulin,
       },
-      options: makeTimeoutOpt(context),
+      options: _makeTimeoutOpt(context),
     );
   }
 
@@ -187,7 +196,7 @@ class Request {
     final res = await _dio.post<JsonMap>(
       '/predict/',
       data: formData,
-      options: makeTimeoutOpt(context),
+      options: _makeTimeoutOpt(context),
     );
 
     return double.parse(res.data!['predicted_value']);

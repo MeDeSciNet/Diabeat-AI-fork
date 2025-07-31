@@ -9,7 +9,7 @@ class GuestPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    _tryLogIn(context); // sync call
+    _tryRefresh(context); // sync call
 
     return Material(
       child: SafeArea(
@@ -55,14 +55,11 @@ class GuestPage extends StatelessWidget {
     );
   }
 
-  Future<void> _tryLogIn(BuildContext context) async {
+  Future<void> _tryRefresh(BuildContext context) async {
     final oldRefreshToken = await Prefs.getEncryptedRefreshToken();
 
     if (oldRefreshToken == null || !context.mounted) return;
-    await Request.refresh(
-      oldRefreshToken: oldRefreshToken,
-      opt: Request.makeTimeoutOpt(context),
-    );
+    await Request.refresh(context);
 
     if (!context.mounted) return;
     Navigator.pushReplacementNamed(context, '/home');
