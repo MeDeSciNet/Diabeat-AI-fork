@@ -9,13 +9,13 @@ import 'package:dynamic_color/dynamic_color.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final loggedIn = await Request.init();
-  runApp(_MainApp(loggedIn));
+  final haveAccount = await Request.init();
+  runApp(_MainApp(haveAccount));
 }
 
 class _MainApp extends StatelessWidget {
-  const _MainApp(this.loggedIn);
-  final bool loggedIn;
+  const _MainApp(this.haveAccount);
+  final bool haveAccount;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +36,7 @@ class _MainApp extends StatelessWidget {
             );
 
         return MaterialApp(
-          initialRoute: loggedIn ? '/home' : '/guest',
+          initialRoute: haveAccount ? '/home' : '/guest',
           routes: {
             '/guest': (context) => const GuestPage(),
             '/guest/login': (context) => const LoginPage(),

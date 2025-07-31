@@ -15,8 +15,9 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) => PopScope(
+    canPop: _index == 0,
     onPopInvokedWithResult: (didPop, result) {
-      if (!didPop) {
+      if (!didPop && _index != 0) {
         setState(() => _index = 0);
       }
     },
