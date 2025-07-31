@@ -356,7 +356,8 @@ class _TimeoutDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text('連線逾時'),
+          const Text('連線逾時', textAlign: TextAlign.center),
+          const SizedBox(height: 20),
           DialogButtons.ternary(
             context,
             text1: '取消',
