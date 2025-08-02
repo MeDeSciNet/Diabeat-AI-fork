@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:diabeat/routes/connection/connection.dart' as connection;
+import 'package:diabeat/routes/connection/prefs.dart' as prefs;
 import 'package:diabeat/routes/connection/session.dart' as session;
 import 'package:diabeat/routes/connection/timeout_dialog.dart';
 import 'package:flutter/material.dart';
@@ -20,8 +21,15 @@ Future<Result> _request(
 
   final url = connection.makeUrl(path);
 
+  // 解構?
   final Map<String, String>? headers;
-  if (auth && session.loggedIn) {
+  if (auth) {
+    if (!session.loggedIn) {
+      if (!context.mounted || !await _refreshFromPrefs(context)) {
+        assert(false, '[!] refresh failed');
+        return Result.failed();
+      }
+    }
     headers = {'Authorization': session.accessToken};
   } else {
     headers = null;
@@ -46,10 +54,8 @@ Future<Result> _request(
       if (200 <= status && status < 300) {
         return Result.successful(body);
       } else if (status == 401) {
-        if (!await _refresh()) {
-          // refresh failed
-          // should not happen !
-          assert(false, 'Refresh Failed !');
+        if (!await _refreshFromSession()) {
+          assert(false, '[!] refresh failed');
           return Result.failed();
         }
         retry = true;
@@ -72,35 +78,48 @@ Future<Result> _request(
     }
   } while (retry);
 
-  assert(false, 'should not goto here !');
+  assert(false, '[!] escape jail');
   return Result.failed();
 }
 
-Future<bool> _refresh() async {
-  final url = connection.makeUrl('/api/token/refresh/');
-  final oldRefreshToken = await session.getRefreshToken();
-  final duration = const Duration(seconds: 3);
+Future<bool> _rawRefresh(String oldRefreshToken) async {
+  final res = await http
+      .post(
+        connection.makeUrl('/api/token/refresh/'),
+        body: {'refresh': oldRefreshToken},
+      )
+      .timeout(const Duration(seconds: 3));
 
-  try {
-    final res = await http
-        .post(url, body: {'refresh': oldRefreshToken})
-        .timeout(duration);
-    final status = res.statusCode;
-
-    if (200 <= status && status < 300) {
-      final data = jsonDecode(res.body);
-      session.save(
-        username: data['username'],
-        accessToken: data['access'],
-        refreshToken: data['refresh'],
-      );
-      return true;
-    }
-
-    return false;
-  } on TimeoutException {
-    return false;
+  final status = res.statusCode;
+  if (200 <= status && status < 300) {
+    final data = jsonDecode(res.body);
+    session.save(
+      username: data['username'],
+      accessToken: data['access'],
+      refreshToken: data['refresh'],
+    );
+    return true;
   }
+
+  return false;
+}
+
+Future<bool> _refreshFromPrefs(BuildContext context) async {
+  final oldRefreshToken = await prefs.readRefreshToken();
+
+  while (true) {
+    try {
+      return await _rawRefresh(oldRefreshToken);
+    } on TimeoutException {
+      if (!context.mounted || await TimeoutDialog.show(context) == null) {
+        return false;
+      }
+    }
+  }
+}
+
+Future<bool> _refreshFromSession() {
+  return _rawRefresh(session.refreshToken);
 }
 
 /* */

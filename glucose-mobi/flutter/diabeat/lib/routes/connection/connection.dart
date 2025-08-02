@@ -27,12 +27,6 @@ Future<bool> connect(BuildContext context) async {
     return true;
   }
 
-  if (!context.mounted) {
-    return false;
-  }
-
-  return switch (await Navigator.pushNamed(context, '/scanner')) {
-    ScannerPageNav.ok => true,
-    _ => false,
-  };
+  return context.mounted &&
+      await Navigator.pushNamed(context, '/scanner') == ScannerPageNav.ok;
 }
