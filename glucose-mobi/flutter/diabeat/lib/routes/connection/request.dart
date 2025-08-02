@@ -22,16 +22,15 @@ Future<Result> _request(
   final url = connection.makeUrl(path);
   final headers = {'Content-Type': 'application/json'};
   if (auth) {
-    if (!session.loggedIn) {
-      if (!context.mounted || !await _refreshFromPrefs(context)) {
-        // invalid account !
-
-        if (context.mounted) {
-          Navigator.popUntil(context, (route) => route.isFirst);
-        }
-        return Result.failed();
+    if (!session.loggedIn &&
+        (!context.mounted || !await _refreshFromPrefs(context))) {
+      if (context.mounted) {
+        session.delete();
+        Navigator.pushNamedAndRemoveUntil(context, '/guest', (route) => false);
       }
+      return Result.failed();
     }
+
     headers['Authorization'] = 'Bearer ${session.accessToken}';
   }
   final stringBody = jsonEncode(body);

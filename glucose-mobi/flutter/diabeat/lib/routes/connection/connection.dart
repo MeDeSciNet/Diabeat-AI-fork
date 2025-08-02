@@ -1,5 +1,5 @@
-import 'package:diabeat/nav.dart';
 import 'package:diabeat/routes/connection/prefs.dart' as prefs;
+import 'package:diabeat/routes/connection/scanner.dart';
 import 'package:flutter/material.dart';
 
 String? _addr;

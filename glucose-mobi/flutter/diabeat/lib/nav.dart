@@ -1,1 +1,0 @@
-enum ScannerPageNav { ok }
