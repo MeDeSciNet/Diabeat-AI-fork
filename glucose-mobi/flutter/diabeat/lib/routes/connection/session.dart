@@ -5,7 +5,13 @@ import 'package:diabeat/routes/connection/prefs.dart' as prefs;
 bool get loggedIn => _session != null;
 String get username => _session!.username;
 String get accessToken => _session!.accessToken;
-String get refreshToken => _session!.refreshToken;
+
+Future<String> getRefreshToken() async {
+  if (loggedIn) {
+    return _session!.refreshToken;
+  }
+  return await prefs.readRefreshToken();
+}
 
 void save({
   required String username,

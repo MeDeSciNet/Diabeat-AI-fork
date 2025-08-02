@@ -1,267 +1,105 @@
-import 'package:diabeat/routes/connection/prefs.dart';
-import 'package:diabeat/routes/connection/scanner.dart';
-import 'package:dio/dio.dart';
-import 'package:diabeat/util.dart';
+import 'dart:async';
+import 'dart:convert';
+import 'package:diabeat/routes/connection/connection.dart' as connection;
+import 'package:diabeat/routes/connection/session.dart' as session;
+import 'package:diabeat/routes/connection/timeout_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
-typedef JsonMap = Map<String, dynamic>;
+Future<Result> _request(
+  BuildContext context,
+  _Method method,
+  String path, {
+  Map<String, dynamic>? body,
+  bool auth = false,
+  int timeout = 3,
+}) async {
+  if (!await connection.connect(context)) {
+    return Result.failed();
+  }
 
-typedef _Session = ({String username, String accessToken, String refreshToken});
+  final url = connection.makeUrl(path);
 
-class Request {
-  Request._();
-  static final _dio = Dio(
-    BaseOptions(
-      connectTimeout: const Duration(seconds: 1),
-      sendTimeout: const Duration(seconds: 3),
-      receiveTimeout: const Duration(seconds: 3),
-      validateStatus: (status) {
-        return status != null && status >= 200 && status < 300;
-      },
-    ),
-  );
-  static _Session? _session;
+  final Map<String, String>? headers;
+  if (auth && session.loggedIn) {
+    headers = {'Authorization': session.accessToken};
+  } else {
+    headers = null;
+  }
 
-  static Future<bool> init() async {
-    _dio.interceptors.add(_AuthInterceptor(_dio, () => _session!.accessToken));
+  final duration = Duration(seconds: timeout);
+  final send = switch (method) {
+    _Method.post =>
+      () => http.post(url, headers: headers, body: body).timeout(duration),
+    _Method.get => () => http.get(url, headers: headers).timeout(duration),
+  };
 
-    final addr = await Prefs.getAddr();
-    if (addr == null) {
-      return false;
-    }
-    _dio.options.baseUrl = 'http://$addr:8000/api';
-
-    final oldRefreshToken = await Prefs.getEncryptedRefreshToken();
-    if (oldRefreshToken == null) {
-      return false;
-    }
+  bool retry;
+  do {
+    retry = false;
 
     try {
-      await refresh();
+      final res = await send();
+      final status = res.statusCode;
+      final body = res.body;
+
+      if (200 <= status && status < 300) {
+        return Result.successful(body);
+      } else if (status == 401) {
+        if (!await _refresh()) {
+          // refresh failed
+          // should not happen !
+          assert(false, 'Refresh Failed !');
+          return Result.failed();
+        }
+        retry = true;
+      } else {
+        return Result.failed(body);
+      }
+    } on TimeoutException {
+      if (!context.mounted) {
+        return Result.failed();
+      }
+
+      switch (await TimeoutDialog.show(context)) {
+        case TimeoutDialogNav.retry:
+          retry = true;
+          break;
+
+        default:
+          return Result.failed();
+      }
+    }
+  } while (retry);
+
+  assert(false, 'should not goto here !');
+  return Result.failed();
+}
+
+Future<bool> _refresh() async {
+  final url = connection.makeUrl('/api/token/refresh/');
+  final oldRefreshToken = await session.getRefreshToken();
+  final duration = const Duration(seconds: 3);
+
+  try {
+    final res = await http
+        .post(url, body: {'refresh': oldRefreshToken})
+        .timeout(duration);
+    final status = res.statusCode;
+
+    if (200 <= status && status < 300) {
+      final data = jsonDecode(res.body);
+      session.save(
+        username: data['username'],
+        accessToken: data['access'],
+        refreshToken: data['refresh'],
+      );
       return true;
-    } on DioException {
-      return false;
-    }
-  }
-
-  static void _saveSession({
-    required String username,
-    required String accessToken,
-    required String refreshToken,
-  }) {
-    _session = (
-      username: username,
-      accessToken: accessToken,
-      refreshToken: refreshToken,
-    );
-    Prefs.writeEncryptedRefreshToken(refreshToken);
-  }
-
-  static void deleteSession() {
-    _session = null;
-    Prefs.delEncryptedRefreshToken();
-  }
-
-  static Future<void> _tryConnect(BuildContext context) async {
-    if (_dio.options.baseUrl.isNotEmpty) return;
-
-    switch (await _DisconnectedDialog.show(context)) {
-      case _DisconnectedDialogNav.ok:
-        return;
-
-      default:
-        throw CancelConnectionException();
-    }
-  }
-
-  static void saveConnection(String value) {
-    _dio.options.baseUrl = 'http://$value:8000/api';
-    Prefs.writeAddr(value);
-  }
-
-  /* */
-  /* */
-  /* ===== request ===== */
-
-  static Options _makeTimeoutOpt(BuildContext context) {
-    return Options(
-      extra: {
-        'when_timeout': () async {
-          // return <dynamic>
-
-          if (!context.mounted) return null;
-          return await _TimeoutDialog.show(context);
-        },
-      },
-    );
-  }
-
-  static Future<void> refresh([BuildContext? context]) async {
-    Options? opt;
-    String oldRefreshToken;
-
-    if (_session == null) {
-      opt = _makeTimeoutOpt(context!);
-      oldRefreshToken = (await Prefs.getEncryptedRefreshToken())!;
-    } else {
-      assert(context != null, 'You should not pass context here !');
-      oldRefreshToken = _session!.refreshToken;
     }
 
-    final res = await _dio.post<JsonMap>(
-      '/token/refresh/',
-      data: {'refresh': oldRefreshToken},
-      options: opt,
-    );
-    final data = res.data!;
-
-    _saveSession(
-      username: data['username'],
-      accessToken: data['access'],
-      refreshToken: data['refresh'],
-    );
-  }
-
-  static Future<void> logIn(
-    BuildContext context, {
-    required String email,
-    required String password,
-  }) async {
-    final extraOpt = _makeTimeoutOpt(context);
-    await _tryConnect(context);
-
-    final res = await _dio.post<JsonMap>(
-      '/token/',
-      data: {'username_or_email': email, 'password': password},
-      options: extraOpt,
-    );
-    final data = res.data!;
-
-    _saveSession(
-      username: data['username'],
-      accessToken: data['access'],
-      refreshToken: data['refresh'],
-    );
-  }
-
-  static Future<void> register(
-    BuildContext context, {
-    required String email,
-    required String username,
-    required String password,
-  }) async {
-    final extraOpt = _makeTimeoutOpt(context);
-    await _tryConnect(context);
-
-    final res = await _dio.post<JsonMap>(
-      '/register/',
-      data: {'email': email, 'username': username, 'password': password},
-      options: extraOpt,
-    );
-    final data = res.data!;
-
-    _saveSession(
-      username: username,
-      accessToken: data['access'],
-      refreshToken: data['refresh'],
-    );
-  }
-
-  static Future<void> postRecord(
-    BuildContext context, {
-    required double glucose,
-    double? carbohydrate,
-    double? exercise,
-    double? insulin,
-  }) async {
-    await _dio.post(
-      '/records/',
-      data: {
-        'blood_glucose': glucose,
-        'carbohydrate_intake': carbohydrate,
-        'exercise_duration': exercise,
-        'insulin_injection': insulin,
-      },
-      options: _makeTimeoutOpt(context),
-    );
-  }
-
-  static Future<double> predictCarbohydrate(BuildContext context) async {
-    // final formData = FormData.fromMap({
-    //   'image': MultipartFile.fromFile(filePath),
-    // });
-
-    final formData = null;
-
-    final res = await _dio.post<JsonMap>(
-      '/predict/',
-      data: formData,
-      options: _makeTimeoutOpt(context),
-    );
-
-    return double.parse(res.data!['predicted_value']);
-  }
-}
-
-class _AuthInterceptor extends Interceptor {
-  _AuthInterceptor(this.dio, this.getAccessToken);
-
-  final Dio dio;
-  final String Function() getAccessToken;
-
-  @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    final nonAuthPaths = const ['/register/', '/token/', '/token/refresh/'];
-    if (!nonAuthPaths.contains(options.path)) {
-      options.headers['Authorization'] = 'Bearer ${getAccessToken()}';
-    }
-    super.onRequest(options, handler);
-  }
-
-  @override
-  Future<void> onError(
-    DioException err,
-    ErrorInterceptorHandler handler,
-  ) async {
-    Future<void> retry() async {
-      handler.resolve(await dio.fetch(err.requestOptions));
-    }
-
-    switch (err.type) {
-      case DioExceptionType.connectionTimeout:
-      case DioExceptionType.sendTimeout:
-      case DioExceptionType.receiveTimeout:
-        {
-          final action =
-              err.requestOptions.extra['when_timeout']
-                  as Future<dynamic> Function()?;
-
-          switch (await action?.call()) {
-            case _TimeoutDialogNav.retry:
-              await retry();
-              return;
-
-            default:
-              break;
-          }
-          break;
-        }
-
-      case DioExceptionType.badResponse:
-        {
-          if (err.response?.statusCode == 401) {
-            await Request.refresh();
-            await retry();
-            return;
-          }
-          break;
-        }
-
-      default:
-        break;
-    }
-
-    super.onError(err, handler);
+    return false;
+  } on TimeoutException {
+    return false;
   }
 }
 
@@ -269,8 +107,94 @@ class _AuthInterceptor extends Interceptor {
 /* */
 /* */
 
+Future<Result> logIn(
+  BuildContext context, {
+  required String email,
+  required String password,
+}) async {
+  final result = await _request(
+    context,
+    _Method.post,
+    '/api/token/',
+    body: {'username_or_email': email, 'password': password},
+  );
+
+  if (result.ok) {
+    final data = result.data;
+    session.save(
+      username: data['username'],
+      accessToken: data['access'],
+      refreshToken: data['refresh'],
+    );
+  }
+
+  return result;
+}
+
+Future<Result> register(
+  BuildContext context, {
+  required String email,
+  required String username,
+  required String password,
+}) async {
+  final result = await _request(
+    context,
+    _Method.post,
+    '/api/register/',
+    body: {'email': email, 'username': username, 'password': password},
+  );
+
+  if (result.ok) {
+    final data = result.data;
+    session.save(
+      username: username,
+      accessToken: data['access'],
+      refreshToken: data['refresh'],
+    );
+  }
+
+  return result;
+}
+
+Future<Result> postRecord(
+  BuildContext context, {
+  required double glucose,
+  double? carbohydrate,
+  double? exercise,
+  double? insulin,
+}) async {
+  return await _request(
+    context,
+    _Method.post,
+    '/api/records/',
+    body: {
+      'blood_glucose': glucose,
+      'carbohydrate_intake': carbohydrate,
+      'exercise_duration': exercise,
+      'insulin_injection': insulin,
+    },
+    auth: true,
+  );
+}
+
+Future<Result> predictCarbohydrate(BuildContext context) async {
+  // TODO
+  return await _request(context, _Method.post, '/api/predict/', auth: true);
+}
 
 /* */
 /* */
 /* */
 
+class Result {
+  Result._(this.ok, [String? body])
+    : data = body == null ? null : jsonDecode(body);
+
+  Result.successful([String? body]) : this._(true, body);
+  Result.failed([String? body]) : this._(false, body);
+
+  final bool ok;
+  final dynamic data;
+}
+
+enum _Method { post, get }
