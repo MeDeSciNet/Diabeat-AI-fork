@@ -24,7 +24,11 @@ Future<Result> _request(
   if (auth) {
     if (!session.loggedIn) {
       if (!context.mounted || !await _refreshFromPrefs(context)) {
-        assert(false, '[!] refresh failed');
+        // invalid account !
+
+        if (context.mounted) {
+          Navigator.popUntil(context, (route) => route.isFirst);
+        }
         return Result.failed();
       }
     }
@@ -53,6 +57,8 @@ Future<Result> _request(
         return Result.successful(body);
       } else if (status == 401) {
         if (!await _refreshFromSession()) {
+          // should not happen !
+
           assert(false, '[!] refresh failed');
           return Result.failed();
         }

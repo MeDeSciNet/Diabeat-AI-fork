@@ -47,7 +47,6 @@ class _RecordPageState extends State<RecordPage> {
       exercise: _exerciseMeta.value,
       insulin: _insulinMeta.value,
     );
-    final data = result.data;
 
     setState(() => _waiting = false);
 
@@ -65,7 +64,7 @@ class _RecordPageState extends State<RecordPage> {
         ),
       );
     } else {
-      // do sth...
+      //
     }
   }
 
