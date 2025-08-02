@@ -2,6 +2,8 @@ import 'package:diabeat/nav.dart';
 import 'package:diabeat/util.dart';
 import 'package:flutter/material.dart';
 
+enum DisconnectedDialogNav { ok }
+
 class DisconnectedDialog extends StatelessWidget {
   const DisconnectedDialog._();
 
@@ -13,7 +15,7 @@ class DisconnectedDialog extends StatelessWidget {
 
     return switch (nav) {
       DisconnectedDialogNav.ok when context.mounted =>
-        switch (await Navigator.pushNamed(context, '/connection/scanner')) {
+        switch (await Navigator.pushNamed(context, '/scanner')) {
           ScannerPageNav.ok => DisconnectedDialogNav.ok,
           _ => null,
         },

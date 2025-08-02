@@ -13,6 +13,10 @@ bool get existAddr => _addr != null;
 
 String get addr => _addr!;
 
+Uri makeUrl(String path) {
+  return Uri.http('$addr:8000', path);
+}
+
 Future<bool> connect(BuildContext context) async {
   if (existAddr) {
     return true;
@@ -27,5 +31,8 @@ Future<bool> connect(BuildContext context) async {
     return false;
   }
 
-  return await Navigator.pushNamed(context, '/scanner') == ScannerPageNav.ok;
+  return switch (await Navigator.pushNamed(context, '/scanner')) {
+    ScannerPageNav.ok => true,
+    _ => false,
+  };
 }
