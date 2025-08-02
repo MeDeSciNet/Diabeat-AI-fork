@@ -1,29 +1,48 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-class Prefs {
-  static final _prefs = SharedPreferencesAsync();
-  static final _encryptedPrefs = const FlutterSecureStorage(
-    aOptions: AndroidOptions(encryptedSharedPreferences: true),
-  );
+final _prefs = SharedPreferencesAsync();
 
-  static Future<String?> getAddr() async {
-    return await _prefs.getString('addr');
-  }
+void writeAddr(String addr) {
+  _prefs.setString('addr', addr);
+}
 
-  static void writeAddr(String value) {
-    _prefs.setString('addr', value);
-  }
+Future<String?> _readRawAddr() {
+  return _prefs.getString('addr');
+}
 
-  static Future<String?> getEncryptedRefreshToken() async {
-    return await _encryptedPrefs.read(key: 'refresh_token');
-  }
+Future<bool> existAddr() async {
+  return await _readRawAddr() != null;
+}
 
-  static void writeEncryptedRefreshToken(String value) {
-    _encryptedPrefs.write(key: 'refresh_token', value: value);
-  }
+Future<String> readAddr() async {
+  return (await _readRawAddr())!;
+}
 
-  static void delEncryptedRefreshToken() {
-    _encryptedPrefs.delete(key: 'refresh_token');
-  }
+/* */
+/* */
+/* ===== Encrypted Shared Prefs ===== */
+
+final _encryptedPrefs = const FlutterSecureStorage(
+  aOptions: AndroidOptions(encryptedSharedPreferences: true),
+);
+
+void writeRefreshToken(String refreshToken) {
+  _encryptedPrefs.write(key: 'refresh_token', value: refreshToken);
+}
+
+void deleteRefreshToken() {
+  _encryptedPrefs.delete(key: 'refresh_token');
+}
+
+Future<String?> _readRawRefreshToken() {
+  return _encryptedPrefs.read(key: 'refresh_token');
+}
+
+Future<bool> existRefreshToken() async {
+  return await _readRawRefreshToken() != null;
+}
+
+Future<String> readRefreshToken() async {
+  return (await _readRawRefreshToken())!;
 }
