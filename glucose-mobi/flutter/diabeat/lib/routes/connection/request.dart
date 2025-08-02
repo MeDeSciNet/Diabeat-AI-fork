@@ -20,9 +20,7 @@ Future<Result> _request(
   }
 
   final url = connection.makeUrl(path);
-
-  // 解構?
-  final Map<String, String>? headers;
+  final headers = {'Content-Type': 'application/json'};
   if (auth) {
     if (!session.loggedIn) {
       if (!context.mounted || !await _refreshFromPrefs(context)) {
@@ -30,15 +28,15 @@ Future<Result> _request(
         return Result.failed();
       }
     }
-    headers = {'Authorization': session.accessToken};
-  } else {
-    headers = null;
+    headers['Authorization'] = 'Bearer ${session.accessToken}';
   }
-
+  final stringBody = jsonEncode(body);
   final duration = Duration(seconds: timeout);
   final send = switch (method) {
     _Method.post =>
-      () => http.post(url, headers: headers, body: body).timeout(duration),
+      () =>
+          http.post(url, headers: headers, body: stringBody).timeout(duration),
+
     _Method.get => () => http.get(url, headers: headers).timeout(duration),
   };
 

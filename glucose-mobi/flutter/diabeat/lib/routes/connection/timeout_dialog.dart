@@ -16,7 +16,7 @@ class TimeoutDialog extends StatelessWidget {
     return switch (nav) {
       TimeoutDialogNav.retry => TimeoutDialogNav.retry,
       TimeoutDialogNav._scan when context.mounted =>
-        switch (await Navigator.pushNamed(context, '/connection/scanner')) {
+        switch (await Navigator.pushNamed(context, '/scanner')) {
           ScannerPageNav.ok => TimeoutDialogNav.retry,
           _ => null,
         },

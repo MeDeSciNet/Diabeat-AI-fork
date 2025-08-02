@@ -42,7 +42,7 @@ class _MainApp extends StatelessWidget {
             '/guest/login': (context) => const LoginPage(),
             '/guest/register': (context) => const RegisterPage(),
             '/home': (context) => const Home(),
-            '/connection/scanner': (context) => ScannerPage(),
+            '/scanner': (context) => ScannerPage(),
           },
           theme: ThemeData(useMaterial3: true, colorScheme: lightDynamic),
           darkTheme: ThemeData(useMaterial3: true, colorScheme: darkDynamic),

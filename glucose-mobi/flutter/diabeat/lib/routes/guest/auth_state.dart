@@ -65,7 +65,7 @@ abstract class AuthState<T extends StatefulWidget> extends State<T> {
   OutlinedButton buildScanButton() {
     return OutlinedButton(
       onPressed: () {
-        Navigator.pushNamed(context, '/connection/scanner');
+        Navigator.pushNamed(context, '/scanner');
       },
       style: PageButtons.outlined,
       child: const Icon(Icons.qr_code_scanner),
