@@ -1,7 +1,6 @@
-import 'package:diabeat/routes/connection/request.dart';
+import 'package:diabeat/routes/connection/request.dart' as request;
 import 'package:diabeat/routes/guest/auth_state.dart';
 import 'package:diabeat/util.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
@@ -19,40 +18,35 @@ class _LoginPageState extends AuthState<LoginPage> {
       validatePassword();
       waiting = emailErr == null && passwordErr == null;
     });
-
     if (!waiting) return;
 
-    try {
-      await Request.logIn(
-        context,
-        email: emailCtrl.text,
-        password: passwordCtrl.text,
-      );
+    final result = await request.logIn(
+      context,
+      email: emailCtrl.text,
+      password: passwordCtrl.text,
+    );
+    final data = result.data;
 
+    if (result.ok) {
       if (!mounted) return;
       Navigator.pop(context);
       Navigator.pushReplacementNamed(context, '/home');
       //
-    } on DioException catch (e) {
+    } else {
       setState(() {
         waiting = false;
 
-        switch (e.type) {
-          case DioExceptionType.badResponse:
-            final errMsg = e.response!.data['non_field_errors'][0];
-            if (errMsg == 'Email does not exist.') {
-              emailErr = 'Email 不存在';
-            } else if (errMsg == 'Incorrect password.') {
-              passwordErr = '密碼錯誤';
-            }
+        if (data == null) return;
+        switch (data['non_field_errors'][0]) {
+          case 'Email does not exist.':
+            emailErr = 'Email 不存在';
             break;
 
-          default:
+          case 'Incorrect password.':
+            passwordErr = '密碼錯誤';
             break;
         }
       });
-    } on CancelConnectionException {
-      setState(() => waiting = false);
     }
   }
 

@@ -1,4 +1,4 @@
-import 'package:diabeat/routes/connection/request.dart';
+import 'package:diabeat/routes/connection/prefs.dart' as prefs;
 import 'package:diabeat/routes/connection/scanner.dart';
 import 'package:diabeat/routes/guest/guest.dart';
 import 'package:diabeat/routes/guest/login.dart';
@@ -9,13 +9,13 @@ import 'package:dynamic_color/dynamic_color.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final haveAccount = await Request.init();
-  runApp(_MainApp(haveAccount));
+  final everLoggedIn = await prefs.existRefreshToken();
+  runApp(_MainApp(everLoggedIn));
 }
 
 class _MainApp extends StatelessWidget {
-  const _MainApp(this.haveAccount);
-  final bool haveAccount;
+  const _MainApp(this.everLoggedIn);
+  final bool everLoggedIn;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +36,7 @@ class _MainApp extends StatelessWidget {
             );
 
         return MaterialApp(
-          initialRoute: haveAccount ? '/home' : '/guest',
+          initialRoute: everLoggedIn ? '/home' : '/guest',
           routes: {
             '/guest': (context) => const GuestPage(),
             '/guest/login': (context) => const LoginPage(),

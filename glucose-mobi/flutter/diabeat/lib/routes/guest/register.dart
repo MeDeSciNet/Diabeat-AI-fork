@@ -1,7 +1,6 @@
-import 'package:diabeat/routes/connection/request.dart';
+import 'package:diabeat/routes/connection/request.dart' as request;
 import 'package:diabeat/routes/guest/auth_state.dart';
 import 'package:diabeat/util.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -22,7 +21,15 @@ class _RegisterPageState extends AuthState<RegisterPage> {
   }
 
   void _validateUsername() {
-    _usernameErr = _usernameCtrl.text.isEmpty ? 'Username 不能為空' : null;
+    final username = _usernameCtrl.text;
+
+    if (username.isEmpty) {
+      _usernameErr = 'Username 不能為空';
+    } else if (username.length > 30) {
+      _usernameErr = 'Username 長度應不超過 30';
+    } else {
+      _usernameErr = null;
+    }
   }
 
   Future<void> _tryRegister() async {
@@ -33,36 +40,36 @@ class _RegisterPageState extends AuthState<RegisterPage> {
       validatePassword();
       waiting = emailErr == null && _usernameErr == null && passwordErr == null;
     });
-
     if (!waiting) return;
 
-    try {
-      await Request.register(
-        context,
-        email: emailCtrl.text,
-        username: _usernameCtrl.text,
-        password: passwordCtrl.text,
-      );
+    final result = await request.register(
+      context,
+      email: emailCtrl.text,
+      username: _usernameCtrl.text,
+      password: passwordCtrl.text,
+    );
+    final data = result.data;
 
+    if (result.ok) {
       if (!mounted) return;
       Navigator.pop(context);
       Navigator.pushReplacementNamed(context, '/home');
       //
-    } on DioException catch (e) {
+    } else {
       setState(() {
-        final data = e.response!.data;
-
-        // fix
-        if (data['email'] != null) {
-          emailErr = '此 Email 已被使用';
-        }
-        if (data['username'] != null) {
-          _usernameErr = '此 Username 已被使用';
-        }
         waiting = false;
+
+        if (data == null) return;
+        emailErr = switch (data['email']) {
+          'Enter a valid email address.' => 'Email 格式不正確',
+          'custom user with this email already exists.' => '此 Email 已被使用',
+          _ => '錯誤',
+        };
+        _usernameErr = switch (data['username']) {
+          'custom user with this username already exists.' => '此 Username 已被使用',
+          _ => '錯誤',
+        };
       });
-    } on CancelConnectionException {
-      setState(() => waiting = false);
     }
   }
 

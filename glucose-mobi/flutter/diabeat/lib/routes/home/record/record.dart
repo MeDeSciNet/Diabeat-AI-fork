@@ -1,6 +1,5 @@
-import 'package:diabeat/routes/connection/request.dart';
+import 'package:diabeat/routes/connection/request.dart' as request;
 import 'package:diabeat/util.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 class RecordPage extends StatefulWidget {
@@ -39,54 +38,39 @@ class _RecordPageState extends State<RecordPage> {
       _validateGlucose();
       _waiting = _glucoseErr == null;
     });
-
     if (!_waiting) return;
 
-    try {
-      await Request.postRecord(
-        context,
-        glucose: _glucoseMeta.value!,
-        carbohydrate: _carbohydrateMeta.value,
-        exercise: _exerciseMeta.value,
-        insulin: _insulinMeta.value,
-      );
+    final result = await request.postRecord(
+      context,
+      glucose: _glucoseMeta.value!,
+      carbohydrate: _carbohydrateMeta.value,
+      exercise: _exerciseMeta.value,
+      insulin: _insulinMeta.value,
+    );
+    final data = result.data;
 
+    setState(() => _waiting = false);
+
+    if (result.ok) {
       _glucoseMeta.clear();
       _carbohydrateMeta.clear();
       _exerciseMeta.clear();
       _insulinMeta.clear();
-      setState(() => _waiting = false);
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Center(child: Text('送出成功')),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
-    } on DioException catch (e) {
-      setState(() {
-        _waiting = false;
-
-        switch (e.type) {
-          case DioExceptionType.badResponse:
-            // do sth...
-            break;
-
-          default:
-            break;
-        }
-      });
-    } on CancelConnectionException {
-      setState(() => _waiting = false);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('送出成功'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } else {
+      // do sth...
     }
   }
 
   Future<void> _tryPredict() async {
-    // go take picutre
-    final predictedValue = await Request.predictCarbohydrate(context);
-    _carbohydrateMeta.value = predictedValue;
+    await request.predictCarbohydrate(context);
   }
 
   @override

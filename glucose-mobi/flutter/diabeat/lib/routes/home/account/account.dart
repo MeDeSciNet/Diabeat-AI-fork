@@ -1,4 +1,4 @@
-import 'package:diabeat/routes/connection/request.dart';
+import 'package:diabeat/routes/connection/session.dart' as session;
 import 'package:flutter/material.dart';
 
 class AccountPage extends StatelessWidget {
@@ -9,7 +9,7 @@ class AccountPage extends StatelessWidget {
     return Center(
       child: FilledButton(
         onPressed: () {
-          Request.deleteSession();
+          session.delete();
           Navigator.pushReplacementNamed(context, '/guest');
         },
         child: const Text('登出'),
