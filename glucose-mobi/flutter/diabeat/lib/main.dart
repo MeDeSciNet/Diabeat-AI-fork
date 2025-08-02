@@ -1,5 +1,5 @@
-import 'package:diabeat/routes/connection/prefs.dart' as prefs;
-import 'package:diabeat/routes/connection/scanner.dart';
+import 'package:diabeat/routes/network/prefs.dart' as prefs;
+import 'package:diabeat/routes/network/scanner.dart';
 import 'package:diabeat/routes/guest/guest.dart';
 import 'package:diabeat/routes/guest/login.dart';
 import 'package:diabeat/routes/guest/register.dart';

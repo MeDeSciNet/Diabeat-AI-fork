@@ -1,4 +1,4 @@
-import 'package:diabeat/routes/connection/request.dart' as request;
+import 'package:diabeat/routes/network/request.dart' as request;
 import 'package:diabeat/util.dart';
 import 'package:flutter/material.dart';
 

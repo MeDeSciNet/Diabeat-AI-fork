@@ -1,4 +1,4 @@
-import 'package:diabeat/routes/connection/prefs.dart' as prefs;
+import 'package:diabeat/routes/network/prefs.dart' as prefs;
 
 ({String username, String accessToken, String refreshToken})? _session;
 

@@ -1,4 +1,4 @@
-import 'package:diabeat/routes/connection/connection.dart' as connection;
+import 'package:diabeat/routes/network/connection.dart' as connection;
 import 'package:diabeat/util.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';

@@ -1,4 +1,4 @@
-import 'package:diabeat/routes/connection/session.dart' as session;
+import 'package:diabeat/routes/network/session.dart' as session;
 import 'package:flutter/material.dart';
 
 class AccountPage extends StatelessWidget {

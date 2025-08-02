@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:diabeat/routes/connection/connection.dart' as connection;
-import 'package:diabeat/routes/connection/prefs.dart' as prefs;
-import 'package:diabeat/routes/connection/session.dart' as session;
-import 'package:diabeat/routes/connection/timeout_dialog.dart';
+import 'package:diabeat/routes/network/connection.dart' as connection;
+import 'package:diabeat/routes/network/prefs.dart' as prefs;
+import 'package:diabeat/routes/network/session.dart' as session;
+import 'package:diabeat/routes/network/timeout_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 

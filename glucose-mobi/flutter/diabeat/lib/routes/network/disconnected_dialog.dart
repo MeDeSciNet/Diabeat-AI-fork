@@ -1,4 +1,4 @@
-import 'package:diabeat/routes/connection/scanner.dart';
+import 'package:diabeat/routes/network/scanner.dart';
 import 'package:diabeat/util.dart';
 import 'package:flutter/material.dart';
 
