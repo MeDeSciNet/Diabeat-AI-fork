@@ -1,9 +1,8 @@
-import 'package:diabeat/routes/connection/request.dart';
+import 'package:diabeat/nav.dart';
+import 'package:diabeat/routes/connection/connection.dart' as connection;
 import 'package:diabeat/util.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-
-enum ScannerPageNav { ok }
 
 class ScannerPage extends StatelessWidget {
   ScannerPage({super.key});
@@ -26,7 +25,7 @@ class ScannerPage extends StatelessWidget {
           break;
 
         case _ConfirmScanDialogNav.ok:
-          Request.saveConnection(addr);
+          connection.connectTo(addr);
           Navigator.pop(context, ScannerPageNav.ok);
           break;
 

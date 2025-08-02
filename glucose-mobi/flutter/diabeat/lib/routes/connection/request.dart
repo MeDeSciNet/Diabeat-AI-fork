@@ -269,58 +269,6 @@ class _AuthInterceptor extends Interceptor {
 /* */
 /* */
 
-class CancelConnectionException implements Exception {}
-
-enum _DisconnectedDialogNav { ok }
-
-class _DisconnectedDialog extends StatelessWidget {
-  const _DisconnectedDialog._();
-
-  static Future<dynamic> show(BuildContext context) async {
-    final nav = await showDialog(
-      context: context,
-      builder: (context) => const _DisconnectedDialog._(),
-    );
-
-    return switch (nav) {
-      _DisconnectedDialogNav.ok when context.mounted =>
-        switch (await Navigator.pushNamed(context, '/connection/scanner')) {
-          ScannerPageNav.ok => _DisconnectedDialogNav.ok,
-          _ => null,
-        },
-      _ => null,
-    };
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('連線狀態', textAlign: TextAlign.center),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const Text(
-            '尚未連接到伺服器',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 16),
-          ),
-          const SizedBox(height: 20),
-          DialogButtons.binary(
-            text1: '取消',
-            onPressed1: () {
-              Navigator.pop(context);
-            },
-            text2: '連接',
-            onPressed2: () {
-              Navigator.pop(context, _DisconnectedDialogNav.ok);
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 /* */
 /* */
