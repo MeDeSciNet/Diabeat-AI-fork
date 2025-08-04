@@ -1,4 +1,4 @@
-import 'package:diabeat/util.dart';
+import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 
 abstract class AuthState<T extends StatefulWidget> extends State<T> {
@@ -67,7 +67,7 @@ abstract class AuthState<T extends StatefulWidget> extends State<T> {
       onPressed: () {
         Navigator.pushNamed(context, '/scanner');
       },
-      style: PageButtons.outlined,
+      style: util.outlinedPageButtonStyle(),
       child: const Icon(Icons.qr_code_scanner),
     );
   }

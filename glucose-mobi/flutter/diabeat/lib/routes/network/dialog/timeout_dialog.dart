@@ -1,5 +1,5 @@
-import 'package:diabeat/routes/network/scanner.dart';
-import 'package:diabeat/util.dart';
+import 'package:diabeat/routes/network/scanner_nav.dart';
+import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 
 enum TimeoutDialogNav { retry, _scan }
@@ -34,7 +34,7 @@ class TimeoutDialog extends StatelessWidget {
         children: [
           const Text('連線逾時', textAlign: TextAlign.center),
           const SizedBox(height: 20),
-          DialogButtons.ternary(
+          util.ternaryDialogButtons(
             context,
             text1: '取消',
             onPressed1: () {

@@ -1,4 +1,4 @@
-import 'package:diabeat/util.dart';
+import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -33,7 +33,7 @@ class GuestPage extends StatelessWidget {
                 onPressed: () {
                   Navigator.pushNamed(context, '/guest/login');
                 },
-                style: PageButtons.filled,
+                style: util.filledPageButtonStyle(),
                 child: const Text('登入'),
               ),
               const SizedBox(height: 10),
@@ -41,7 +41,7 @@ class GuestPage extends StatelessWidget {
                 onPressed: () {
                   Navigator.pushNamed(context, '/guest/register');
                 },
-                style: PageButtons.outlined,
+                style: util.outlinedPageButtonStyle(),
                 child: const Text('註冊'),
               ),
             ],

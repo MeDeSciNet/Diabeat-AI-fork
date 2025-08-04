@@ -1,6 +1,6 @@
 import 'package:diabeat/routes/network/request.dart' as request;
 import 'package:diabeat/routes/guest/auth_state.dart';
-import 'package:diabeat/util.dart';
+import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
@@ -85,7 +85,7 @@ class _LoginPageState extends AuthState<LoginPage> {
                   Expanded(
                     child: FilledButton(
                       onPressed: waiting ? null : _tryLogIn,
-                      style: PageButtons.filled,
+                      style: util.filledPageButtonStyle(),
                       child: const Text('登入'),
                     ),
                   ),

@@ -1,6 +1,6 @@
 import 'package:diabeat/routes/network/request.dart' as request;
 import 'package:diabeat/routes/guest/auth_state.dart';
-import 'package:diabeat/util.dart';
+import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -123,7 +123,7 @@ class _RegisterPageState extends AuthState<RegisterPage> {
                   Expanded(
                     child: FilledButton(
                       onPressed: waiting ? null : _tryRegister,
-                      style: PageButtons.filled,
+                      style: util.filledPageButtonStyle(),
                       child: const Text('註冊'),
                     ),
                   ),

@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:diabeat/routes/network/connection.dart' as connection;
-import 'package:diabeat/routes/network/prefs.dart' as prefs;
+import 'package:diabeat/routes/network/result.dart';
 import 'package:diabeat/routes/network/session.dart' as session;
-import 'package:diabeat/routes/network/timeout_dialog.dart';
+import 'package:diabeat/routes/network/dialog/timeout_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+
+enum _Method { post, get }
 
 Future<Result> _request(
   BuildContext context,
@@ -15,22 +17,18 @@ Future<Result> _request(
   bool auth = false,
   int timeout = 3,
 }) async {
-  if (!await connection.connect(context)) {
+  // step 1 : connect
+  if (!await connection.tryConnect(context)) {
     return Result.failed();
   }
 
+  // step 2 : make headers & body
   final url = connection.makeUrl(path);
   final headers = {'Content-Type': 'application/json'};
   if (auth) {
-    if (!session.loggedIn &&
-        (!context.mounted || !await _refreshFromPrefs(context))) {
-      if (context.mounted) {
-        session.delete();
-        Navigator.pushNamedAndRemoveUntil(context, '/guest', (route) => false);
-      }
+    if (!context.mounted || !await session.tryAuthorize(context)) {
       return Result.failed();
     }
-
     headers['Authorization'] = 'Bearer ${session.accessToken}';
   }
   final stringBody = jsonEncode(body);
@@ -43,6 +41,7 @@ Future<Result> _request(
     _Method.get => () => http.get(url, headers: headers).timeout(duration),
   };
 
+  // step 3 : send & retry request
   bool retry;
   do {
     retry = false;
@@ -55,10 +54,7 @@ Future<Result> _request(
       if (200 <= status && status < 300) {
         return Result.successful(body);
       } else if (status == 401) {
-        if (!await _refreshFromSession()) {
-          // should not happen !
-
-          assert(false, '[!] refresh failed');
+        if (!context.mounted || !await session.tryRefresh(context)) {
           return Result.failed();
         }
         retry = true;
@@ -84,50 +80,6 @@ Future<Result> _request(
   assert(false, '[!] escape jail');
   return Result.failed();
 }
-
-Future<bool> _rawRefresh(String oldRefreshToken) async {
-  final res = await http
-      .post(
-        connection.makeUrl('/api/token/refresh/'),
-        body: {'refresh': oldRefreshToken},
-      )
-      .timeout(const Duration(seconds: 3));
-
-  final status = res.statusCode;
-  if (200 <= status && status < 300) {
-    final data = jsonDecode(res.body);
-    session.save(
-      username: data['username'],
-      accessToken: data['access'],
-      refreshToken: data['refresh'],
-    );
-    return true;
-  }
-
-  return false;
-}
-
-Future<bool> _refreshFromPrefs(BuildContext context) async {
-  final oldRefreshToken = await prefs.readRefreshToken();
-
-  while (true) {
-    try {
-      return await _rawRefresh(oldRefreshToken);
-    } on TimeoutException {
-      if (!context.mounted || await TimeoutDialog.show(context) == null) {
-        return false;
-      }
-    }
-  }
-}
-
-Future<bool> _refreshFromSession() {
-  return _rawRefresh(session.refreshToken);
-}
-
-/* */
-/* */
-/* */
 
 Future<Result> logIn(
   BuildContext context, {
@@ -203,20 +155,3 @@ Future<Result> predictCarbohydrate(BuildContext context) async {
   // TODO
   return await _request(context, _Method.post, '/api/predict/', auth: true);
 }
-
-/* */
-/* */
-/* */
-
-class Result {
-  Result._(this.ok, [String? body])
-    : data = body == null ? null : jsonDecode(body);
-
-  Result.successful([String? body]) : this._(true, body);
-  Result.failed([String? body]) : this._(false, body);
-
-  final bool ok;
-  final dynamic data;
-}
-
-enum _Method { post, get }

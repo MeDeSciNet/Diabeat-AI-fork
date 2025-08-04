@@ -1,5 +1,5 @@
-import 'package:diabeat/routes/network/scanner.dart';
-import 'package:diabeat/util.dart';
+import 'package:diabeat/routes/network/scanner_nav.dart';
+import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 
 enum DisconnectedDialogNav { ok }
@@ -37,7 +37,7 @@ class DisconnectedDialog extends StatelessWidget {
             style: TextStyle(fontSize: 16),
           ),
           const SizedBox(height: 20),
-          DialogButtons.binary(
+          util.binaryDialogButtons(
             text1: '取消',
             onPressed1: () {
               Navigator.pop(context);

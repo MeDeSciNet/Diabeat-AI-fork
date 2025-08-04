@@ -1,9 +1,8 @@
 import 'package:diabeat/routes/network/connection.dart' as connection;
-import 'package:diabeat/util.dart';
+import 'package:diabeat/routes/network/dialog/confirm_scan_dialog.dart';
+import 'package:diabeat/routes/network/scanner_nav.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-
-enum ScannerPageNav { ok }
 
 class ScannerPage extends StatelessWidget {
   ScannerPage({super.key});
@@ -20,12 +19,12 @@ class ScannerPage extends StatelessWidget {
 
       if (!context.mounted) return;
       final addr = addrs.first.rawValue!.split(' ')[1];
-      switch (await _ConfirmScanDialog.show(context, addr)) {
-        case _ConfirmScanDialogNav.leave:
+      switch (await ConfirmScanDialog.show(context, addr)) {
+        case ConfirmScanDialogNav.leave:
           Navigator.pop(context);
           break;
 
-        case _ConfirmScanDialogNav.ok:
+        case ConfirmScanDialogNav.ok:
           connection.connectTo(addr);
           Navigator.pop(context, ScannerPageNav.ok);
           break;
@@ -93,55 +92,6 @@ class _SliderWidgetState extends State<_SliderWidget> {
         widget.controller.setZoomScale(_scale);
       },
       year2023: false, // deprecated
-    );
-  }
-}
-
-enum _ConfirmScanDialogNav { leave, ok }
-
-class _ConfirmScanDialog extends StatelessWidget {
-  const _ConfirmScanDialog._(this._addr);
-  final String _addr;
-
-  static Future show(BuildContext context, String addr) async {
-    return await showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => _ConfirmScanDialog._(addr),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('連線狀態', textAlign: TextAlign.center),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            '確定連接到 $_addr ?',
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 16),
-          ),
-          const SizedBox(height: 20),
-          DialogButtons.ternary(
-            context,
-            text1: '退出',
-            onPressed1: () {
-              Navigator.pop(context, _ConfirmScanDialogNav.leave);
-            },
-            text2: '重試',
-            onPressed2: () {
-              Navigator.pop(context);
-            },
-            text3: '確定',
-            onPressed3: () {
-              Navigator.pop(context, _ConfirmScanDialogNav.ok);
-            },
-          ),
-        ],
-      ),
     );
   }
 }

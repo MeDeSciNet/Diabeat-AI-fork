@@ -1,5 +1,5 @@
 import 'package:diabeat/routes/network/request.dart' as request;
-import 'package:diabeat/util.dart';
+import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 
 class RecordPage extends StatefulWidget {
@@ -94,7 +94,7 @@ class _RecordPageState extends State<RecordPage> {
                   controller: _glucoseMeta.ctrl,
                   focusNode: _glucoseMeta.focusNode,
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
-                  inputFormatters: [NonNegativeNumberFormatter()],
+                  inputFormatters: util.nonNegativeNumberFormatters(),
                   textInputAction: TextInputAction.next,
                   onSubmitted: _carbohydrateMeta.focus(context),
                   decoration: InputDecoration(
@@ -120,7 +120,7 @@ class _RecordPageState extends State<RecordPage> {
                           keyboardType: TextInputType.numberWithOptions(
                             decimal: true,
                           ),
-                          inputFormatters: [NonNegativeNumberFormatter()],
+                          inputFormatters: util.nonNegativeNumberFormatters(),
                           textInputAction: TextInputAction.next,
                           onSubmitted: _exerciseMeta.focus(context),
                           decoration: InputDecoration(
@@ -147,7 +147,7 @@ class _RecordPageState extends State<RecordPage> {
                   controller: _exerciseMeta.ctrl,
                   focusNode: _exerciseMeta.focusNode,
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
-                  inputFormatters: [NonNegativeNumberFormatter()],
+                  inputFormatters: util.nonNegativeNumberFormatters(),
                   textInputAction: TextInputAction.next,
                   onSubmitted: _insulinMeta.focus(context),
                   decoration: InputDecoration(
@@ -160,7 +160,7 @@ class _RecordPageState extends State<RecordPage> {
                   controller: _insulinMeta.ctrl,
                   focusNode: _insulinMeta.focusNode,
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
-                  inputFormatters: [NonNegativeNumberFormatter()],
+                  inputFormatters: util.nonNegativeNumberFormatters(),
                   textInputAction: TextInputAction.done,
                   decoration: InputDecoration(
                     labelText: '胰島素注射量 (U)',
@@ -172,7 +172,7 @@ class _RecordPageState extends State<RecordPage> {
             const Spacer(),
             FilledButton(
               onPressed: _waiting ? null : _tryPostRecord,
-              style: PageButtons.filled,
+              style: util.filledPageButtonStyle(),
               child: const Text('送出'),
             ),
             const Spacer(),
