@@ -11,6 +11,8 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends AuthState<LoginPage> {
+  final _passwordFocus = FocusNode();
+
   Future<void> _tryLogIn() async {
     setState(() {
       submitted = true;
@@ -25,19 +27,21 @@ class _LoginPageState extends AuthState<LoginPage> {
       email: emailCtrl.text,
       password: passwordCtrl.text,
     );
-    final data = result.data;
 
     if (result.ok) {
-      if (!mounted) return;
-      Navigator.pop(context);
-      Navigator.pushReplacementNamed(context, '/home');
-      //
+      if (mounted) {
+        Navigator.pop(context);
+        Navigator.pushReplacementNamed(context, '/home');
+      }
     } else {
+      _passwordFocus.requestFocus();
+
       setState(() {
         waiting = false;
 
-        if (data == null) return;
-        switch (data['non_field_errors'][0]) {
+        if (!result.haveData) return;
+
+        switch (result.dataAsMap['non_field_errors'][0]) {
           case 'Email does not exist.':
             emailErr = 'Email 不存在';
             break;
@@ -76,7 +80,24 @@ class _LoginPageState extends AuthState<LoginPage> {
               const Spacer(flex: 1),
               buildEmailField(),
               const SizedBox(height: 20),
-              buildPasswordField(),
+              TextField(
+                controller: passwordCtrl,
+                focusNode: _passwordFocus,
+                keyboardType: TextInputType.visiblePassword,
+                textInputAction: TextInputAction.send,
+                obscureText: passwordObscured,
+                decoration: makePasswordDecoration(),
+                onChanged: (value) {
+                  if (submitted) {
+                    setState(validatePassword);
+                  }
+                },
+                onSubmitted: waiting
+                    ? null
+                    : (value) {
+                        _tryLogIn();
+                      },
+              ),
               const Spacer(flex: 2),
               Row(
                 children: [

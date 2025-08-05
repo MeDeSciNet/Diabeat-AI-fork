@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:diabeat/routes/network/connection.dart' as connection;
-import 'package:diabeat/routes/network/dialog/ghost_account_dialog.dart';
+import 'package:diabeat/routes/network/dialog/refresh_failed_dialog.dart';
 import 'package:diabeat/routes/network/dialog/timeout_dialog.dart';
 import 'package:diabeat/routes/network/prefs.dart' as prefs;
 import 'package:flutter/material.dart';
@@ -32,16 +32,17 @@ void delete() {
   prefs.deleteRefreshToken();
 }
 
-Future<bool> _rawRefresh(BuildContext context, String oldRefreshToken) async {
+Future<bool> _refresh(BuildContext context, String oldRefreshToken) async {
   final res = await http
       .post(
-        connection.makeUrl('/api/token/refresh/'),
+        connection.makeUrl('/token/refresh'),
         body: {'refresh': oldRefreshToken},
       )
       .timeout(const Duration(seconds: 3));
+
   final status = res.statusCode;
 
-  if (200 <= status && status < 300) {
+  if (status == 200) {
     final data = jsonDecode(res.body);
     save(
       username: data['username'],
@@ -52,7 +53,7 @@ Future<bool> _rawRefresh(BuildContext context, String oldRefreshToken) async {
   }
 
   if (context.mounted) {
-    GhostAccountDialog.show(context);
+    RefreshFailedDialog.show(context);
   }
   return false;
 }
@@ -65,7 +66,7 @@ Future<bool> tryAuthorize(BuildContext context) async {
   final oldRefreshToken = await prefs.readRefreshToken();
   while (true) {
     try {
-      return context.mounted && await _rawRefresh(context, oldRefreshToken);
+      return context.mounted && await _refresh(context, oldRefreshToken);
       //
     } on TimeoutException {
       if (!context.mounted || await TimeoutDialog.show(context) == null) {
@@ -76,5 +77,5 @@ Future<bool> tryAuthorize(BuildContext context) async {
 }
 
 Future<bool> tryRefresh(BuildContext context) {
-  return _rawRefresh(context, refreshToken);
+  return _refresh(context, refreshToken);
 }

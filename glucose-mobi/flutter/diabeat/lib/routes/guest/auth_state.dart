@@ -6,7 +6,7 @@ abstract class AuthState<T extends StatefulWidget> extends State<T> {
   final passwordCtrl = TextEditingController();
   String? emailErr;
   String? passwordErr;
-  bool _passwordObscured = true;
+  bool passwordObscured = true;
   bool submitted = false;
   bool waiting = false;
 
@@ -35,38 +35,29 @@ abstract class AuthState<T extends StatefulWidget> extends State<T> {
     );
   }
 
-  TextField buildPasswordField() {
-    return TextField(
-      controller: passwordCtrl,
-      keyboardType: TextInputType.visiblePassword,
-      textInputAction: TextInputAction.done,
-      decoration: InputDecoration(
-        labelText: '密碼',
-        errorText: passwordErr,
-        border: const OutlineInputBorder(),
-        suffixIcon: IconButton(
-          onPressed: () {
-            setState(() => _passwordObscured ^= true);
-          },
-          icon: _passwordObscured
-              ? const Icon(Icons.visibility)
-              : const Icon(Icons.visibility_off),
-        ),
+  InputDecoration makePasswordDecoration() {
+    return InputDecoration(
+      labelText: '密碼',
+      errorText: passwordErr,
+      border: const OutlineInputBorder(),
+      suffixIcon: IconButton(
+        onPressed: () {
+          setState(() => passwordObscured ^= true);
+        },
+        icon: passwordObscured
+            ? const Icon(Icons.visibility)
+            : const Icon(Icons.visibility_off),
       ),
-      obscureText: _passwordObscured,
-      onChanged: (value) {
-        if (submitted) {
-          setState(validatePassword);
-        }
-      },
     );
   }
 
   OutlinedButton buildScanButton() {
     return OutlinedButton(
-      onPressed: () {
-        Navigator.pushNamed(context, '/scanner');
-      },
+      onPressed: waiting
+          ? null
+          : () {
+              Navigator.pushNamed(context, '/scanner');
+            },
       style: util.outlinedPageButtonStyle(),
       child: const Icon(Icons.qr_code_scanner),
     );

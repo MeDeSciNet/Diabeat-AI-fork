@@ -9,4 +9,8 @@ class Result {
 
   final bool ok;
   final dynamic data;
+  bool get haveData => data != null;
+  Map<String, dynamic> get dataAsMap => data;
+  List<Map<String, dynamic>> get dataAsList =>
+      (data as List).cast<Map<String, dynamic>>();
 }

@@ -1,14 +1,14 @@
 import 'package:diabeat/routes/network/session.dart' as session;
 import 'package:flutter/material.dart';
 
-class GhostAccountDialog extends StatelessWidget {
-  const GhostAccountDialog._();
+class RefreshFailedDialog extends StatelessWidget {
+  const RefreshFailedDialog._();
 
   static void show(BuildContext context) {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const GhostAccountDialog._(),
+      builder: (context) => const RefreshFailedDialog._(),
     );
   }
 

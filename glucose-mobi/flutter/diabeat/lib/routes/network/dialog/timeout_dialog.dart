@@ -1,12 +1,14 @@
-import 'package:diabeat/routes/network/scanner_nav.dart';
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 
-enum TimeoutDialogNav { retry, _scan }
+enum _TimeoutDialogNav { scan, retry }
 
 class TimeoutDialog extends StatelessWidget {
   const TimeoutDialog._();
 
+  /// retry  : true
+  ///
+  /// cancel : null
   static Future<dynamic> show(BuildContext context) async {
     final nav = await showDialog(
       context: context,
@@ -14,12 +16,11 @@ class TimeoutDialog extends StatelessWidget {
     );
 
     return switch (nav) {
-      TimeoutDialogNav.retry => TimeoutDialogNav.retry,
-      TimeoutDialogNav._scan when context.mounted =>
-        switch (await Navigator.pushNamed(context, '/scanner')) {
-          ScannerPageNav.ok => TimeoutDialogNav.retry,
-          _ => null,
-        },
+      _TimeoutDialogNav.scan when context.mounted => await Navigator.pushNamed(
+        context,
+        '/scanner',
+      ),
+      _TimeoutDialogNav.retry => true,
       _ => null,
     };
   }
@@ -32,22 +33,37 @@ class TimeoutDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text('連線逾時', textAlign: TextAlign.center),
+          const Text(
+            '連線逾時',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 16),
+          ),
           const SizedBox(height: 20),
-          util.ternaryDialogButtons(
-            context,
-            text1: '取消',
-            onPressed1: () {
+          FilledButton.icon(
+            onPressed: () {
+              Navigator.pop(context, _TimeoutDialogNav.scan);
+            },
+            style: util.filledPageButtonStyle(),
+            icon: const Icon(Icons.qr_code_scanner),
+            label: const Text('連接'),
+          ),
+          const SizedBox(height: 10),
+          FilledButton.tonalIcon(
+            onPressed: () {
+              Navigator.pop(context, _TimeoutDialogNav.retry);
+            },
+            style: util.tonalPageButtonStyle(context),
+            icon: const Icon(Icons.replay),
+            label: const Text('重試'),
+          ),
+          const SizedBox(height: 10),
+          OutlinedButton.icon(
+            onPressed: () {
               Navigator.pop(context);
             },
-            text2: '重試',
-            onPressed2: () {
-              Navigator.pop(context, TimeoutDialogNav.retry);
-            },
-            text3: '連接',
-            onPressed3: () {
-              Navigator.pop(context, TimeoutDialogNav._scan);
-            },
+            style: util.outlinedPageButtonStyle(),
+            icon: const Icon(Icons.close),
+            label: const Text('取消'),
           ),
         ],
       ),

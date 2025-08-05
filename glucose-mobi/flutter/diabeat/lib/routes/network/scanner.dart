@@ -1,12 +1,16 @@
 import 'package:diabeat/routes/network/connection.dart' as connection;
 import 'package:diabeat/routes/network/dialog/confirm_scan_dialog.dart';
-import 'package:diabeat/routes/network/scanner_nav.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+/// connected    : true
+///
+/// disconnected : null
 class ScannerPage extends StatelessWidget {
   ScannerPage({super.key});
-  final _controller = MobileScannerController(formats: [BarcodeFormat.qrCode]);
+  final _controller = MobileScannerController(
+    formats: const [BarcodeFormat.qrCode],
+  );
 
   void Function(BarcodeCapture) _detect(BuildContext context) {
     return (BarcodeCapture barcodes) async {
@@ -20,13 +24,13 @@ class ScannerPage extends StatelessWidget {
       if (!context.mounted) return;
       final addr = addrs.first.rawValue!.split(' ')[1];
       switch (await ConfirmScanDialog.show(context, addr)) {
-        case ConfirmScanDialogNav.leave:
-          Navigator.pop(context);
+        case true:
+          connection.connectTo(addr);
+          Navigator.pop(context, true);
           break;
 
-        case ConfirmScanDialogNav.ok:
-          connection.connectTo(addr);
-          Navigator.pop(context, ScannerPageNav.ok);
+        case false:
+          Navigator.pop(context);
           break;
 
         default:

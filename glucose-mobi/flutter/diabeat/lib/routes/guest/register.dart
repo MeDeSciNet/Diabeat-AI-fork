@@ -48,7 +48,6 @@ class _RegisterPageState extends AuthState<RegisterPage> {
       username: _usernameCtrl.text,
       password: passwordCtrl.text,
     );
-    final data = result.data;
 
     if (result.ok) {
       if (!mounted) return;
@@ -59,13 +58,15 @@ class _RegisterPageState extends AuthState<RegisterPage> {
       setState(() {
         waiting = false;
 
-        if (data == null) return;
-        emailErr = switch (data['email']) {
+        if (!result.haveData) return;
+
+        final data = result.dataAsMap;
+        emailErr = switch (data['email'][0]) {
           'Enter a valid email address.' => 'Email 格式不正確',
           'custom user with this email already exists.' => '此 Email 已被使用',
           _ => '錯誤',
         };
-        _usernameErr = switch (data['username']) {
+        _usernameErr = switch (data['username'][0]) {
           'custom user with this username already exists.' => '此 Username 已被使用',
           _ => '錯誤',
         };
@@ -114,7 +115,18 @@ class _RegisterPageState extends AuthState<RegisterPage> {
                 },
               ),
               const SizedBox(height: 20),
-              buildPasswordField(),
+              TextField(
+                controller: passwordCtrl,
+                keyboardType: TextInputType.visiblePassword,
+                textInputAction: TextInputAction.done,
+                obscureText: passwordObscured,
+                decoration: makePasswordDecoration(),
+                onChanged: (value) {
+                  if (submitted) {
+                    setState(validatePassword);
+                  }
+                },
+              ),
               const Spacer(flex: 2),
               Row(
                 children: [

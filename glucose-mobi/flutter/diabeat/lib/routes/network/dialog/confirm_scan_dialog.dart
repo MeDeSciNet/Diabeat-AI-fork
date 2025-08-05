@@ -1,13 +1,16 @@
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 
-enum ConfirmScanDialogNav { leave, ok }
-
 class ConfirmScanDialog extends StatelessWidget {
   const ConfirmScanDialog._(this._addr);
   final String _addr;
 
-  static Future show(BuildContext context, String addr) async {
+  /// confirm scan : true
+  ///
+  /// re-scan      : null
+  ///
+  /// cancel scan  : false
+  static Future<dynamic> show(BuildContext context, String addr) async {
     return await showDialog(
       context: context,
       barrierDismissible: false,
@@ -29,20 +32,31 @@ class ConfirmScanDialog extends StatelessWidget {
             style: const TextStyle(fontSize: 16),
           ),
           const SizedBox(height: 20),
-          util.ternaryDialogButtons(
-            context,
-            text1: '退出',
-            onPressed1: () {
-              Navigator.pop(context, ConfirmScanDialogNav.leave);
+          FilledButton.icon(
+            onPressed: () {
+              Navigator.pop(context, true);
             },
-            text2: '重試',
-            onPressed2: () {
+            style: util.filledPageButtonStyle(),
+            icon: const Icon(Icons.check),
+            label: const Text('確定'),
+          ),
+          const SizedBox(height: 10),
+          FilledButton.tonalIcon(
+            onPressed: () {
               Navigator.pop(context);
             },
-            text3: '確定',
-            onPressed3: () {
-              Navigator.pop(context, ConfirmScanDialogNav.ok);
+            style: util.tonalPageButtonStyle(context),
+            icon: const Icon(Icons.qr_code_scanner),
+            label: const Text('重掃'),
+          ),
+          const SizedBox(height: 10),
+          OutlinedButton.icon(
+            onPressed: () {
+              Navigator.pop(context, false);
             },
+            style: util.outlinedPageButtonStyle(),
+            icon: const Icon(Icons.close),
+            label: const Text('取消'),
           ),
         ],
       ),

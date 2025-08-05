@@ -6,54 +6,48 @@ import 'package:diabeat/routes/network/session.dart' as session;
 import 'package:diabeat/routes/network/dialog/timeout_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 
-enum _Method { post, get }
-
-Future<Result> _request(
-  BuildContext context,
-  _Method method,
-  String path, {
-  Map<String, dynamic>? body,
+Map<String, String> _configHeaders(
+  Map<String, String>? origin, {
+  bool json = false,
   bool auth = false,
-  int timeout = 3,
-}) async {
-  // step 1 : connect
+}) {
+  origin ??= {};
+  if (json) {
+    origin['Content-Type'] = 'application/json';
+  }
+  if (auth) {
+    origin['Authorization'] = 'Bearer ${session.accessToken}';
+  }
+  return origin;
+}
+
+Future<Result> _handle(
+  BuildContext context,
+  bool auth,
+  Future<(int, String)> Function() request,
+) async {
   if (!await connection.tryConnect(context)) {
     return Result.failed();
   }
 
-  // step 2 : make headers & body
-  final url = connection.makeUrl(path);
-  final headers = {'Content-Type': 'application/json'};
   if (auth) {
     if (!context.mounted || !await session.tryAuthorize(context)) {
       return Result.failed();
     }
-    headers['Authorization'] = 'Bearer ${session.accessToken}';
   }
-  final stringBody = jsonEncode(body);
-  final duration = Duration(seconds: timeout);
-  final send = switch (method) {
-    _Method.post =>
-      () =>
-          http.post(url, headers: headers, body: stringBody).timeout(duration),
 
-    _Method.get => () => http.get(url, headers: headers).timeout(duration),
-  };
-
-  // step 3 : send & retry request
   bool retry;
   do {
     retry = false;
 
     try {
-      final res = await send();
-      final status = res.statusCode;
-      final body = res.body;
+      final (statusCode, body) = await request();
 
-      if (200 <= status && status < 300) {
+      if (200 <= statusCode && statusCode < 300) {
         return Result.successful(body);
-      } else if (status == 401) {
+      } else if (statusCode == 401) {
         if (!context.mounted || !await session.tryRefresh(context)) {
           return Result.failed();
         }
@@ -67,7 +61,7 @@ Future<Result> _request(
       }
 
       switch (await TimeoutDialog.show(context)) {
-        case TimeoutDialogNav.retry:
+        case true:
           retry = true;
           break;
 
@@ -86,12 +80,16 @@ Future<Result> logIn(
   required String email,
   required String password,
 }) async {
-  final result = await _request(
-    context,
-    _Method.post,
-    '/api/token/',
-    body: {'username_or_email': email, 'password': password},
-  );
+  final result = await _handle(context, false, () async {
+    final res = await http
+        .post(
+          connection.makeUrl('/token'),
+          body: {'username_or_email': email, 'password': password},
+        )
+        .timeout(const Duration(seconds: 3));
+
+    return (res.statusCode, res.body);
+  });
 
   if (result.ok) {
     final data = result.data;
@@ -111,12 +109,16 @@ Future<Result> register(
   required String username,
   required String password,
 }) async {
-  final result = await _request(
-    context,
-    _Method.post,
-    '/api/register/',
-    body: {'email': email, 'username': username, 'password': password},
-  );
+  final result = await _handle(context, false, () async {
+    final res = await http
+        .post(
+          connection.makeUrl('/register'),
+          body: {'email': email, 'username': username, 'password': password},
+        )
+        .timeout(const Duration(seconds: 3));
+
+    return (res.statusCode, res.body);
+  });
 
   if (result.ok) {
     final data = result.data;
@@ -137,21 +139,54 @@ Future<Result> postRecord(
   double? exercise,
   double? insulin,
 }) async {
-  return await _request(
-    context,
-    _Method.post,
-    '/api/records/',
-    body: {
-      'blood_glucose': glucose,
-      'carbohydrate_intake': carbohydrate,
-      'exercise_duration': exercise,
-      'insulin_injection': insulin,
-    },
-    auth: true,
-  );
+  return await _handle(context, true, () async {
+    final res = await http
+        .post(
+          connection.makeUrl('/records'),
+          headers: _configHeaders(null, json: true, auth: true),
+          body: jsonEncode({
+            'blood_glucose': glucose,
+            'carbohydrate_intake': carbohydrate,
+            'exercise_duration': exercise,
+            'insulin_injection': insulin,
+          }),
+        )
+        .timeout(const Duration(seconds: 3));
+
+    return (res.statusCode, res.body);
+  });
 }
 
-Future<Result> predictCarbohydrate(BuildContext context) async {
-  // TODO
-  return await _request(context, _Method.post, '/api/predict/', auth: true);
+Future<Result> getRecords(BuildContext context) async {
+  return await _handle(context, true, () async {
+    final res = await http.get(
+      connection.makeUrl('/records'),
+      headers: _configHeaders(null, auth: true),
+    );
+
+    return (res.statusCode, res.body);
+  });
+}
+
+Future<Result> predictCarbohydrate(BuildContext context, XFile xFile) async {
+  return await _handle(context, true, () async {
+    final request = http.MultipartRequest(
+      'POST',
+      connection.makeUrl('/predict'),
+    );
+
+    _configHeaders(request.headers, auth: true);
+
+    request.files.add(
+      http.MultipartFile(
+        'image',
+        xFile.openRead(),
+        await xFile.length(),
+        filename: xFile.name,
+      ),
+    );
+
+    final res = await request.send();
+    return (res.statusCode, await res.stream.bytesToString());
+  });
 }

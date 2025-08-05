@@ -1,12 +1,12 @@
-import 'package:diabeat/routes/network/scanner_nav.dart';
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
-
-enum DisconnectedDialogNav { ok }
 
 class DisconnectedDialog extends StatelessWidget {
   const DisconnectedDialog._();
 
+  /// connected    : true
+  ///
+  /// disconnected : null
   static Future<dynamic> show(BuildContext context) async {
     final nav = await showDialog(
       context: context,
@@ -14,11 +14,10 @@ class DisconnectedDialog extends StatelessWidget {
     );
 
     return switch (nav) {
-      DisconnectedDialogNav.ok when context.mounted =>
-        switch (await Navigator.pushNamed(context, '/scanner')) {
-          ScannerPageNav.ok => DisconnectedDialogNav.ok,
-          _ => null,
-        },
+      true when context.mounted => await Navigator.pushNamed(
+        context,
+        '/scanner',
+      ),
       _ => null,
     };
   }
@@ -37,15 +36,22 @@ class DisconnectedDialog extends StatelessWidget {
             style: TextStyle(fontSize: 16),
           ),
           const SizedBox(height: 20),
-          util.binaryDialogButtons(
-            text1: '取消',
-            onPressed1: () {
+          FilledButton.icon(
+            onPressed: () {
+              Navigator.pop(context, true);
+            },
+            style: util.filledPageButtonStyle(),
+            icon: const Icon(Icons.qr_code_scanner),
+            label: const Text('連接'),
+          ),
+          SizedBox(height: 10),
+          OutlinedButton.icon(
+            onPressed: () {
               Navigator.pop(context);
             },
-            text2: '連接',
-            onPressed2: () {
-              Navigator.pop(context, DisconnectedDialogNav.ok);
-            },
+            style: util.outlinedPageButtonStyle(),
+            icon: const Icon(Icons.close),
+            label: const Text('取消'),
           ),
         ],
       ),

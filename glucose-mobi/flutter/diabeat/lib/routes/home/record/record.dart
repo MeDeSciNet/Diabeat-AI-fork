@@ -1,6 +1,8 @@
+import 'package:diabeat/routes/network/dialog/image_picker_dialog.dart';
 import 'package:diabeat/routes/network/request.dart' as request;
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class RecordPage extends StatefulWidget {
   const RecordPage({super.key});
@@ -10,26 +12,27 @@ class RecordPage extends StatefulWidget {
 }
 
 class _RecordPageState extends State<RecordPage> {
-  final _glucoseMeta = _UnsignedDoubleFieldMeta();
-  final _carbohydrateMeta = _UnsignedDoubleFieldMeta();
-  final _exerciseMeta = _UnsignedDoubleFieldMeta();
-  final _insulinMeta = _UnsignedDoubleFieldMeta();
-  String? _glucoseErr;
+  final _glucoseMan = util.UDoubleFieldManager();
+  final _carbohydrateMan = util.UDoubleFieldManager();
+  final _exerciseMan = util.UDoubleFieldManager();
+  final _insulinMan = util.UDoubleFieldManager();
+  final _picker = ImagePicker();
 
+  String? _glucoseErr;
   bool _submitted = false;
   bool _waiting = false;
 
   @override
   void dispose() {
-    _glucoseMeta.dispose();
-    _carbohydrateMeta.dispose();
-    _exerciseMeta.dispose();
-    _insulinMeta.dispose();
+    _glucoseMan.dispose();
+    _carbohydrateMan.dispose();
+    _exerciseMan.dispose();
+    _insulinMan.dispose();
     super.dispose();
   }
 
   void _validateGlucose() {
-    _glucoseErr = _glucoseMeta.value == null ? '血糖不能為空' : null;
+    _glucoseErr = _glucoseMan.value == null ? '血糖不能為空' : null;
   }
 
   Future<void> _tryPostRecord() async {
@@ -42,19 +45,19 @@ class _RecordPageState extends State<RecordPage> {
 
     final result = await request.postRecord(
       context,
-      glucose: _glucoseMeta.value!,
-      carbohydrate: _carbohydrateMeta.value,
-      exercise: _exerciseMeta.value,
-      insulin: _insulinMeta.value,
+      glucose: _glucoseMan.value!,
+      carbohydrate: _carbohydrateMan.value,
+      exercise: _exerciseMan.value,
+      insulin: _insulinMan.value,
     );
 
     setState(() => _waiting = false);
 
     if (result.ok) {
-      _glucoseMeta.clear();
-      _carbohydrateMeta.clear();
-      _exerciseMeta.clear();
-      _insulinMeta.clear();
+      _glucoseMan.clear();
+      _carbohydrateMan.clear();
+      _exerciseMan.clear();
+      _insulinMan.clear();
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -69,7 +72,26 @@ class _RecordPageState extends State<RecordPage> {
   }
 
   Future<void> _tryPredict() async {
-    await request.predictCarbohydrate(context);
+    setState(() => _waiting = true);
+
+    final nav = await ImagePickerDialog.show(context);
+    final image = switch (nav) {
+      ImagePickerDialogNav.camera => await _picker.pickImage(
+        source: ImageSource.camera,
+      ),
+      ImagePickerDialogNav.gallery => await _picker.pickImage(
+        source: ImageSource.gallery,
+      ),
+      _ => null,
+    };
+
+    if (mounted && image != null) {
+      final result = await request.predictCarbohydrate(context, image);
+      _carbohydrateMan.text = (result.dataAsMap['predicted_value'] as double)
+          .toStringAsFixed(1);
+    }
+
+    setState(() => _waiting = false);
   }
 
   @override
@@ -91,12 +113,12 @@ class _RecordPageState extends State<RecordPage> {
             Column(
               children: [
                 TextField(
-                  controller: _glucoseMeta.ctrl,
-                  focusNode: _glucoseMeta.focusNode,
+                  controller: _glucoseMan.ctrl,
+                  focusNode: _glucoseMan.focusNode,
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
-                  inputFormatters: util.nonNegativeNumberFormatters(),
+                  inputFormatters: util.makeUdoubleFormatter(),
                   textInputAction: TextInputAction.next,
-                  onSubmitted: _carbohydrateMeta.focus(context),
+                  onSubmitted: _carbohydrateMan.focus(context),
                   decoration: InputDecoration(
                     labelText: '血糖 (mg/dL)',
                     errorText: _glucoseErr,
@@ -115,14 +137,14 @@ class _RecordPageState extends State<RecordPage> {
                     children: [
                       Expanded(
                         child: TextField(
-                          controller: _carbohydrateMeta.ctrl,
-                          focusNode: _carbohydrateMeta.focusNode,
+                          controller: _carbohydrateMan.ctrl,
+                          focusNode: _carbohydrateMan.focusNode,
                           keyboardType: TextInputType.numberWithOptions(
                             decimal: true,
                           ),
-                          inputFormatters: util.nonNegativeNumberFormatters(),
+                          inputFormatters: util.makeUdoubleFormatter(),
                           textInputAction: TextInputAction.next,
-                          onSubmitted: _exerciseMeta.focus(context),
+                          onSubmitted: _exerciseMan.focus(context),
                           decoration: InputDecoration(
                             labelText: '碳水攝取量 (g)',
                             border: const OutlineInputBorder(),
@@ -130,26 +152,23 @@ class _RecordPageState extends State<RecordPage> {
                         ),
                       ),
                       const SizedBox(width: 10),
-                      FilledButton(
-                        onPressed: _tryPredict,
-                        style: FilledButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                        ),
-                        child: const Icon(Icons.camera_alt),
+                      FilledButton.icon(
+                        onPressed: _waiting ? null : _tryPredict,
+                        style: util.filledPageButtonStyle(),
+                        icon: const Icon(Icons.auto_awesome),
+                        label: const Text('預測'),
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 20),
                 TextField(
-                  controller: _exerciseMeta.ctrl,
-                  focusNode: _exerciseMeta.focusNode,
+                  controller: _exerciseMan.ctrl,
+                  focusNode: _exerciseMan.focusNode,
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
-                  inputFormatters: util.nonNegativeNumberFormatters(),
+                  inputFormatters: util.makeUdoubleFormatter(),
                   textInputAction: TextInputAction.next,
-                  onSubmitted: _insulinMeta.focus(context),
+                  onSubmitted: _insulinMan.focus(context),
                   decoration: InputDecoration(
                     labelText: '運動時長 (min)',
                     border: const OutlineInputBorder(),
@@ -157,10 +176,10 @@ class _RecordPageState extends State<RecordPage> {
                 ),
                 const SizedBox(height: 20),
                 TextField(
-                  controller: _insulinMeta.ctrl,
-                  focusNode: _insulinMeta.focusNode,
+                  controller: _insulinMan.ctrl,
+                  focusNode: _insulinMan.focusNode,
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
-                  inputFormatters: util.nonNegativeNumberFormatters(),
+                  inputFormatters: util.makeUdoubleFormatter(),
                   textInputAction: TextInputAction.done,
                   decoration: InputDecoration(
                     labelText: '胰島素注射量 (U)',
@@ -180,30 +199,5 @@ class _RecordPageState extends State<RecordPage> {
         ),
       ),
     );
-  }
-}
-
-class _UnsignedDoubleFieldMeta {
-  final ctrl = TextEditingController();
-  final focusNode = FocusNode();
-
-  double? get value => double.tryParse(ctrl.text);
-  set value(double? value) {
-    ctrl.text = value?.toString() ?? '';
-  }
-
-  void dispose() {
-    ctrl.dispose();
-    focusNode.dispose();
-  }
-
-  void Function(String) focus(BuildContext context) {
-    return (value) {
-      FocusScope.of(context).requestFocus(focusNode);
-    };
-  }
-
-  void clear() {
-    ctrl.clear();
   }
 }

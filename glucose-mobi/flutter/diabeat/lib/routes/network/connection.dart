@@ -11,7 +11,7 @@ void connectTo(String addr) {
 bool get existAddr => _addr != null;
 String get addr => _addr!;
 Uri makeUrl(String path) {
-  return Uri.http('$addr:8000', path);
+  return Uri.http('$addr:8000', '/api$path/');
 }
 
 Future<bool> tryConnect(BuildContext context) async {
@@ -24,6 +24,5 @@ Future<bool> tryConnect(BuildContext context) async {
     return true;
   }
 
-  return context.mounted &&
-      await DisconnectedDialog.show(context) == DisconnectedDialogNav.ok;
+  return context.mounted && await DisconnectedDialog.show(context);
 }
