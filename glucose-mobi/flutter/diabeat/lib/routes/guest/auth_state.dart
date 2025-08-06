@@ -52,14 +52,15 @@ abstract class AuthState<T extends StatefulWidget> extends State<T> {
   }
 
   OutlinedButton buildScanButton() {
-    return OutlinedButton(
+    return OutlinedButton.icon(
       onPressed: waiting
           ? null
           : () {
               Navigator.pushNamed(context, '/scanner');
             },
       style: util.outlinedPageButtonStyle(),
-      child: const Icon(Icons.qr_code_scanner),
+      icon: const Icon(Icons.qr_code_scanner),
+      label: const Text('連線'),
     );
   }
 

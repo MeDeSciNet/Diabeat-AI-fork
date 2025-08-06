@@ -29,20 +29,22 @@ class GuestPage extends StatelessWidget {
                   ],
                 ),
               ),
-              FilledButton(
+              FilledButton.icon(
                 onPressed: () {
                   Navigator.pushNamed(context, '/guest/login');
                 },
                 style: util.filledPageButtonStyle(),
-                child: const Text('登入'),
+                icon: const Icon(Icons.login),
+                label: const Text('登入'),
               ),
               const SizedBox(height: 10),
-              OutlinedButton(
+              OutlinedButton.icon(
                 onPressed: () {
                   Navigator.pushNamed(context, '/guest/register');
                 },
                 style: util.outlinedPageButtonStyle(),
-                child: const Text('註冊'),
+                icon: const Icon(Icons.create),
+                label: const Text('註冊'),
               ),
             ],
           ),

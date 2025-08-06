@@ -24,5 +24,5 @@ Future<bool> tryConnect(BuildContext context) async {
     return true;
   }
 
-  return context.mounted && await DisconnectedDialog.show(context);
+  return context.mounted && await DisconnectedDialog.show(context) == true;
 }

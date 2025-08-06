@@ -21,7 +21,7 @@ class ConfirmScanDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('連線狀態', textAlign: TextAlign.center),
+      title: const Text('連接到伺服器', textAlign: TextAlign.center),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,

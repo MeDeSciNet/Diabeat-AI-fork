@@ -1,29 +1,45 @@
-import 'dart:developer';
-
 import 'package:diabeat/routes/network/request.dart' as request;
 import 'package:flutter/material.dart';
 
-class ChartPage extends StatelessWidget {
+class ChartPage extends StatefulWidget {
   const ChartPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: FilledButton(
-        onPressed: () async {
-          final result = await request.getRecords(context);
-          final data = result.dataAsList;
+  State<ChartPage> createState() => _ChartPageState();
+}
 
-          for (var element in data) {
-            log(element['blood_glucose'].toString());
-            log(element['carbohydrate_intake'].toString());
-            log(element['exercise_duration'].toString());
-            log(element['insulin_injection'].toString());
-            log('=====');
-          }
-        },
-        child: Text('Chart'),
-      ),
+class _ChartPageState extends State<ChartPage> {
+  List<Map<String, dynamic>>? data;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(child: 
+        ListView.builder(
+          itemCount: data?.length,
+          itemBuilder: (context, index) {
+            if (data == null) return null;
+
+            final item = data![index];
+            return Row(
+              children: [
+                Expanded(child: Text(item['blood_glucose'].toString())),
+                Expanded(child: Text(item['carbohydrate_intake'].toString())),
+                Expanded(child: Text(item['exercise_duration'].toString())),
+                Expanded(child: Text(item['insulin_injection'].toString())),
+              ],
+            );
+          },
+        )),
+        FilledButton(
+          onPressed: () async {
+            final result = await request.getRecords(context);
+            setState(() => data = result.dataAsList);
+          },
+          child: const Text('refresh'),
+        ),
+      ],
     );
   }
 }

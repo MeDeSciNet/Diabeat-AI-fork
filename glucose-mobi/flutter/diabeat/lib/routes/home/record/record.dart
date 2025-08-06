@@ -118,7 +118,7 @@ class _RecordPageState extends State<RecordPage> {
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
                   inputFormatters: util.makeUdoubleFormatter(),
                   textInputAction: TextInputAction.next,
-                  onSubmitted: _carbohydrateMan.focus(context),
+                  onSubmitted: _carbohydrateMan.focus(),
                   decoration: InputDecoration(
                     labelText: '血糖 (mg/dL)',
                     errorText: _glucoseErr,
@@ -144,7 +144,7 @@ class _RecordPageState extends State<RecordPage> {
                           ),
                           inputFormatters: util.makeUdoubleFormatter(),
                           textInputAction: TextInputAction.next,
-                          onSubmitted: _exerciseMan.focus(context),
+                          onSubmitted: _exerciseMan.focus(),
                           decoration: InputDecoration(
                             labelText: '碳水攝取量 (g)',
                             border: const OutlineInputBorder(),
@@ -168,7 +168,7 @@ class _RecordPageState extends State<RecordPage> {
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
                   inputFormatters: util.makeUdoubleFormatter(),
                   textInputAction: TextInputAction.next,
-                  onSubmitted: _insulinMan.focus(context),
+                  onSubmitted: _insulinMan.focus(),
                   decoration: InputDecoration(
                     labelText: '運動時長 (min)',
                     border: const OutlineInputBorder(),
@@ -189,10 +189,11 @@ class _RecordPageState extends State<RecordPage> {
               ],
             ),
             const Spacer(),
-            FilledButton(
+            FilledButton.icon(
               onPressed: _waiting ? null : _tryPostRecord,
               style: util.filledPageButtonStyle(),
-              child: const Text('送出'),
+              icon: const Icon(Icons.send),
+              label: const Text('送出'),
             ),
             const Spacer(),
           ],

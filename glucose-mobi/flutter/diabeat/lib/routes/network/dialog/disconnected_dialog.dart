@@ -25,24 +25,18 @@ class DisconnectedDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('連線狀態', textAlign: TextAlign.center),
+      title: const Text('尚未連線到伺服器', textAlign: TextAlign.center),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
-            '尚未連接到伺服器',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 16),
-          ),
-          const SizedBox(height: 20),
           FilledButton.icon(
             onPressed: () {
               Navigator.pop(context, true);
             },
             style: util.filledPageButtonStyle(),
             icon: const Icon(Icons.qr_code_scanner),
-            label: const Text('連接'),
+            label: const Text('連線'),
           ),
           SizedBox(height: 10),
           OutlinedButton.icon(

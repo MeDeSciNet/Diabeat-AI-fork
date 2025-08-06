@@ -38,9 +38,9 @@ class UDoubleFieldManager {
     focusNode.dispose();
   }
 
-  void Function(String) focus(BuildContext context) {
+  void Function(String) focus() {
     return (value) {
-      FocusScope.of(context).requestFocus(focusNode);
+      focusNode.requestFocus();
     };
   }
 

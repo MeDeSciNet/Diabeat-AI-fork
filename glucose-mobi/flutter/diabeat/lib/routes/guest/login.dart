@@ -104,10 +104,11 @@ class _LoginPageState extends AuthState<LoginPage> {
                   buildScanButton(),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: FilledButton(
+                    child: FilledButton.icon(
                       onPressed: waiting ? null : _tryLogIn,
                       style: util.filledPageButtonStyle(),
-                      child: const Text('登入'),
+                      icon: const Icon(Icons.login),
+                      label: const Text('登入'),
                     ),
                   ),
                 ],

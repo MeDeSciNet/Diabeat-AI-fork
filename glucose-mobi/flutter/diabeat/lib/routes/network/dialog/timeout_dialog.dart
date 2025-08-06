@@ -28,17 +28,11 @@ class TimeoutDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Center(child: Text('請求狀態')),
+      title: Text('連線逾時', textAlign: TextAlign.center),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
-            '連線逾時',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 16),
-          ),
-          const SizedBox(height: 20),
           FilledButton.icon(
             onPressed: () {
               Navigator.pop(context, _TimeoutDialogNav.scan);

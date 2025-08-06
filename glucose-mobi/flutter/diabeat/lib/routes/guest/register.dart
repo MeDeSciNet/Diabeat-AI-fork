@@ -133,10 +133,11 @@ class _RegisterPageState extends AuthState<RegisterPage> {
                   buildScanButton(),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: FilledButton(
+                    child: FilledButton.icon(
                       onPressed: waiting ? null : _tryRegister,
                       style: util.filledPageButtonStyle(),
-                      child: const Text('註冊'),
+                      icon: const Icon(Icons.create),
+                      label: const Text('註冊'),
                     ),
                   ),
                 ],

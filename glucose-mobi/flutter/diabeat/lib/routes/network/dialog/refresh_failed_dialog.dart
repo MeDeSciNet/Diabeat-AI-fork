@@ -4,34 +4,33 @@ import 'package:flutter/material.dart';
 class RefreshFailedDialog extends StatelessWidget {
   const RefreshFailedDialog._();
 
-  static void show(BuildContext context) {
-    showDialog(
+  static Future<void> show(BuildContext context) async {
+    await showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => const RefreshFailedDialog._(),
     );
+
+    if (context.mounted) {
+      session.delete();
+      Navigator.pushNamedAndRemoveUntil(context, '/guest', (route) => false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Center(child: Text('帳號異常')),
+      title: Text('Token 刷新失敗', textAlign: TextAlign.center),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text('Token 更新失敗', textAlign: TextAlign.center),
-          const SizedBox(height: 20),
-          FilledButton(
+          FilledButton.icon(
             onPressed: () {
-              session.delete();
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                '/guest',
-                (route) => false,
-              );
+              Navigator.pop(context);
             },
-            child: const Text('登出'),
+            icon: const Icon(Icons.logout),
+            label: const Text('登出'),
           ),
         ],
       ),
