@@ -33,6 +33,10 @@ void delete() {
 }
 
 Future<bool> _refresh(BuildContext context, String oldRefreshToken) async {
+  if (!await connection.tryConnect(context)) {
+    return false;
+  }
+
   final res = await http
       .post(
         connection.makeUrl('/token/refresh'),
