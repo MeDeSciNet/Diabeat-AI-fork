@@ -27,13 +27,13 @@ class _LoginPageState extends AuthState<LoginPage> {
       email: emailCtrl.text,
       password: passwordCtrl.text,
     );
+    if (!mounted) return;
 
     if (result.ok) {
-      if (mounted) {
-        Navigator.of(context)
-          ..pop()
-          ..pushReplacementNamed('/home');
-      }
+      Navigator.of(
+        context,
+        rootNavigator: true,
+      ).pushNamedAndRemoveUntil('/home', (route) => false);
     } else {
       _passwordFocus.requestFocus();
 
@@ -41,7 +41,6 @@ class _LoginPageState extends AuthState<LoginPage> {
         waiting = false;
 
         if (!result.haveData) return;
-
         switch (result.dataAsMap['non_field_errors'][0]) {
           case 'Email does not exist.':
             emailErr = 'Email 不存在';

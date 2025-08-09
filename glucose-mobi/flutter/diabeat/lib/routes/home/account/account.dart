@@ -1,4 +1,3 @@
-import 'package:diabeat/routes/home/account/predict_diabetes.dart';
 import 'package:diabeat/routes/network/session.dart' as session;
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
@@ -31,22 +30,29 @@ class _AccountPageState extends State<AccountPage> {
             const Spacer(),
             Text(
               'Hello, ${session.loggedIn ? session.username : ''}',
-              style: const TextStyle(fontSize: 55),
+              style: const TextStyle(fontSize: 50),
               textAlign: TextAlign.center,
             ),
             const Spacer(),
             OutlinedButton.icon(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PredictDiabetesPage(),
-                  ),
-                );
+                Navigator.pushNamed(context, '/predict');
               },
               style: util.outlinedPageButtonStyle(),
               icon: const Icon(Icons.auto_awesome),
               label: const Text('預測糖尿病'),
+            ),
+            const SizedBox(height: 10),
+            OutlinedButton.icon(
+              onPressed: () {
+                Navigator.of(
+                  context,
+                  rootNavigator: true,
+                ).pushNamed('/scanner');
+              },
+              style: util.outlinedPageButtonStyle(),
+              icon: const Icon(Icons.qr_code_scanner),
+              label: const Text('連線'),
             ),
             const Spacer(),
             FilledButton.icon(
@@ -61,6 +67,7 @@ class _AccountPageState extends State<AccountPage> {
               icon: const Icon(Icons.logout),
               label: const Text('登出'),
             ),
+            const SizedBox(height: 10),
           ],
         ),
       ),

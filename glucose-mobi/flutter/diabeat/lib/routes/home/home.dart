@@ -1,4 +1,5 @@
 import 'package:diabeat/routes/home/account/account.dart';
+import 'package:diabeat/routes/home/account/predict_diabetes.dart';
 import 'package:diabeat/routes/home/chart/chart.dart';
 import 'package:diabeat/routes/home/record/record.dart';
 import 'package:flutter/material.dart';
@@ -41,26 +42,41 @@ class _HomeState extends State<Home> {
           children: [
             Navigator(
               key: _navigatorKeys[0],
+              initialRoute: '/',
               onGenerateRoute: (settings) {
-                return MaterialPageRoute(
-                  builder: (context) => const RecordPage(),
-                );
+                return switch (settings.name) {
+                  '/' => MaterialPageRoute(
+                    builder: (context) => const RecordPage(),
+                  ),
+                  _ => null,
+                };
               },
             ),
             Navigator(
               key: _navigatorKeys[1],
+              initialRoute: '/',
               onGenerateRoute: (settings) {
-                return MaterialPageRoute(
-                  builder: (context) => const ChartPage(),
-                );
+                return switch (settings.name) {
+                  '/' => MaterialPageRoute(
+                    builder: (context) => const ChartPage(),
+                  ),
+                  _ => null,
+                };
               },
             ),
             Navigator(
               key: _navigatorKeys[2],
+              initialRoute: '/',
               onGenerateRoute: (settings) {
-                return MaterialPageRoute(
-                  builder: (context) => const AccountPage(),
-                );
+                return switch (settings.name) {
+                  '/' => MaterialPageRoute(
+                    builder: (context) => const AccountPage(),
+                  ),
+                  '/predict' => MaterialPageRoute(
+                    builder: (context) => PredictDiabetesPage(),
+                  ),
+                  _ => null,
+                };
               },
             ),
           ],

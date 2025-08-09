@@ -1,181 +1,145 @@
-import 'dart:developer';
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 
-class PredictDiabetesPage extends StatelessWidget {
-  PredictDiabetesPage({super.key});
-  final _formKey = GlobalKey<FormState>();
+class PredictDiabetesPage extends StatefulWidget {
+  const PredictDiabetesPage({super.key});
+
+  @override
+  State<PredictDiabetesPage> createState() => _PredictDiabetesPageState();
+}
+
+class _PredictDiabetesPageState extends State<PredictDiabetesPage> {
+  int _index = 0;
+  String? _gender;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-        children: [
-          const SizedBox(width: 20),
-          Expanded(
-            child: FilledButton.tonal(
-              onPressed: () {},
-              child: const Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(height:20,),
-                  Icon(Icons.male, size: 50),
-                  Text('男', style: TextStyle(fontSize: 30)),
-                  SizedBox(height:20,),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(width: 20),
-          Expanded(
-            child: FilledButton.tonal(
-              onPressed: () {},
-              child: const Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(height:20,),
-                  Icon(Icons.female, size: 50),
-                  Text('女', style: TextStyle(fontSize: 30)),
-                  SizedBox(height:20,),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(width: 20),
-        ],
-      );
-    // return Scaffold(
-    //   appBar: AppBar(
-    //     leading: IconButton(
-    //       onPressed: () {
-    //         Navigator.pop(context);
-    //       },
-    //       icon: const Icon(Icons.arrow_back_ios_new),
-    //     ),
-    //     title: const Text('預測糖尿病'),
-    //   ),
-    //   body: ,
-      // body: Form(
-      //   key: _formKey,
-      //   child: Padding(
-      //     padding: EdgeInsets.symmetric(horizontal: 50),
-      //     child: ListView(
-      //       children: [
-      //         buildGenderField(),
-      //         const SizedBox(height: 20),
-      //         _MedicalHistoryCheckBox(),
-      //         const SizedBox(height: 20),
-      //         const DropdownMenu(
-      //           label: Text('吸菸史'),
-      //           dropdownMenuEntries: [
-      //             DropdownMenuEntry(value: 'never', label: '從不吸菸'),
-      //             DropdownMenuEntry(value: 'former', label: '曾經吸菸'),
-      //             DropdownMenuEntry(value: 'not current', label: '目前沒有吸菸'),
-      //             DropdownMenuEntry(value: 'current', label: '目前有吸菸'),
-      //           ],
-      //         ),
-      //         const SizedBox(height: 20),
-      //         TextFormField(
-      //           keyboardType: TextInputType.number,
-      //           decoration: const InputDecoration(
-      //             labelText: '年齡',
-      //             border: OutlineInputBorder(),
-      //           ),
-      //           validator: (value) {
-      //             if (value == null || value.isEmpty) {
-      //               return '必填';
-      //             }
-      //             return null;
-      //           },
-      //         ),
-      //         const SizedBox(height: 20),
-      //         TextFormField(
-      //           validator: (value) {
-      //             if (value == null || value.isEmpty) {
-      //               return '必填';
-      //             }
-      //             return null;
-      //           },
-      //           decoration: const InputDecoration(
-      //             labelText: 'BMI',
-      //             border: OutlineInputBorder(),
-      //           ),
-      //         ),
-      //         const SizedBox(height: 20),
-      //         TextFormField(
-      //           validator: (value) {
-      //             if (value == null || value.isEmpty) {
-      //               return '必填';
-      //             }
-      //             return null;
-      //           },
-      //           decoration: const InputDecoration(
-      //             labelText: 'Hb1Ac',
-      //             border: OutlineInputBorder(),
-      //           ),
-      //         ),
-      //         const SizedBox(height: 20),
-      //         TextFormField(
-      //           validator: (value) {
-      //             if (value == null || value.isEmpty) {
-      //               return '必填';
-      //             }
-      //             return null;
-      //           },
-      //           decoration: const InputDecoration(
-      //             labelText: '血糖值',
-      //             border: OutlineInputBorder(),
-      //           ),
-      //         ),
-      //         const SizedBox(height: 20),
-      //         FilledButton.icon(
-      //           onPressed: () {
-      //             if (_formKey.currentState!.validate()) {
-      //               log('test');
-      //               _formKey.currentState!.save();
-      //             }
-      //           },
-      //           style: util.filledPageButtonStyle(),
-      //           icon: const Icon(Icons.send),
-      //           label: const Text('提交'),
-      //         ),
-      //       ],
-      //     ),
-      //   ),
-      // ),
-    // );
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(Icons.arrow_back_ios_new),
+        ),
+        title: const Text('預測糖尿病'),
+        centerTitle: true,
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(20),
+        child: IndexedStack(
+          index: _index,
+          children: [
+            _buildPersonalInfoPage(),
+            _buildMedicalHistoryPage(),
+            _buildFigurePage(),
+          ],
+        ),
+      ),
+    );
   }
 
-  Widget buildGenderField() {
-    return FormField<String>(
-      validator: (value) => value == null ? '請選擇性別' : null,
-      builder: (field) {
-        return Column(
+  Widget _buildPreviousPageButton() {
+    return Expanded(
+      child: OutlinedButton.icon(
+        onPressed: () {
+          setState(() => _index--);
+        },
+        style: util.outlinedPageButtonStyle(),
+        icon: const Icon(Icons.arrow_back_ios_new),
+        label: const Text('上一頁'),
+      ),
+    );
+  }
+
+  Widget _buildNextPageButton() {
+    return Expanded(
+      child: FilledButton.icon(
+        onPressed: () {
+          setState(() => _index++);
+        },
+        style: util.filledPageButtonStyle(),
+        icon: const Icon(Icons.arrow_forward_ios),
+        iconAlignment: IconAlignment.end,
+        label: const Text('下一頁'),
+      ),
+    );
+  }
+
+  Widget _buildPersonalInfoPage() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text('性別', style: TextStyle(fontSize: 25)),
+        RadioListTile(
+          title: const Text('男'),
+          value: 'male',
+          groupValue: _gender,
+          onChanged: (value) {
+            setState(() => _gender = value);
+          },
+        ),
+        RadioListTile(
+          title: const Text('女'),
+          value: 'female',
+          groupValue: _gender,
+          onChanged: (value) {
+            setState(() => _gender = value);
+          },
+        ),
+        const Spacer(),
+        Row(
           children: [
-            const Text(
-              '性別',
-              style: TextStyle(fontSize: 20),
-              textAlign: TextAlign.start,
-            ),
-            RadioListTile<String>(
-              title: const Text('男'),
-              value: 'male',
-              groupValue: field.value,
-              onChanged: field.didChange,
-            ),
-            RadioListTile<String>(
-              title: const Text('女'),
-              value: 'female',
-              groupValue: field.value,
-              onChanged: field.didChange,
-            ),
-            if (field.hasError)
-              field.widget.errorBuilder!(field.context, field.errorText!),
+            const Spacer(),
+            const SizedBox(width: 10),
+            _buildNextPageButton(),
           ],
-        );
-      },
-      errorBuilder: (context, errorText) {
-        return Text(errorText);
-      },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMedicalHistoryPage() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text('medical history'),
+        const Spacer(),
+        Row(
+          children: [
+            _buildPreviousPageButton(),
+            const SizedBox(width: 10),
+            _buildNextPageButton(),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFigurePage() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text('figure'),
+        const Spacer(),
+        Row(
+          children: [
+            _buildPreviousPageButton(),
+            const SizedBox(width: 10),
+            Expanded(
+              child: FilledButton.icon(
+                onPressed: () {
+                  // send
+                },
+                style: util.filledPageButtonStyle(),
+                icon: const Icon(Icons.send),
+                iconAlignment: IconAlignment.end,
+                label: const Text('送出'),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

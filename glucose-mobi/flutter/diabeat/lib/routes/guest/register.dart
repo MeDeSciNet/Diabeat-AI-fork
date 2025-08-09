@@ -48,19 +48,18 @@ class _RegisterPageState extends AuthState<RegisterPage> {
       username: _usernameCtrl.text,
       password: passwordCtrl.text,
     );
+    if (!mounted) return;
 
     if (result.ok) {
-      if (mounted) {
-        Navigator.of(context)
-          ..pop(context)
-          ..pushReplacementNamed('/home');
-      }
+      Navigator.of(
+        context,
+        rootNavigator: true,
+      ).pushNamedAndRemoveUntil('/home', (route) => false);
     } else {
       setState(() {
         waiting = false;
 
         if (!result.haveData) return;
-
         final data = result.dataAsMap;
         emailErr = switch (data['email'][0]) {
           'Enter a valid email address.' => 'Email 格式不正確',
@@ -83,7 +82,7 @@ class _RegisterPageState extends AuthState<RegisterPage> {
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: Icon(Icons.arrow_back_ios_new),
+          icon: const Icon(Icons.arrow_back_ios_new),
         ),
       ),
       body: SafeArea(

@@ -42,30 +42,28 @@ class ScannerPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      child: SafeArea(
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(Icons.arrow_back_ios_new),
+        ),
+        title: const Text('連接到伺服器'),
+        centerTitle: true,
+      ),
+      body: SafeArea(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Stack(
-              children: [
-                AspectRatio(
-                  aspectRatio: 9 / 16,
-                  child: MobileScanner(
-                    controller: _controller,
-                    onDetect: _detect(context),
-                  ),
-                ),
-                IconButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  icon: const Icon(Icons.arrow_back_ios_new),
-                ),
-              ],
+            Expanded(
+              child: MobileScanner(
+                controller: _controller,
+                onDetect: _detect(context),
+              ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
               child: _SliderWidget(_controller),
             ),
           ],
@@ -77,7 +75,6 @@ class ScannerPage extends StatelessWidget {
 
 class _SliderWidget extends StatefulWidget {
   const _SliderWidget(this.controller);
-
   final MobileScannerController controller;
 
   @override
@@ -95,7 +92,7 @@ class _SliderWidgetState extends State<_SliderWidget> {
         setState(() => _scale = value);
         widget.controller.setZoomScale(_scale);
       },
-      year2023: false, // deprecated
+      year2023: false,
     );
   }
 }

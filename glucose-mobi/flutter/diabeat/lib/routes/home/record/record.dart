@@ -51,6 +51,7 @@ class _RecordPageState extends State<RecordPage> {
       insulin: _insulinMan.value,
     );
 
+    if (!mounted) return;
     setState(() => _waiting = false);
 
     if (result.ok) {
@@ -59,7 +60,6 @@ class _RecordPageState extends State<RecordPage> {
       _exerciseMan.clear();
       _insulinMan.clear();
 
-      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('送出成功'),
@@ -67,13 +67,11 @@ class _RecordPageState extends State<RecordPage> {
         ),
       );
     } else {
-      //
+      // result.failed
     }
   }
 
   Future<void> _tryPredict() async {
-    setState(() => _waiting = true);
-
     final nav = await ImagePickerDialog.show(context);
     final image = switch (nav) {
       ImagePickerDialogNav.camera => await _picker.pickImage(
@@ -85,12 +83,21 @@ class _RecordPageState extends State<RecordPage> {
       _ => null,
     };
 
-    if (mounted && image != null) {
+    if (!mounted) return;
+    setState(() => _waiting = true);
+
+    if (image != null) {
       final result = await request.predictCarbohydrate(context, image);
-      _carbohydrateMan.text = (result.dataAsMap['predicted_value'] as double)
-          .toStringAsFixed(1);
+
+      if (result.ok) {
+        final value = result.dataAsMap['predicted_value'] as double;
+        _carbohydrateMan.text = value.toStringAsFixed(1);
+      } else {
+        // result.failed
+      }
     }
 
+    if (!mounted) return;
     setState(() => _waiting = false);
   }
 

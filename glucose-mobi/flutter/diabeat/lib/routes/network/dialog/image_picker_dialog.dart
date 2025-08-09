@@ -6,8 +6,8 @@ enum ImagePickerDialogNav { camera, gallery }
 class ImagePickerDialog extends StatelessWidget {
   const ImagePickerDialog._();
 
-  static Future<dynamic> show(BuildContext context) async {
-    return await showDialog(
+  static Future<ImagePickerDialogNav?> show(BuildContext context) {
+    return showDialog(
       context: context,
       builder: (context) => const ImagePickerDialog._(),
     );

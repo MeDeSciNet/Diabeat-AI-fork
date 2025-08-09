@@ -56,7 +56,7 @@ abstract class AuthState<T extends StatefulWidget> extends State<T> {
       onPressed: waiting
           ? null
           : () {
-              Navigator.pushNamed(context, '/scanner');
+              Navigator.of(context, rootNavigator: true).pushNamed('/scanner');
             },
       style: util.outlinedPageButtonStyle(),
       icon: const Icon(Icons.qr_code_scanner),

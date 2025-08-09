@@ -10,8 +10,8 @@ class ConfirmScanDialog extends StatelessWidget {
   /// re-scan      : null
   ///
   /// cancel scan  : false
-  static Future<dynamic> show(BuildContext context, String addr) async {
-    return await showDialog(
+  static Future<bool?> show(BuildContext context, String addr) {
+    return showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => ConfirmScanDialog._(addr),

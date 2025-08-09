@@ -1,5 +1,3 @@
-import 'package:diabeat/routes/guest/login.dart';
-import 'package:diabeat/routes/guest/register.dart';
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -23,7 +21,13 @@ class GuestPage extends StatelessWidget {
                     const SizedBox(width: 20),
                     const Text('Diabeat', style: TextStyle(fontSize: 55)),
                     IconButton(
-                      onPressed: _launchRepo,
+                      onPressed: () {
+                        launchUrl(
+                          Uri.parse(
+                            'https://github.com/MeDeSciNet/Diabeat-AI-fork',
+                          ),
+                        );
+                      },
                       iconSize: 55,
                       color: Colors.red,
                       icon: const Icon(Icons.bloodtype),
@@ -33,10 +37,10 @@ class GuestPage extends StatelessWidget {
               ),
               FilledButton.icon(
                 onPressed: () {
-                  Navigator.push(
+                  Navigator.of(
                     context,
-                    MaterialPageRoute(builder: (context) => const LoginPage()),
-                  );
+                    rootNavigator: true,
+                  ).pushNamed('/guest/login');
                 },
                 style: util.filledPageButtonStyle(),
                 icon: const Icon(Icons.login),
@@ -45,12 +49,10 @@ class GuestPage extends StatelessWidget {
               const SizedBox(height: 10),
               OutlinedButton.icon(
                 onPressed: () {
-                  Navigator.push(
+                  Navigator.of(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => const RegisterPage(),
-                    ),
-                  );
+                    rootNavigator: true,
+                  ).pushNamed('/guest/register');
                 },
                 style: util.outlinedPageButtonStyle(),
                 icon: const Icon(Icons.create),
@@ -61,9 +63,5 @@ class GuestPage extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  void _launchRepo() {
-    launchUrl(Uri.parse('https://github.com/MeDeSciNet/Diabeat-AI-fork'));
   }
 }

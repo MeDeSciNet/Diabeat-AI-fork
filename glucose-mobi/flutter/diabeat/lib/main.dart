@@ -1,3 +1,5 @@
+import 'package:diabeat/routes/guest/login.dart';
+import 'package:diabeat/routes/guest/register.dart';
 import 'package:diabeat/routes/network/prefs.dart' as prefs;
 import 'package:diabeat/routes/network/scanner.dart';
 import 'package:diabeat/routes/guest/guest.dart';
@@ -36,9 +38,11 @@ class _MainApp extends StatelessWidget {
         return MaterialApp(
           initialRoute: everLoggedIn ? '/home' : '/guest',
           routes: {
-            '/scanner': (context) => ScannerPage(),
-            '/guest': (context) => const GuestPage(),
             '/home': (context) => const Home(),
+            '/guest': (context) => const GuestPage(),
+            '/guest/login': (context) => const LoginPage(),
+            '/guest/register': (context) => const RegisterPage(),
+            '/scanner': (context) => ScannerPage(),
           },
           theme: ThemeData(useMaterial3: true, colorScheme: lightDynamic),
           darkTheme: ThemeData(useMaterial3: true, colorScheme: darkDynamic),

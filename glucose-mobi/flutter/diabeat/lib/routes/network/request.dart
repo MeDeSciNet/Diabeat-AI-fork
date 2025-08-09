@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:diabeat/routes/network/connection.dart' as connection;
-import 'package:diabeat/routes/network/result.dart';
 import 'package:diabeat/routes/network/session.dart' as session;
 import 'package:diabeat/routes/network/dialog/timeout_dialog.dart';
 import 'package:flutter/material.dart';
@@ -189,4 +188,23 @@ Future<Result> predictCarbohydrate(BuildContext context, XFile xFile) async {
     final res = await request.send();
     return (res.statusCode, await res.stream.bytesToString());
   });
+}
+
+/* */
+/* */
+/* */
+
+class Result {
+  Result._(this.ok, [String? body])
+    : data = body == null ? null : jsonDecode(body);
+
+  Result.successful([String? body]) : this._(true, body);
+  Result.failed([String? body]) : this._(false, body);
+
+  final bool ok;
+  final dynamic data;
+  bool get haveData => data != null;
+  Map<String, dynamic> get dataAsMap => data;
+  List<Map<String, dynamic>> get dataAsList =>
+      (data as List).cast<Map<String, dynamic>>();
 }
