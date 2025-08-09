@@ -57,17 +57,11 @@ class UdoubleFormatter extends TextInputFormatter {
     TextEditingValue oldValue,
     TextEditingValue newValue,
   ) {
-    if (newValue.text.isEmpty) return newValue;
-
-    final value = double.tryParse(newValue.text);
-    if (value == null || value < 0) {
-      return oldValue;
+    if (newValue.text.isEmpty) {
+      return newValue;
     }
 
-    return newValue;
+    final value = double.tryParse(newValue.text);
+    return value == null || value < 0 ? oldValue : newValue;
   }
-}
-
-List<TextInputFormatter> makeUdoubleFormatter() {
-  return const [UdoubleFormatter()];
 }

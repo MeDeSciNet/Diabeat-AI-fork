@@ -50,10 +50,11 @@ class _RegisterPageState extends AuthState<RegisterPage> {
     );
 
     if (result.ok) {
-      if (!mounted) return;
-      Navigator.pop(context);
-      Navigator.pushReplacementNamed(context, '/home');
-      //
+      if (mounted) {
+        Navigator.of(context)
+          ..pop(context)
+          ..pushReplacementNamed('/home');
+      }
     } else {
       setState(() {
         waiting = false;

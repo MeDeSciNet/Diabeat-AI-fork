@@ -1,9 +1,6 @@
-import 'package:diabeat/routes/home/account/predict_diabetes.dart';
 import 'package:diabeat/routes/network/prefs.dart' as prefs;
 import 'package:diabeat/routes/network/scanner.dart';
 import 'package:diabeat/routes/guest/guest.dart';
-import 'package:diabeat/routes/guest/login.dart';
-import 'package:diabeat/routes/guest/register.dart';
 import 'package:diabeat/routes/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:dynamic_color/dynamic_color.dart';
@@ -41,11 +38,7 @@ class _MainApp extends StatelessWidget {
           routes: {
             '/scanner': (context) => ScannerPage(),
             '/guest': (context) => const GuestPage(),
-            '/guest/login': (context) => const LoginPage(),
-            '/guest/register': (context) => const RegisterPage(),
             '/home': (context) => const Home(),
-            '/account/predict_diabetes': (context) =>
-                const PredictDiabetesPage(),
           },
           theme: ThemeData(useMaterial3: true, colorScheme: lightDynamic),
           darkTheme: ThemeData(useMaterial3: true, colorScheme: darkDynamic),

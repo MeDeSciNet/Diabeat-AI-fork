@@ -115,8 +115,10 @@ class _RecordPageState extends State<RecordPage> {
                 TextField(
                   controller: _glucoseMan.ctrl,
                   focusNode: _glucoseMan.focusNode,
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
-                  inputFormatters: util.makeUdoubleFormatter(),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  inputFormatters: const [util.UdoubleFormatter()],
                   textInputAction: TextInputAction.next,
                   onSubmitted: _carbohydrateMan.focus(),
                   decoration: InputDecoration(
@@ -139,10 +141,10 @@ class _RecordPageState extends State<RecordPage> {
                         child: TextField(
                           controller: _carbohydrateMan.ctrl,
                           focusNode: _carbohydrateMan.focusNode,
-                          keyboardType: TextInputType.numberWithOptions(
+                          keyboardType: const TextInputType.numberWithOptions(
                             decimal: true,
                           ),
-                          inputFormatters: util.makeUdoubleFormatter(),
+                          inputFormatters: const [util.UdoubleFormatter()],
                           textInputAction: TextInputAction.next,
                           onSubmitted: _exerciseMan.focus(),
                           decoration: InputDecoration(
@@ -165,8 +167,10 @@ class _RecordPageState extends State<RecordPage> {
                 TextField(
                   controller: _exerciseMan.ctrl,
                   focusNode: _exerciseMan.focusNode,
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
-                  inputFormatters: util.makeUdoubleFormatter(),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  inputFormatters: const [util.UdoubleFormatter()],
                   textInputAction: TextInputAction.next,
                   onSubmitted: _insulinMan.focus(),
                   decoration: InputDecoration(
@@ -178,8 +182,10 @@ class _RecordPageState extends State<RecordPage> {
                 TextField(
                   controller: _insulinMan.ctrl,
                   focusNode: _insulinMan.focusNode,
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
-                  inputFormatters: util.makeUdoubleFormatter(),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  inputFormatters: const [util.UdoubleFormatter()],
                   textInputAction: TextInputAction.done,
                   decoration: InputDecoration(
                     labelText: '胰島素注射量 (U)',

@@ -30,8 +30,9 @@ class _LoginPageState extends AuthState<LoginPage> {
 
     if (result.ok) {
       if (mounted) {
-        Navigator.pop(context);
-        Navigator.pushReplacementNamed(context, '/home');
+        Navigator.of(context)
+          ..pop()
+          ..pushReplacementNamed('/home');
       }
     } else {
       _passwordFocus.requestFocus();

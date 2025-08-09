@@ -1,3 +1,5 @@
+import 'package:diabeat/routes/guest/login.dart';
+import 'package:diabeat/routes/guest/register.dart';
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -31,7 +33,10 @@ class GuestPage extends StatelessWidget {
               ),
               FilledButton.icon(
                 onPressed: () {
-                  Navigator.pushNamed(context, '/guest/login');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LoginPage()),
+                  );
                 },
                 style: util.filledPageButtonStyle(),
                 icon: const Icon(Icons.login),
@@ -40,7 +45,12 @@ class GuestPage extends StatelessWidget {
               const SizedBox(height: 10),
               OutlinedButton.icon(
                 onPressed: () {
-                  Navigator.pushNamed(context, '/guest/register');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const RegisterPage(),
+                    ),
+                  );
                 },
                 style: util.outlinedPageButtonStyle(),
                 icon: const Icon(Icons.create),
