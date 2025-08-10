@@ -1,3 +1,4 @@
+import 'package:diabeat/routes/network/connection.dart' as connection;
 import 'package:diabeat/routes/network/session.dart' as session;
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
@@ -44,15 +45,19 @@ class _AccountPageState extends State<AccountPage> {
             ),
             const SizedBox(height: 10),
             OutlinedButton.icon(
-              onPressed: () {
-                Navigator.of(
+              onPressed: () async {
+                final nav = await Navigator.of(
                   context,
                   rootNavigator: true,
                 ).pushNamed('/scanner');
+
+                if (nav == true) {
+                  setState(() {});
+                }
               },
               style: util.outlinedPageButtonStyle(),
               icon: const Icon(Icons.qr_code_scanner),
-              label: const Text('連線'),
+              label: Text(connection.existAddr ? connection.addr : '連接'),
             ),
             const Spacer(),
             FilledButton.icon(

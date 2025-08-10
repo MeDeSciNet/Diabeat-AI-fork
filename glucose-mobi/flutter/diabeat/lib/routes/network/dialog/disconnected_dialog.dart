@@ -7,7 +7,7 @@ class DisconnectedDialog extends StatelessWidget {
   /// connected    : true
   ///
   /// disconnected : null
-  static Future<bool?> show(BuildContext context) async {
+  static Future<dynamic> show(BuildContext context) async {
     final nav = await showDialog(
       context: context,
       builder: (context) => const DisconnectedDialog._(),

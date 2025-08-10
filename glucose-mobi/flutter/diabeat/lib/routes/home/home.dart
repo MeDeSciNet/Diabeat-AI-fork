@@ -1,5 +1,5 @@
 import 'package:diabeat/routes/home/account/account.dart';
-import 'package:diabeat/routes/home/account/predict_diabetes.dart';
+import 'package:diabeat/routes/home/account/predict_diabetes_pages/root.dart';
 import 'package:diabeat/routes/home/chart/chart.dart';
 import 'package:diabeat/routes/home/record/record.dart';
 import 'package:flutter/material.dart';

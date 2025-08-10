@@ -24,6 +24,33 @@ ButtonStyle outlinedPageButtonStyle() {
   );
 }
 
+Widget prevPageButton(void Function() onPressed) {
+  return Expanded(
+    child: OutlinedButton.icon(
+      onPressed: onPressed,
+      style: outlinedPageButtonStyle(),
+      icon: const Icon(Icons.arrow_back_ios_new),
+      label: const Text('上一頁'),
+    ),
+  );
+}
+
+Widget nextPageButton(void Function() onPressed) {
+  return Expanded(
+    child: FilledButton.icon(
+      onPressed: onPressed,
+      style: filledPageButtonStyle(),
+      icon: const Icon(Icons.arrow_forward_ios),
+      iconAlignment: IconAlignment.end,
+      label: const Text('下一頁'),
+    ),
+  );
+}
+
+String? stringValidator(String? value) {
+  return value == null || value.isEmpty ? '必填' : null;
+}
+
 class UDoubleFieldManager {
   final ctrl = TextEditingController();
   final focusNode = FocusNode();
@@ -57,11 +84,12 @@ class UdoubleFormatter extends TextInputFormatter {
     TextEditingValue oldValue,
     TextEditingValue newValue,
   ) {
-    if (newValue.text.isEmpty) {
+    final newText = newValue.text;
+    if (newText.isEmpty) {
       return newValue;
     }
 
-    final value = double.tryParse(newValue.text);
+    final value = double.tryParse(newText);
     return value == null || value < 0 ? oldValue : newValue;
   }
 }

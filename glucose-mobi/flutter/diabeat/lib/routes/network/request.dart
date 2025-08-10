@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:diabeat/routes/network/connection.dart' as connection;
 import 'package:diabeat/routes/network/session.dart' as session;
-import 'package:diabeat/routes/network/dialog/timeout_dialog.dart';
+import 'package:diabeat/routes/network/dialog/timeout.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
@@ -137,8 +137,8 @@ Future<Result> postRecord(
   double? carbohydrate,
   double? exercise,
   double? insulin,
-}) async {
-  return await _handle(context, true, () async {
+}) {
+  return _handle(context, true, () async {
     final res = await http
         .post(
           connection.makeUrl('/records'),
@@ -156,8 +156,8 @@ Future<Result> postRecord(
   });
 }
 
-Future<Result> getRecords(BuildContext context) async {
-  return await _handle(context, true, () async {
+Future<Result> getRecords(BuildContext context) {
+  return _handle(context, true, () async {
     final res = await http.get(
       connection.makeUrl('/records'),
       headers: _configHeaders(null, auth: true),
@@ -167,8 +167,8 @@ Future<Result> getRecords(BuildContext context) async {
   });
 }
 
-Future<Result> predictCarbohydrate(BuildContext context, XFile xFile) async {
-  return await _handle(context, true, () async {
+Future<Result> predictCarbohydrate(BuildContext context, XFile xFile) {
+  return _handle(context, true, () async {
     final request = http.MultipartRequest(
       'POST',
       connection.makeUrl('/predict'),
@@ -187,6 +187,39 @@ Future<Result> predictCarbohydrate(BuildContext context, XFile xFile) async {
 
     final res = await request.send();
     return (res.statusCode, await res.stream.bytesToString());
+  });
+}
+
+Future<Result> predictDiabetes(
+  BuildContext context, {
+  required String gender,
+  required int age,
+  required double bmi,
+  required bool hypertension,
+  required bool heartDisease,
+  required String smokingHistory,
+  required double glucose,
+  required double hba1c,
+}) {
+  return _handle(context, true, () async {
+    final res = await http
+        .post(
+          connection.makeUrl('/predictform'),
+          headers: _configHeaders(null, json: true, auth: true),
+          body: jsonEncode({
+            'gender': gender,
+            'age': age,
+            'bmi': bmi,
+            'hypertension': hypertension,
+            'heart_disease': heartDisease,
+            'smoking_history': smokingHistory,
+            'HbA1c_level': hba1c,
+            'blood_glucose_level': glucose,
+          }),
+        )
+        .timeout(const Duration(seconds: 3));
+
+    return (res.statusCode, res.body);
   });
 }
 

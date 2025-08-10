@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:diabeat/routes/network/connection.dart' as connection;
 import 'package:diabeat/routes/network/dialog/refresh_failed_dialog.dart';
-import 'package:diabeat/routes/network/dialog/timeout_dialog.dart';
+import 'package:diabeat/routes/network/dialog/timeout.dart';
 import 'package:diabeat/routes/network/prefs.dart' as prefs;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;

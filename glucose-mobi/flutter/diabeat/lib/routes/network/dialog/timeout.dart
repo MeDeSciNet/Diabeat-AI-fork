@@ -9,7 +9,7 @@ class TimeoutDialog extends StatelessWidget {
   /// retry  : true
   ///
   /// cancel : null
-  static Future<bool?> show(BuildContext context) async {
+  static Future<dynamic> show(BuildContext context) async {
     final nav = await showDialog(
       context: context,
       builder: (context) => const TimeoutDialog._(),
