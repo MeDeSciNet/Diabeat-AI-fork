@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:diabeat/routes/home/account/predict_diabetes_pages/blood_figure_page.dart';
 import 'package:diabeat/routes/home/account/predict_diabetes_pages/medical_history_page.dart';
 import 'package:diabeat/routes/home/account/predict_diabetes_pages/personal_info_page.dart';
@@ -99,8 +97,9 @@ class _PredictDiabetesPageState extends State<PredictDiabetesPage> {
       );
 
       if (result.ok) {
-        final predcition = result.dataAsMap['prediction'] as int;
-        log(predcition.toString());
+        final predcition = result.dataAsMap['prediction'] == 1;
+        final page3State = _pageKeys[3].currentState! as ResultPageState;
+        page3State.setState(() => page3State.prediction = predcition);
       } else {
         // result.failed
       }
