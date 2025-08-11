@@ -5,33 +5,34 @@ class ChartPage extends StatefulWidget {
   const ChartPage({super.key});
 
   @override
-  State<ChartPage> createState() => _ChartPageState();
+  State<ChartPage> createState() => ChartPageState();
 }
 
-class _ChartPageState extends State<ChartPage> {
+class ChartPageState extends State<ChartPage> {
   List<Map<String, dynamic>>? data;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Expanded(child: 
-        ListView.builder(
-          itemCount: data?.length,
-          itemBuilder: (context, index) {
-            if (data == null) return null;
+        Expanded(
+          child: ListView.builder(
+            itemCount: data?.length,
+            itemBuilder: (context, index) {
+              if (data == null) return null;
 
-            final item = data![index];
-            return Row(
-              children: [
-                Expanded(child: Text(item['blood_glucose'].toString())),
-                Expanded(child: Text(item['carbohydrate_intake'].toString())),
-                Expanded(child: Text(item['exercise_duration'].toString())),
-                Expanded(child: Text(item['insulin_injection'].toString())),
-              ],
-            );
-          },
-        )),
+              final item = data![index];
+              return Row(
+                children: [
+                  Expanded(child: Text(item['blood_glucose'].toString())),
+                  Expanded(child: Text(item['carbohydrate_intake'].toString())),
+                  Expanded(child: Text(item['exercise_duration'].toString())),
+                  Expanded(child: Text(item['insulin_injection'].toString())),
+                ],
+              );
+            },
+          ),
+        ),
         FilledButton(
           onPressed: () async {
             final result = await request.getRecords(context);
@@ -41,5 +42,9 @@ class _ChartPageState extends State<ChartPage> {
         ),
       ],
     );
+  }
+
+  void update() {
+    setState(() {});
   }
 }

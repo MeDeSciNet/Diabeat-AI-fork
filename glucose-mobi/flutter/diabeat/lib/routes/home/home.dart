@@ -1,7 +1,8 @@
 import 'package:diabeat/routes/home/account/account.dart';
-import 'package:diabeat/routes/home/account/predict_diabetes_pages/root.dart';
+import 'package:diabeat/routes/home/account/predict_diabetes/root.dart';
 import 'package:diabeat/routes/home/chart/chart.dart';
 import 'package:diabeat/routes/home/record/record.dart';
+import 'package:diabeat/routes/network/session.dart' as session;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -18,7 +19,20 @@ class _HomeState extends State<Home> {
     GlobalKey<NavigatorState>(),
     GlobalKey<NavigatorState>(),
   ];
+  final _chartPageKey = GlobalKey<ChartPageState>();
+  final _accountPageKey = GlobalKey<AccountPageState>();
   int _index = 0;
+
+  @override
+  void initState() {
+    () async {
+      if (await session.tryNoSessionRefresh(context)) {
+        _chartPageKey.currentState!.update();
+        _accountPageKey.currentState!.update();
+      }
+    }();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +72,7 @@ class _HomeState extends State<Home> {
               onGenerateRoute: (settings) {
                 return switch (settings.name) {
                   '/' => MaterialPageRoute(
-                    builder: (context) => const ChartPage(),
+                    builder: (context) => ChartPage(key: _chartPageKey),
                   ),
                   _ => null,
                 };
@@ -70,10 +84,10 @@ class _HomeState extends State<Home> {
               onGenerateRoute: (settings) {
                 return switch (settings.name) {
                   '/' => MaterialPageRoute(
-                    builder: (context) => const AccountPage(),
+                    builder: (context) => AccountPage(key: _accountPageKey),
                   ),
                   '/predict' => MaterialPageRoute(
-                    builder: (context) => PredictDiabetesPage(),
+                    builder: (context) => PredictDiabetesRoot(),
                   ),
                   _ => null,
                 };

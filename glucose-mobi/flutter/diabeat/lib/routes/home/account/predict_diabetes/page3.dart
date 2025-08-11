@@ -2,22 +2,22 @@ import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 
-class ResultPage extends StatefulWidget {
-  const ResultPage({super.key});
+class Page3 extends StatefulWidget {
+  const Page3({super.key});
 
   @override
-  State<ResultPage> createState() => ResultPageState();
+  State<Page3> createState() => Page3State();
 }
 
-class ResultPageState extends State<ResultPage> {
-  bool? prediction;
+class Page3State extends State<Page3> {
+  bool? _prediction;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(prediction == null ? '預測中' : (prediction! ? '是' : '否')),
+        Text(_prediction == null ? '預測中' : (_prediction! ? '是' : '否')),
         const Spacer(),
         FilledButton.icon(
           onPressed: () {
@@ -29,5 +29,9 @@ class ResultPageState extends State<ResultPage> {
         ),
       ],
     );
+  }
+
+  void update(bool prediction) {
+    setState(() => _prediction = prediction);
   }
 }

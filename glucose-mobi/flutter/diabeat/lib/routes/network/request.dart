@@ -7,34 +7,12 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 
-Map<String, String> _configHeaders(
-  Map<String, String>? origin, {
-  bool json = false,
-  bool auth = false,
-}) {
-  origin ??= {};
-  if (json) {
-    origin['Content-Type'] = 'application/json';
-  }
-  if (auth) {
-    origin['Authorization'] = 'Bearer ${session.accessToken}';
-  }
-  return origin;
-}
-
 Future<Result> _handle(
   BuildContext context,
-  bool auth,
   Future<(int, String)> Function() request,
 ) async {
   if (!await connection.tryConnect(context)) {
     return Result.failed();
-  }
-
-  if (auth) {
-    if (!context.mounted || !await session.tryAuthorize(context)) {
-      return Result.failed();
-    }
   }
 
   bool retry;
@@ -79,7 +57,7 @@ Future<Result> logIn(
   required String email,
   required String password,
 }) async {
-  final result = await _handle(context, false, () async {
+  final result = await _handle(context, () async {
     final res = await http
         .post(
           connection.makeUrl('/token'),
@@ -91,7 +69,7 @@ Future<Result> logIn(
   });
 
   if (result.ok) {
-    final data = result.data;
+    final data = result._data;
     session.save(
       username: data['username'],
       accessToken: data['access'],
@@ -108,7 +86,7 @@ Future<Result> register(
   required String username,
   required String password,
 }) async {
-  final result = await _handle(context, false, () async {
+  final result = await _handle(context, () async {
     final res = await http
         .post(
           connection.makeUrl('/register'),
@@ -120,7 +98,7 @@ Future<Result> register(
   });
 
   if (result.ok) {
-    final data = result.data;
+    final data = result._data;
     session.save(
       username: username,
       accessToken: data['access'],
@@ -138,7 +116,7 @@ Future<Result> postRecord(
   double? exercise,
   double? insulin,
 }) {
-  return _handle(context, true, () async {
+  return _handle(context, () async {
     final res = await http
         .post(
           connection.makeUrl('/records'),
@@ -157,7 +135,7 @@ Future<Result> postRecord(
 }
 
 Future<Result> getRecords(BuildContext context) {
-  return _handle(context, true, () async {
+  return _handle(context, () async {
     final res = await http.get(
       connection.makeUrl('/records'),
       headers: _configHeaders(null, auth: true),
@@ -168,7 +146,7 @@ Future<Result> getRecords(BuildContext context) {
 }
 
 Future<Result> predictCarbohydrate(BuildContext context, XFile xFile) {
-  return _handle(context, true, () async {
+  return _handle(context, () async {
     final request = http.MultipartRequest(
       'POST',
       connection.makeUrl('/predict'),
@@ -201,7 +179,7 @@ Future<Result> predictDiabetes(
   required double glucose,
   required double hba1c,
 }) {
-  return _handle(context, true, () async {
+  return _handle(context, () async {
     final res = await http
         .post(
           connection.makeUrl('/predictform'),
@@ -227,17 +205,32 @@ Future<Result> predictDiabetes(
 /* */
 /* */
 
+Map<String, String> _configHeaders(
+  Map<String, String>? origin, {
+  bool json = false,
+  bool auth = false,
+}) {
+  origin ??= {};
+  if (json) {
+    origin['Content-Type'] = 'application/json';
+  }
+  if (auth) {
+    origin['Authorization'] = 'Bearer ${session.accessToken}';
+  }
+  return origin;
+}
+
 class Result {
   Result._(this.ok, [String? body])
-    : data = body == null ? null : jsonDecode(body);
+    : _data = body == null ? null : jsonDecode(body);
 
   Result.successful([String? body]) : this._(true, body);
   Result.failed([String? body]) : this._(false, body);
 
   final bool ok;
-  final dynamic data;
-  bool get haveData => data != null;
-  Map<String, dynamic> get dataAsMap => data;
+  final dynamic _data;
+  bool get haveData => _data != null;
+  Map<String, dynamic> get dataAsMap => _data;
   List<Map<String, dynamic>> get dataAsList =>
-      (data as List).cast<Map<String, dynamic>>();
+      (_data as List).cast<Map<String, dynamic>>();
 }

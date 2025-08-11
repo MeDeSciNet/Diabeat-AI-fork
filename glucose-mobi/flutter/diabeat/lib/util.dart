@@ -24,6 +24,19 @@ ButtonStyle outlinedPageButtonStyle() {
   );
 }
 
+AppBar backAppBar(BuildContext context, [String? title]) {
+  final backButton = IconButton(
+    onPressed: () {
+      Navigator.pop(context);
+    },
+    icon: const Icon(Icons.arrow_back_ios_new),
+  );
+
+  return title == null
+      ? AppBar(leading: backButton)
+      : AppBar(leading: backButton, title: Text(title), centerTitle: true);
+}
+
 Widget prevPageButton(void Function() onPressed) {
   return Expanded(
     child: OutlinedButton.icon(
@@ -47,33 +60,12 @@ Widget nextPageButton(void Function() onPressed) {
   );
 }
 
-String? stringValidator(String? value) {
-  return value == null || value.isEmpty ? '必填' : null;
+InputDecoration inputBorder(String label) {
+  return InputDecoration(labelText: label, border: const OutlineInputBorder());
 }
 
-class UDoubleFieldManager {
-  final ctrl = TextEditingController();
-  final focusNode = FocusNode();
-
-  double? get value => double.tryParse(ctrl.text);
-  set text(String value) {
-    ctrl.text = value;
-  }
-
-  void dispose() {
-    ctrl.dispose();
-    focusNode.dispose();
-  }
-
-  void Function(String) focus() {
-    return (value) {
-      focusNode.requestFocus();
-    };
-  }
-
-  void clear() {
-    ctrl.clear();
-  }
+String? nonEmptyValidator(String? value) {
+  return value == null || value.isEmpty ? '必填' : null;
 }
 
 class UdoubleFormatter extends TextInputFormatter {

@@ -1,20 +1,16 @@
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 
-class BloodFigurePage extends StatefulWidget {
-  const BloodFigurePage({
-    super.key,
-    required this.goPrevPage,
-    required this.goSendPage,
-  });
+class Page2 extends StatefulWidget {
+  const Page2({super.key, required this.goPrevPage, required this.goSendPage});
   final void Function() goPrevPage;
   final void Function() goSendPage;
 
   @override
-  State<BloodFigurePage> createState() => BloodFigurePageState();
+  State<Page2> createState() => Page2State();
 }
 
-class BloodFigurePageState extends State<BloodFigurePage> {
+class Page2State extends State<Page2> {
   final _formKey = GlobalKey<FormState>();
   final _hba1cFocus = FocusNode();
   double? glucose;
@@ -28,7 +24,7 @@ class BloodFigurePageState extends State<BloodFigurePage> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           TextFormField(
-            validator: util.stringValidator,
+            validator: util.nonEmptyValidator,
             autovalidateMode: AutovalidateMode.onUserInteraction,
             onSaved: (newValue) => glucose = double.parse(newValue!),
             keyboardType: TextInputType.numberWithOptions(decimal: true),
@@ -37,24 +33,18 @@ class BloodFigurePageState extends State<BloodFigurePage> {
             onFieldSubmitted: (value) {
               _hba1cFocus.requestFocus();
             },
-            decoration: const InputDecoration(
-              labelText: '血糖 (mg/dL)',
-              border: OutlineInputBorder(),
-            ),
+            decoration: util.inputBorder('血糖 (mg/dL)'),
           ),
           const SizedBox(height: 20),
           TextFormField(
             focusNode: _hba1cFocus,
-            validator: util.stringValidator,
+            validator: util.nonEmptyValidator,
             autovalidateMode: AutovalidateMode.onUserInteraction,
             onSaved: (newValue) => hba1c = double.parse(newValue!),
             keyboardType: TextInputType.numberWithOptions(decimal: true),
             inputFormatters: const [util.UdoubleFormatter()],
             textInputAction: TextInputAction.done,
-            decoration: const InputDecoration(
-              labelText: 'HbA1c (%)',
-              border: OutlineInputBorder(),
-            ),
+            decoration: util.inputBorder('HbA1c (%)'),
           ),
           const Spacer(),
           Row(

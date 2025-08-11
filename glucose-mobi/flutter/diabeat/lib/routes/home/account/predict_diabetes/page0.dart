@@ -1,15 +1,15 @@
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 
-class PersonalInfoPage extends StatefulWidget {
-  const PersonalInfoPage({super.key, required this.goNextPage});
+class Page0 extends StatefulWidget {
+  const Page0({super.key, required this.goNextPage});
   final void Function() goNextPage;
 
   @override
-  State<PersonalInfoPage> createState() => PersonalInfoPageState();
+  State<Page0> createState() => Page0State();
 }
 
-class PersonalInfoPageState extends State<PersonalInfoPage> {
+class Page0State extends State<Page0> {
   final _formKey = GlobalKey<FormState>();
   final _heightFocus = FocusNode();
   final _weightFocus = FocusNode();
@@ -26,7 +26,7 @@ class PersonalInfoPageState extends State<PersonalInfoPage> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           FormField<String>(
-            validator: util.stringValidator,
+            validator: util.nonEmptyValidator,
             autovalidateMode: AutovalidateMode.onUserInteraction,
             onSaved: (newValue) => gender = newValue,
             builder: (field) => Column(
@@ -66,11 +66,8 @@ class PersonalInfoPageState extends State<PersonalInfoPage> {
             onFieldSubmitted: (value) {
               _heightFocus.requestFocus();
             },
-            decoration: const InputDecoration(
-              labelText: '年齡',
-              border: OutlineInputBorder(),
-            ),
-            validator: util.stringValidator,
+            decoration: util.inputBorder('年齡'),
+            validator: util.nonEmptyValidator,
             autovalidateMode: AutovalidateMode.onUserInteraction,
             onSaved: (newValue) => age = int.parse(newValue!),
           ),
@@ -83,11 +80,8 @@ class PersonalInfoPageState extends State<PersonalInfoPage> {
             onFieldSubmitted: (value) {
               _weightFocus.requestFocus();
             },
-            decoration: const InputDecoration(
-              labelText: '身高 (cm)',
-              border: OutlineInputBorder(),
-            ),
-            validator: util.stringValidator,
+            decoration: util.inputBorder('身高 (cm)'),
+            validator: util.nonEmptyValidator,
             autovalidateMode: AutovalidateMode.onUserInteraction,
             onSaved: (newValue) => height = double.parse(newValue!),
           ),
@@ -100,11 +94,8 @@ class PersonalInfoPageState extends State<PersonalInfoPage> {
             onFieldSubmitted: (value) {
               _tryGoNextPage();
             },
-            decoration: const InputDecoration(
-              labelText: '體重 (kg)',
-              border: OutlineInputBorder(),
-            ),
-            validator: util.stringValidator,
+            decoration: util.inputBorder('體重 (kg)'),
+            validator: util.nonEmptyValidator,
             autovalidateMode: AutovalidateMode.onUserInteraction,
             onSaved: (newValue) => weight = double.parse(newValue!),
           ),

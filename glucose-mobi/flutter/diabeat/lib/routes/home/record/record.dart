@@ -12,53 +12,40 @@ class RecordPage extends StatefulWidget {
 }
 
 class _RecordPageState extends State<RecordPage> {
-  final _glucoseMan = util.UDoubleFieldManager();
-  final _carbohydrateMan = util.UDoubleFieldManager();
-  final _exerciseMan = util.UDoubleFieldManager();
-  final _insulinMan = util.UDoubleFieldManager();
+  final _managers = [
+    _UdoubleFieldManager('血糖 (mg/dL)'),
+    _UdoubleFieldManager('碳水攝取量 (g)'),
+    _UdoubleFieldManager('運動時長 (min)'),
+    _UdoubleFieldManager('胰島素注射量 (U)'),
+  ];
   final _picker = ImagePicker();
-
-  String? _glucoseErr;
-  bool _submitted = false;
   bool _waiting = false;
 
   @override
   void dispose() {
-    _glucoseMan.dispose();
-    _carbohydrateMan.dispose();
-    _exerciseMan.dispose();
-    _insulinMan.dispose();
+    for (final man in _managers) {
+      man.controller.dispose();
+      man.focusNode.dispose();
+    }
     super.dispose();
   }
 
-  void _validateGlucose() {
-    _glucoseErr = _glucoseMan.value == null ? '血糖不能為空' : null;
-  }
-
   Future<void> _tryPostRecord() async {
-    setState(() {
-      _submitted = true;
-      _validateGlucose();
-      _waiting = _glucoseErr == null;
-    });
-    if (!_waiting) return;
-
     final result = await request.postRecord(
       context,
-      glucose: _glucoseMan.value!,
-      carbohydrate: _carbohydrateMan.value,
-      exercise: _exerciseMan.value,
-      insulin: _insulinMan.value,
+      glucose: _managers[0].value!,
+      carbohydrate: _managers[1].value,
+      exercise: _managers[2].value,
+      insulin: _managers[3].value,
     );
 
     if (!mounted) return;
     setState(() => _waiting = false);
 
     if (result.ok) {
-      _glucoseMan.clear();
-      _carbohydrateMan.clear();
-      _exerciseMan.clear();
-      _insulinMan.clear();
+      for (final man in _managers) {
+        man.controller.clear();
+      }
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -91,7 +78,7 @@ class _RecordPageState extends State<RecordPage> {
 
       if (result.ok) {
         final value = result.dataAsMap['predicted_value'] as double;
-        _carbohydrateMan.text = value.toStringAsFixed(1);
+        _managers[1].controller.text = value.toStringAsFixed(1);
       } else {
         // result.failed
       }
@@ -119,47 +106,13 @@ class _RecordPageState extends State<RecordPage> {
             const Spacer(),
             Column(
               children: [
-                TextField(
-                  controller: _glucoseMan.ctrl,
-                  focusNode: _glucoseMan.focusNode,
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
-                  inputFormatters: const [util.UdoubleFormatter()],
-                  textInputAction: TextInputAction.next,
-                  onSubmitted: _carbohydrateMan.focus(),
-                  decoration: InputDecoration(
-                    labelText: '血糖 (mg/dL)',
-                    errorText: _glucoseErr,
-                    border: const OutlineInputBorder(),
-                  ),
-                  onChanged: (value) {
-                    if (_submitted) {
-                      setState(_validateGlucose);
-                    }
-                  },
-                ),
+                _uDoubleFormField(0),
                 const SizedBox(height: 20),
                 IntrinsicHeight(
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _carbohydrateMan.ctrl,
-                          focusNode: _carbohydrateMan.focusNode,
-                          keyboardType: const TextInputType.numberWithOptions(
-                            decimal: true,
-                          ),
-                          inputFormatters: const [util.UdoubleFormatter()],
-                          textInputAction: TextInputAction.next,
-                          onSubmitted: _exerciseMan.focus(),
-                          decoration: InputDecoration(
-                            labelText: '碳水攝取量 (g)',
-                            border: const OutlineInputBorder(),
-                          ),
-                        ),
-                      ),
+                      Expanded(child: _uDoubleFormField(1)),
                       const SizedBox(width: 10),
                       FilledButton.icon(
                         onPressed: _waiting ? null : _tryPredict,
@@ -171,34 +124,9 @@ class _RecordPageState extends State<RecordPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                TextField(
-                  controller: _exerciseMan.ctrl,
-                  focusNode: _exerciseMan.focusNode,
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
-                  inputFormatters: const [util.UdoubleFormatter()],
-                  textInputAction: TextInputAction.next,
-                  onSubmitted: _insulinMan.focus(),
-                  decoration: InputDecoration(
-                    labelText: '運動時長 (min)',
-                    border: const OutlineInputBorder(),
-                  ),
-                ),
+                _uDoubleFormField(2),
                 const SizedBox(height: 20),
-                TextField(
-                  controller: _insulinMan.ctrl,
-                  focusNode: _insulinMan.focusNode,
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
-                  inputFormatters: const [util.UdoubleFormatter()],
-                  textInputAction: TextInputAction.done,
-                  decoration: InputDecoration(
-                    labelText: '胰島素注射量 (U)',
-                    border: const OutlineInputBorder(),
-                  ),
-                ),
+                _uDoubleFormField(3),
               ],
             ),
             const Spacer(),
@@ -214,4 +142,32 @@ class _RecordPageState extends State<RecordPage> {
       ),
     );
   }
+
+  Widget _uDoubleFormField(int index) {
+    return TextFormField(
+      validator: index == 0 ? util.nonEmptyValidator : null,
+      autovalidateMode: AutovalidateMode.onUnfocus,
+      controller: _managers[index].controller,
+      focusNode: _managers[index].focusNode,
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      inputFormatters: const [util.UdoubleFormatter()],
+      textInputAction: index == 3 ? TextInputAction.done : TextInputAction.next,
+      onFieldSubmitted: index == 3
+          ? null
+          : (value) {
+              _managers[index + 1].focusNode.requestFocus();
+            },
+      decoration: util.inputBorder('碳水攝取量 (g)'),
+    );
+  }
+}
+
+class _UdoubleFieldManager {
+  _UdoubleFieldManager(this.labelText);
+
+  final controller = TextEditingController();
+  final focusNode = FocusNode();
+  final String labelText;
+
+  double? get value => double.tryParse(controller.text);
 }

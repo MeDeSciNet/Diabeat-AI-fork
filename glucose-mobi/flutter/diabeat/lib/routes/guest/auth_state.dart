@@ -2,43 +2,50 @@ import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 
 abstract class AuthState<T extends StatefulWidget> extends State<T> {
-  final emailCtrl = TextEditingController();
-  final passwordCtrl = TextEditingController();
+  final formKey = GlobalKey<FormState>();
+
   String? emailErr;
-  String? passwordErr;
   bool passwordObscured = true;
-  bool submitted = false;
   bool waiting = false;
+  
+  late String email;
+  late String password;
 
-  @override
-  void dispose() {
-    emailCtrl.dispose();
-    passwordCtrl.dispose();
-    super.dispose();
-  }
+  Widget buildEmailField() {
+    return TextFormField(
+      validator: (value) {
+        final regex = RegExp(
+          r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+        );
 
-  TextField buildEmailField() {
-    return TextField(
-      controller: emailCtrl,
+        if (value == null || value.isEmpty) {
+          return 'Email 不能為空';
+        } else if (!regex.hasMatch(value)) {
+          return 'Email 格式不正確';
+        } else {
+          return null;
+        }
+      },
+      autovalidateMode: AutovalidateMode.onUnfocus,
+      onSaved: (newValue) => email = newValue!,
+      forceErrorText: emailErr,
       keyboardType: TextInputType.emailAddress,
       textInputAction: TextInputAction.next,
       decoration: InputDecoration(
         labelText: 'Email',
-        errorText: emailErr,
         border: const OutlineInputBorder(),
       ),
       onChanged: (value) {
-        if (submitted) {
-          setState(validateEmail);
+        if (emailErr != null) {
+          setState(() => emailErr = null);
         }
       },
     );
   }
 
-  InputDecoration makePasswordDecoration() {
+  InputDecoration passwordDecoration() {
     return InputDecoration(
       labelText: '密碼',
-      errorText: passwordErr,
       border: const OutlineInputBorder(),
       suffixIcon: IconButton(
         onPressed: () {
@@ -49,6 +56,18 @@ abstract class AuthState<T extends StatefulWidget> extends State<T> {
             : const Icon(Icons.visibility_off),
       ),
     );
+  }
+
+  String? passwordValidator(String? value) {
+    if (value == null || value.isEmpty) {
+      return '密碼不能為空';
+    }
+
+    if (value.length < 6) {
+      return '密碼至少需要 6 個字母';
+    }
+
+    return null;
   }
 
   OutlinedButton buildScanButton() {
@@ -64,28 +83,5 @@ abstract class AuthState<T extends StatefulWidget> extends State<T> {
     );
   }
 
-  void validateEmail() {
-    final regex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-    final email = emailCtrl.text;
-
-    if (email.isEmpty) {
-      emailErr = 'Email 不能為空';
-    } else if (!regex.hasMatch(email)) {
-      emailErr = 'Email 格式不正確';
-    } else {
-      emailErr = null;
-    }
-  }
-
-  void validatePassword() {
-    final password = passwordCtrl.text;
-
-    if (password.isEmpty) {
-      passwordErr = '密碼不能為空';
-    } else if (password.length < 6) {
-      passwordErr = '密碼至少需要 6 個字母';
-    } else {
-      passwordErr = null;
-    }
-  }
+  FormState get formState => formKey.currentState!;
 }

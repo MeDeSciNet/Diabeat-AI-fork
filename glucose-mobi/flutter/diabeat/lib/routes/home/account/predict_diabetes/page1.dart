@@ -1,8 +1,8 @@
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 
-class MedicalHistoryPage extends StatefulWidget {
-  const MedicalHistoryPage({
+class Page1 extends StatefulWidget {
+  const Page1({
     super.key,
     required this.goPrevPage,
     required this.goNextPage,
@@ -11,10 +11,10 @@ class MedicalHistoryPage extends StatefulWidget {
   final void Function() goNextPage;
 
   @override
-  State<MedicalHistoryPage> createState() => MedicalHistoryPageState();
+  State<Page1> createState() => Page1State();
 }
 
-class MedicalHistoryPageState extends State<MedicalHistoryPage> {
+class Page1State extends State<Page1> {
   final _formKey = GlobalKey<FormState>();
   bool hypertension = false;
   bool heartDisease = false;
@@ -46,7 +46,7 @@ class MedicalHistoryPageState extends State<MedicalHistoryPage> {
           ),
           const SizedBox(height: 20),
           FormField<String>(
-            validator: util.stringValidator,
+            validator: util.nonEmptyValidator,
             autovalidateMode: AutovalidateMode.onUserInteraction,
             onSaved: (newValue) => smokingHistory = newValue,
             builder: (field) => Column(

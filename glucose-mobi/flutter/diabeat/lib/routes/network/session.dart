@@ -42,7 +42,7 @@ Future<bool> _refresh(BuildContext context, String oldRefreshToken) async {
         connection.makeUrl('/token/refresh'),
         body: {'refresh': oldRefreshToken},
       )
-      .timeout(const Duration(seconds: 3));
+      .timeout(const Duration(seconds: 1));
 
   final status = res.statusCode;
 
@@ -62,7 +62,7 @@ Future<bool> _refresh(BuildContext context, String oldRefreshToken) async {
   return false;
 }
 
-Future<bool> tryAuthorize(BuildContext context) async {
+Future<bool> tryNoSessionRefresh(BuildContext context) async {
   if (loggedIn) {
     return true;
   }
@@ -74,6 +74,9 @@ Future<bool> tryAuthorize(BuildContext context) async {
       //
     } on TimeoutException {
       if (!context.mounted || await TimeoutDialog.show(context) == null) {
+        if (context.mounted) {
+          RefreshFailedDialog.show(context);
+        }
         return false;
       }
     }

@@ -7,19 +7,10 @@ class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
 
   @override
-  State<AccountPage> createState() => _AccountPageState();
+  State<AccountPage> createState() => AccountPageState();
 }
 
-class _AccountPageState extends State<AccountPage> {
-  @override
-  void initState() {
-    () async {
-      await session.tryAuthorize(context);
-      setState(() {});
-    }();
-    super.initState();
-  }
-
+class AccountPageState extends State<AccountPage> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -29,11 +20,12 @@ class _AccountPageState extends State<AccountPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const Spacer(),
-            Text(
-              'Hello, ${session.loggedIn ? session.username : ''}',
-              style: const TextStyle(fontSize: 50),
-              textAlign: TextAlign.center,
-            ),
+            if (session.loggedIn)
+              Text(
+                'Hello, ${session.username}',
+                style: const TextStyle(fontSize: 50),
+                textAlign: TextAlign.center,
+              ),
             const Spacer(),
             OutlinedButton.icon(
               onPressed: () {
@@ -77,5 +69,9 @@ class _AccountPageState extends State<AccountPage> {
         ),
       ),
     );
+  }
+
+  void update() {
+    setState(() {});
   }
 }

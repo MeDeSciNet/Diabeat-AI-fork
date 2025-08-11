@@ -1,4 +1,5 @@
 import 'package:diabeat/routes/network/session.dart' as session;
+import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 
 class RefreshFailedDialog extends StatelessWidget {
@@ -13,7 +14,10 @@ class RefreshFailedDialog extends StatelessWidget {
 
     if (context.mounted) {
       session.delete();
-      Navigator.pushNamedAndRemoveUntil(context, '/guest', (route) => false);
+      Navigator.of(
+        context,
+        rootNavigator: true,
+      ).pushNamedAndRemoveUntil('/guest', (route) => false);
     }
   }
 
@@ -29,6 +33,7 @@ class RefreshFailedDialog extends StatelessWidget {
             onPressed: () {
               Navigator.pop(context);
             },
+            style: util.filledPageButtonStyle(),
             icon: const Icon(Icons.logout),
             label: const Text('登出'),
           ),

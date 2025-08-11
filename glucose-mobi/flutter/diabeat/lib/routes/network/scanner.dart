@@ -1,16 +1,24 @@
 import 'package:diabeat/routes/network/connection.dart' as connection;
 import 'package:diabeat/routes/network/dialog/confirm_scan_dialog.dart';
+import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 /// connected    : true
 ///
 /// disconnected : null
-class ScannerPage extends StatelessWidget {
-  ScannerPage({super.key});
+class ScannerPage extends StatefulWidget {
+  const ScannerPage({super.key});
+
+  @override
+  State<ScannerPage> createState() => _ScannerPageState();
+}
+
+class _ScannerPageState extends State<ScannerPage> {
   final _controller = MobileScannerController(
     formats: const [BarcodeFormat.qrCode],
   );
+  double _scale = 0;
 
   void Function(BarcodeCapture) _detect(BuildContext context) {
     return (BarcodeCapture barcodes) async {
@@ -43,16 +51,7 @@ class ScannerPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(Icons.arrow_back_ios_new),
-        ),
-        title: const Text('連接到伺服器'),
-        centerTitle: true,
-      ),
+      appBar: util.backAppBar(context, '連接到伺服器'),
       body: SafeArea(
         child: Column(
           children: [
@@ -64,35 +63,18 @@ class ScannerPage extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
-              child: _SliderWidget(_controller),
+              child: Slider(
+                value: _scale,
+                onChanged: (value) {
+                  setState(() => _scale = value);
+                  _controller.setZoomScale(_scale);
+                },
+                year2023: false,
+              ),
             ),
           ],
         ),
       ),
-    );
-  }
-}
-
-class _SliderWidget extends StatefulWidget {
-  const _SliderWidget(this.controller);
-  final MobileScannerController controller;
-
-  @override
-  State<_SliderWidget> createState() => _SliderWidgetState();
-}
-
-class _SliderWidgetState extends State<_SliderWidget> {
-  double _scale = 0;
-
-  @override
-  Widget build(BuildContext context) {
-    return Slider(
-      value: _scale,
-      onChanged: (value) {
-        setState(() => _scale = value);
-        widget.controller.setZoomScale(_scale);
-      },
-      year2023: false,
     );
   }
 }

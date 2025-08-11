@@ -10,14 +10,15 @@ class DisconnectedDialog extends StatelessWidget {
   static Future<dynamic> show(BuildContext context) async {
     final nav = await showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) => const DisconnectedDialog._(),
     );
 
     return switch (nav) {
-      true when context.mounted => await Navigator.pushNamed(
+      true when context.mounted => await Navigator.of(
         context,
-        '/scanner',
-      ),
+        rootNavigator: true,
+      ).pushNamed('/scanner'),
       _ => null,
     };
   }
