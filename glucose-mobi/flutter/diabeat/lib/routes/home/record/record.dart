@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:diabeat/routes/network/dialog/image_picker_dialog.dart';
 import 'package:diabeat/routes/network/request.dart' as request;
 import 'package:diabeat/util.dart' as util;
@@ -8,10 +9,10 @@ class RecordPage extends StatefulWidget {
   const RecordPage({super.key});
 
   @override
-  State<RecordPage> createState() => _RecordPageState();
+  State<RecordPage> createState() => RecordPageState();
 }
 
-class _RecordPageState extends State<RecordPage> {
+class RecordPageState extends State<RecordPage> {
   final _managers = [
     _UdoubleFieldManager('血糖 (mg/dL)'),
     _UdoubleFieldManager('碳水攝取量 (g)'),
@@ -19,7 +20,11 @@ class _RecordPageState extends State<RecordPage> {
     _UdoubleFieldManager('胰島素注射量 (U)'),
   ];
   final _picker = ImagePicker();
-  bool _waiting = false;
+  bool _waiting = true;
+
+  void update() {
+    setState(() => _waiting = false);
+  }
 
   @override
   void dispose() {
@@ -28,62 +33,6 @@ class _RecordPageState extends State<RecordPage> {
       man.focusNode.dispose();
     }
     super.dispose();
-  }
-
-  Future<void> _tryPostRecord() async {
-    final result = await request.postRecord(
-      context,
-      glucose: _managers[0].value!,
-      carbohydrate: _managers[1].value,
-      exercise: _managers[2].value,
-      insulin: _managers[3].value,
-    );
-
-    if (!mounted) return;
-    setState(() => _waiting = false);
-
-    if (result.ok) {
-      for (final man in _managers) {
-        man.controller.clear();
-      }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('送出成功'),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    } else {
-      // result.failed
-    }
-  }
-
-  Future<void> _tryPredict() async {
-    final nav = await ImagePickerDialog.show(context);
-    final image = switch (nav) {
-      ImagePickerDialogNav.camera => await _picker.pickImage(
-        source: ImageSource.camera,
-      ),
-      ImagePickerDialogNav.gallery => await _picker.pickImage(
-        source: ImageSource.gallery,
-      ),
-      _ => null,
-    };
-
-    if (!mounted) return;
-    setState(() => _waiting = true);
-
-    if (image != null) {
-      final result = await request.predictCarbohydrate(context, image);
-
-      if (result.ok) {
-        final value = result.data['predicted_value'] as double;
-        _managers[1].controller.text = value.toStringAsFixed(1);
-      }
-    }
-
-    if (!mounted) return;
-    setState(() => _waiting = false);
   }
 
   @override
@@ -139,6 +88,56 @@ class _RecordPageState extends State<RecordPage> {
         ),
       ),
     );
+  }
+
+  Future<void> _tryPostRecord() async {
+    setState(() => _waiting = true);
+
+    final result = await request.postRecord(
+      context,
+      glucose: _managers[0].value!,
+      carbohydrate: _managers[1].value,
+      exercise: _managers[2].value,
+      insulin: _managers[3].value,
+    );
+
+    if (!mounted) return;
+    setState(() => _waiting = false);
+
+    if (result.ok) {
+      for (final man in _managers) {
+        man.controller.clear();
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('送出成功'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } else {
+      log('post record failed');
+    }
+  }
+
+  Future<void> _tryPredict() async {
+    final source = await ImagePickerDialog.show(context);
+    if (source == null) return;
+
+    final image = await _picker.pickImage(source: source);
+    if (image == null || !mounted) return;
+    setState(() => _waiting = true);
+
+    final result = await request.predictCarb(context, image);
+    if (result.ok) {
+      final value = result.data['predicted_value'] as double;
+      _managers[1].controller.text = value.toStringAsFixed(1);
+    } else {
+      log('predict carb failed');
+    }
+
+    if (!mounted) return;
+    setState(() => _waiting = false);
   }
 
   Widget _uDoubleFormField(int index) {

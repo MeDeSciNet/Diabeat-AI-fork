@@ -169,7 +169,7 @@ Future<Result> getRecords(BuildContext context) {
   });
 }
 
-Future<Result> predictCarbohydrate(BuildContext context, XFile xFile) {
+Future<Result> predictCarb(BuildContext context, XFile xFile) {
   return _handle(context, () async {
     final request = http.MultipartRequest(
       'POST',

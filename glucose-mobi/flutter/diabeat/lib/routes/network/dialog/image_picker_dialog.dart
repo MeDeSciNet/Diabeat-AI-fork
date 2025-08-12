@@ -1,12 +1,11 @@
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
-
-enum ImagePickerDialogNav { camera, gallery }
+import 'package:image_picker/image_picker.dart';
 
 class ImagePickerDialog extends StatelessWidget {
   const ImagePickerDialog._();
 
-  static Future<ImagePickerDialogNav?> show(BuildContext context) {
+  static Future<ImageSource?> show(BuildContext context) {
     return showDialog(
       context: context,
       builder: (context) => const ImagePickerDialog._(),
@@ -22,7 +21,7 @@ class ImagePickerDialog extends StatelessWidget {
       children: [
         FilledButton.icon(
           onPressed: () {
-            Navigator.pop(context, ImagePickerDialogNav.camera);
+            Navigator.pop(context, ImageSource.camera);
           },
           style: util.filledPageButtonStyle(),
           label: const Text('拍照'),
@@ -31,7 +30,7 @@ class ImagePickerDialog extends StatelessWidget {
         const SizedBox(height: 10),
         OutlinedButton.icon(
           onPressed: () {
-            Navigator.pop(context, ImagePickerDialogNav.gallery);
+            Navigator.pop(context, ImageSource.gallery);
           },
           style: util.outlinedPageButtonStyle(),
           icon: const Icon(Icons.photo),

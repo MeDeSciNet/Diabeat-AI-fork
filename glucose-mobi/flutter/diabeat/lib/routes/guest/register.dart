@@ -105,8 +105,8 @@ class _RegisterPageState extends AuthState<RegisterPage> {
       password: password,
     );
     if (!mounted) return;
-    final data = result.data as Map<String, dynamic>;
 
+    final data = result.data as Map<String, dynamic>;
     if (result.ok) {
       session.save(
         username: _username,

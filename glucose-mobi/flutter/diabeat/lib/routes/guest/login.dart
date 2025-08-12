@@ -90,8 +90,8 @@ class _LoginPageState extends AuthState<LoginPage> {
       password: password,
     );
     if (!mounted) return;
+    
     final data = result.data;
-
     if (result.ok) {
       session.save(
         username: data['username'],

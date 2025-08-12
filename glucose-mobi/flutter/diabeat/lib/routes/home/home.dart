@@ -8,7 +8,6 @@ import 'package:diabeat/routes/network/dialog/refresh_failed_dialog.dart';
 import 'package:diabeat/routes/network/dialog/timeout.dart';
 import 'package:diabeat/routes/network/prefs.dart' as prefs;
 import 'package:diabeat/routes/network/request.dart' as request;
-import 'package:diabeat/routes/network/session.dart' as session;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -25,15 +24,12 @@ class _HomeState extends State<Home> {
     GlobalKey<NavigatorState>(),
     GlobalKey<NavigatorState>(),
   ];
+  final _recordPageKey = GlobalKey<RecordPageState>();
   final _chartPageKey = GlobalKey<ChartPageState>();
   final _accountPageKey = GlobalKey<AccountPageState>();
   int _index = 0;
 
-  Future<bool> _tryNoSessionRefresh(BuildContext context) async {
-    if (session.loggedIn) {
-      return true;
-    }
-
+  Future<bool> _noSessionRefresh(BuildContext context) async {
     final oldRefreshToken = await prefs.readRefreshToken();
     while (true) {
       try {
@@ -54,7 +50,8 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     () async {
-      if (await _tryNoSessionRefresh(context)) {
+      if (await _noSessionRefresh(context)) {
+        _recordPageKey.currentState!.update();
         _chartPageKey.currentState!.update();
         _accountPageKey.currentState!.update();
       }
@@ -88,7 +85,7 @@ class _HomeState extends State<Home> {
               onGenerateRoute: (settings) {
                 return switch (settings.name) {
                   '/' => MaterialPageRoute(
-                    builder: (context) => const RecordPage(),
+                    builder: (context) => RecordPage(key: _recordPageKey),
                   ),
                   _ => null,
                 };
