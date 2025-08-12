@@ -1,7 +1,13 @@
+import 'dart:async';
+
 import 'package:diabeat/routes/home/account/account.dart';
 import 'package:diabeat/routes/home/account/predict_diabetes/root.dart';
 import 'package:diabeat/routes/home/chart/chart.dart';
 import 'package:diabeat/routes/home/record/record.dart';
+import 'package:diabeat/routes/network/dialog/refresh_failed_dialog.dart';
+import 'package:diabeat/routes/network/dialog/timeout.dart';
+import 'package:diabeat/routes/network/prefs.dart' as prefs;
+import 'package:diabeat/routes/network/request.dart' as request;
 import 'package:diabeat/routes/network/session.dart' as session;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -23,10 +29,32 @@ class _HomeState extends State<Home> {
   final _accountPageKey = GlobalKey<AccountPageState>();
   int _index = 0;
 
+  Future<bool> tryNoSessionRefresh(BuildContext context) async {
+    if (session.loggedIn) {
+      return true;
+    }
+
+    final oldRefreshToken = await prefs.readRefreshToken();
+    while (true) {
+      try {
+        return context.mounted &&
+            await request.refresh(context, oldRefreshToken);
+        //
+      } on TimeoutException {
+        if (!context.mounted || await TimeoutDialog.show(context) == null) {
+          if (context.mounted) {
+            RefreshFailedDialog.show(context);
+          }
+          return false;
+        }
+      }
+    }
+  }
+
   @override
   void initState() {
     () async {
-      if (await session.tryNoSessionRefresh(context)) {
+      if (await tryNoSessionRefresh(context)) {
         _chartPageKey.currentState!.update();
         _accountPageKey.currentState!.update();
       }

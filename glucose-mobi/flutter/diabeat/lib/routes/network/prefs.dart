@@ -3,10 +3,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 final _prefs = SharedPreferencesAsync();
 
-void writeAddr(String addr) {
-  _prefs.setString('addr', addr);
-}
-
 Future<String?> _readRawAddr() {
   return _prefs.getString('addr');
 }
@@ -19,6 +15,10 @@ Future<String> readAddr() async {
   return (await _readRawAddr())!;
 }
 
+void writeAddr(String addr) {
+  _prefs.setString('addr', addr);
+}
+
 /* */
 /* */
 /* ===== Encrypted Shared Prefs ===== */
@@ -26,14 +26,6 @@ Future<String> readAddr() async {
 final _encryptedPrefs = const FlutterSecureStorage(
   aOptions: AndroidOptions(encryptedSharedPreferences: true),
 );
-
-void writeRefreshToken(String refreshToken) {
-  _encryptedPrefs.write(key: 'refresh_token', value: refreshToken);
-}
-
-void deleteRefreshToken() {
-  _encryptedPrefs.delete(key: 'refresh_token');
-}
 
 Future<String?> _readRawRefreshToken() {
   return _encryptedPrefs.read(key: 'refresh_token');
@@ -45,4 +37,12 @@ Future<bool> existRefreshToken() async {
 
 Future<String> readRefreshToken() async {
   return (await _readRawRefreshToken())!;
+}
+
+void writeRefreshToken(String refreshToken) {
+  _encryptedPrefs.write(key: 'refresh_token', value: refreshToken);
+}
+
+void deleteRefreshToken() {
+  _encryptedPrefs.delete(key: 'refresh_token');
 }
