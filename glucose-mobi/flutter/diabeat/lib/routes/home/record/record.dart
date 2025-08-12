@@ -146,7 +146,6 @@ class _RecordPageState extends State<RecordPage> {
   Widget _uDoubleFormField(int index) {
     return TextFormField(
       validator: index == 0 ? util.nonEmptyValidator : null,
-      autovalidateMode: AutovalidateMode.onUnfocus,
       controller: _managers[index].controller,
       focusNode: _managers[index].focusNode,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),

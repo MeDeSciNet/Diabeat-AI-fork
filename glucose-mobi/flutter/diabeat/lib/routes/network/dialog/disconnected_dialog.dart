@@ -1,3 +1,4 @@
+import 'package:diabeat/routes/network/scanner.dart';
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 
@@ -15,10 +16,7 @@ class DisconnectedDialog extends StatelessWidget {
     );
 
     return switch (nav) {
-      true when context.mounted => await Navigator.of(
-        context,
-        rootNavigator: true,
-      ).pushNamed('/scanner'),
+      true when context.mounted => await ScannerPage.push(context),
       _ => null,
     };
   }

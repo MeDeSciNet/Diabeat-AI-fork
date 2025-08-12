@@ -10,6 +10,10 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 class ScannerPage extends StatefulWidget {
   const ScannerPage({super.key});
 
+  static Future<dynamic> push(BuildContext context) {
+    return Navigator.of(context, rootNavigator: true).pushNamed('/scanner');
+  }
+
   @override
   State<ScannerPage> createState() => _ScannerPageState();
 }
@@ -18,7 +22,7 @@ class _ScannerPageState extends State<ScannerPage> {
   final _controller = MobileScannerController(
     formats: const [BarcodeFormat.qrCode],
   );
-  double _scale = 0;
+  final _scale = ValueNotifier<double>(0);
 
   void Function(BarcodeCapture) _detect(BuildContext context) {
     return (BarcodeCapture barcodes) async {
@@ -63,13 +67,16 @@ class _ScannerPageState extends State<ScannerPage> {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
-              child: Slider(
-                value: _scale,
-                onChanged: (value) {
-                  setState(() => _scale = value);
-                  _controller.setZoomScale(_scale);
-                },
-                year2023: false,
+              child: ValueListenableBuilder(
+                valueListenable: _scale,
+                builder: (context, value, child) => Slider(
+                  value: _scale.value,
+                  onChanged: (value) {
+                    setState(() => _scale.value = value);
+                    _controller.setZoomScale(_scale.value);
+                  },
+                  year2023: false,
+                ),
               ),
             ),
           ],

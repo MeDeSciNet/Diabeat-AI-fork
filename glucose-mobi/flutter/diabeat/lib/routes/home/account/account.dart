@@ -1,4 +1,5 @@
 import 'package:diabeat/routes/network/connection.dart' as connection;
+import 'package:diabeat/routes/network/scanner.dart';
 import 'package:diabeat/routes/network/session.dart' as session;
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
@@ -38,12 +39,7 @@ class AccountPageState extends State<AccountPage> {
             const SizedBox(height: 10),
             OutlinedButton.icon(
               onPressed: () async {
-                final nav = await Navigator.of(
-                  context,
-                  rootNavigator: true,
-                ).pushNamed('/scanner');
-
-                if (nav == true) {
+                if (await ScannerPage.push(context) == true) {
                   setState(() {});
                 }
               },

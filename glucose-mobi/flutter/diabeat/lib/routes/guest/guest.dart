@@ -37,10 +37,7 @@ class GuestPage extends StatelessWidget {
               ),
               FilledButton.icon(
                 onPressed: () {
-                  Navigator.of(
-                    context,
-                    rootNavigator: true,
-                  ).pushNamed('/guest/login');
+                  Navigator.of(context).pushNamed('/guest/login');
                 },
                 style: util.filledPageButtonStyle(),
                 icon: const Icon(Icons.login),
@@ -49,10 +46,7 @@ class GuestPage extends StatelessWidget {
               const SizedBox(height: 10),
               OutlinedButton.icon(
                 onPressed: () {
-                  Navigator.of(
-                    context,
-                    rootNavigator: true,
-                  ).pushNamed('/guest/register');
+                  Navigator.of(context).pushNamed('/guest/register');
                 },
                 style: util.outlinedPageButtonStyle(),
                 icon: const Icon(Icons.create),

@@ -27,7 +27,6 @@ class Page0State extends State<Page0> {
         children: [
           FormField<String>(
             validator: util.nonEmptyValidator,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
             onSaved: (newValue) => gender = newValue,
             builder: (field) => Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -68,7 +67,6 @@ class Page0State extends State<Page0> {
             },
             decoration: util.inputBorder('年齡'),
             validator: util.nonEmptyValidator,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
             onSaved: (newValue) => age = int.parse(newValue!),
           ),
           const SizedBox(height: 20),
@@ -82,7 +80,6 @@ class Page0State extends State<Page0> {
             },
             decoration: util.inputBorder('身高 (cm)'),
             validator: util.nonEmptyValidator,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
             onSaved: (newValue) => height = double.parse(newValue!),
           ),
           const SizedBox(height: 20),
@@ -96,7 +93,6 @@ class Page0State extends State<Page0> {
             },
             decoration: util.inputBorder('體重 (kg)'),
             validator: util.nonEmptyValidator,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
             onSaved: (newValue) => weight = double.parse(newValue!),
           ),
           const Spacer(),

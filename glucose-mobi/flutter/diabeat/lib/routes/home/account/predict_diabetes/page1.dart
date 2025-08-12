@@ -47,7 +47,6 @@ class Page1State extends State<Page1> {
           const SizedBox(height: 20),
           FormField<String>(
             validator: util.nonEmptyValidator,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
             onSaved: (newValue) => smokingHistory = newValue,
             builder: (field) => Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,

@@ -25,7 +25,6 @@ class Page2State extends State<Page2> {
         children: [
           TextFormField(
             validator: util.nonEmptyValidator,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
             onSaved: (newValue) => glucose = double.parse(newValue!),
             keyboardType: TextInputType.numberWithOptions(decimal: true),
             inputFormatters: const [util.UdoubleFormatter()],
@@ -39,7 +38,6 @@ class Page2State extends State<Page2> {
           TextFormField(
             focusNode: _hba1cFocus,
             validator: util.nonEmptyValidator,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
             onSaved: (newValue) => hba1c = double.parse(newValue!),
             keyboardType: TextInputType.numberWithOptions(decimal: true),
             inputFormatters: const [util.UdoubleFormatter()],

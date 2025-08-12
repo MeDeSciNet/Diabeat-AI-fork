@@ -37,14 +37,10 @@ class _RegisterPageState extends AuthState<RegisterPage> {
                 const SizedBox(height: 20),
                 TextFormField(
                   validator: _usernameValidator,
-                  autovalidateMode: AutovalidateMode.onUnfocus,
                   onSaved: (newValue) => _username = newValue!,
                   forceErrorText: _usernameErr,
                   textInputAction: TextInputAction.next,
-                  decoration: InputDecoration(
-                    labelText: 'Username',
-                    border: const OutlineInputBorder(),
-                  ),
+                  decoration: util.inputBorder('Username'),
                   onChanged: (value) {
                     if (_usernameErr != null) {
                       setState(() => _usernameErr = null);
@@ -54,7 +50,6 @@ class _RegisterPageState extends AuthState<RegisterPage> {
                 const SizedBox(height: 20),
                 TextFormField(
                   validator: passwordValidator,
-                  autovalidateMode: AutovalidateMode.onUnfocus,
                   onSaved: (newValue) => password = newValue!,
                   keyboardType: TextInputType.visiblePassword,
                   textInputAction: TextInputAction.done,
@@ -111,10 +106,7 @@ class _RegisterPageState extends AuthState<RegisterPage> {
     if (!mounted) return;
 
     if (result.ok) {
-      Navigator.of(
-        context,
-        rootNavigator: true,
-      ).pushNamedAndRemoveUntil('/home', (route) => false);
+      Navigator.of(context).pushNamedAndRemoveUntil('/home', (route) => false);
     } else {
       setState(() {
         waiting = false;

@@ -1,3 +1,4 @@
+import 'package:diabeat/routes/network/scanner.dart';
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 
@@ -7,7 +8,7 @@ abstract class AuthState<T extends StatefulWidget> extends State<T> {
   String? emailErr;
   bool passwordObscured = true;
   bool waiting = false;
-  
+
   late String email;
   late String password;
 
@@ -26,15 +27,11 @@ abstract class AuthState<T extends StatefulWidget> extends State<T> {
           return null;
         }
       },
-      autovalidateMode: AutovalidateMode.onUnfocus,
       onSaved: (newValue) => email = newValue!,
       forceErrorText: emailErr,
       keyboardType: TextInputType.emailAddress,
       textInputAction: TextInputAction.next,
-      decoration: InputDecoration(
-        labelText: 'Email',
-        border: const OutlineInputBorder(),
-      ),
+      decoration: util.inputBorder('Email'),
       onChanged: (value) {
         if (emailErr != null) {
           setState(() => emailErr = null);
@@ -75,7 +72,7 @@ abstract class AuthState<T extends StatefulWidget> extends State<T> {
       onPressed: waiting
           ? null
           : () {
-              Navigator.of(context, rootNavigator: true).pushNamed('/scanner');
+              ScannerPage.push(context);
             },
       style: util.outlinedPageButtonStyle(),
       icon: const Icon(Icons.qr_code_scanner),

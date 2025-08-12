@@ -14,43 +14,6 @@ class _LoginPageState extends AuthState<LoginPage> {
   final _passwordFocus = FocusNode();
   String? _passwordErr;
 
-  Future<void> _tryLogIn() async {
-    if (!formState.validate()) return;
-    formState.save();
-    setState(() => waiting = true);
-
-    final result = await request.logIn(
-      context,
-      email: email,
-      password: password,
-    );
-    if (!mounted) return;
-
-    if (result.ok) {
-      Navigator.of(
-        context,
-        rootNavigator: true,
-      ).pushNamedAndRemoveUntil('/home', (route) => false);
-    } else {
-      _passwordFocus.requestFocus();
-
-      setState(() {
-        waiting = false;
-
-        if (!result.haveData) return;
-        switch (result.dataAsMap['non_field_errors'][0]) {
-          case 'Email does not exist.':
-            emailErr = 'Email 不存在';
-            break;
-
-          case 'Incorrect password.':
-            _passwordErr = '密碼錯誤';
-            break;
-        }
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,7 +37,6 @@ class _LoginPageState extends AuthState<LoginPage> {
                 const SizedBox(height: 20),
                 TextFormField(
                   validator: passwordValidator,
-                  autovalidateMode: AutovalidateMode.onUnfocus,
                   forceErrorText: _passwordErr,
                   onSaved: (newValue) => password = newValue!,
                   focusNode: _passwordFocus,
@@ -114,5 +76,39 @@ class _LoginPageState extends AuthState<LoginPage> {
         ),
       ),
     );
+  }
+
+  Future<void> _tryLogIn() async {
+    if (!formState.validate()) return;
+    formState.save();
+    setState(() => waiting = true);
+
+    final result = await request.logIn(
+      context,
+      email: email,
+      password: password,
+    );
+    if (!mounted) return;
+
+    if (result.ok) {
+      Navigator.of(context).pushNamedAndRemoveUntil('/home', (route) => false);
+    } else {
+      _passwordFocus.requestFocus();
+
+      setState(() {
+        waiting = false;
+
+        if (!result.haveData) return;
+        switch (result.dataAsMap['non_field_errors'][0]) {
+          case 'Email does not exist.':
+            emailErr = 'Email 不存在';
+            break;
+
+          case 'Incorrect password.':
+            _passwordErr = '密碼錯誤';
+            break;
+        }
+      });
+    }
   }
 }

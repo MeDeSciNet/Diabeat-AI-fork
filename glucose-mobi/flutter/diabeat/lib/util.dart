@@ -24,19 +24,6 @@ ButtonStyle outlinedPageButtonStyle() {
   );
 }
 
-AppBar backAppBar(BuildContext context, [String? title]) {
-  final backButton = IconButton(
-    onPressed: () {
-      Navigator.pop(context);
-    },
-    icon: const Icon(Icons.arrow_back_ios_new),
-  );
-
-  return title == null
-      ? AppBar(leading: backButton)
-      : AppBar(leading: backButton, title: Text(title), centerTitle: true);
-}
-
 Widget prevPageButton(void Function() onPressed) {
   return Expanded(
     child: OutlinedButton.icon(
@@ -58,6 +45,19 @@ Widget nextPageButton(void Function() onPressed) {
       label: const Text('下一頁'),
     ),
   );
+}
+
+AppBar backAppBar(BuildContext context, [String? title]) {
+  final backButton = IconButton(
+    onPressed: () {
+      Navigator.pop(context);
+    },
+    icon: const Icon(Icons.arrow_back_ios_new),
+  );
+
+  return title == null
+      ? AppBar(leading: backButton)
+      : AppBar(leading: backButton, title: Text(title), centerTitle: true);
 }
 
 InputDecoration inputBorder(String label) {
