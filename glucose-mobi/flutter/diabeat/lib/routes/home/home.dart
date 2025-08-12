@@ -29,7 +29,7 @@ class _HomeState extends State<Home> {
   final _accountPageKey = GlobalKey<AccountPageState>();
   int _index = 0;
 
-  Future<bool> tryNoSessionRefresh(BuildContext context) async {
+  Future<bool> _tryNoSessionRefresh(BuildContext context) async {
     if (session.loggedIn) {
       return true;
     }
@@ -54,7 +54,7 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     () async {
-      if (await tryNoSessionRefresh(context)) {
+      if (await _tryNoSessionRefresh(context)) {
         _chartPageKey.currentState!.update();
         _accountPageKey.currentState!.update();
       }

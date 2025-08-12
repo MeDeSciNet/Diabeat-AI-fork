@@ -1,5 +1,6 @@
 import 'package:diabeat/routes/network/request.dart' as request;
 import 'package:diabeat/routes/guest/auth_state.dart';
+import 'package:diabeat/routes/network/session.dart' as session;
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 
@@ -89,17 +90,23 @@ class _LoginPageState extends AuthState<LoginPage> {
       password: password,
     );
     if (!mounted) return;
+    final data = result.data;
 
     if (result.ok) {
+      session.save(
+        username: data['username'],
+        accessToken: data['access'],
+        refreshToken: data['refresh'],
+      );
       Navigator.of(context).pushNamedAndRemoveUntil('/home', (route) => false);
+      //
     } else {
       _passwordFocus.requestFocus();
 
       setState(() {
         waiting = false;
 
-        if (!result.haveData) return;
-        switch (result.dataAsMap['non_field_errors'][0]) {
+        switch (data['non_field_errors'][0]) {
           case 'Email does not exist.':
             emailErr = 'Email 不存在';
             break;

@@ -87,7 +87,7 @@ class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
       );
 
       if (result.ok) {
-        final predcition = result.dataAsMap['prediction'] == 1;
+        final predcition = result.data['prediction'] == 1;
         _page3Key.currentState!.update(predcition);
       } else {
         // result.failed

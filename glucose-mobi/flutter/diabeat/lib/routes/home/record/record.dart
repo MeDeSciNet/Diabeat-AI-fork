@@ -77,10 +77,8 @@ class _RecordPageState extends State<RecordPage> {
       final result = await request.predictCarbohydrate(context, image);
 
       if (result.ok) {
-        final value = result.dataAsMap['predicted_value'] as double;
+        final value = result.data['predicted_value'] as double;
         _managers[1].controller.text = value.toStringAsFixed(1);
-      } else {
-        // result.failed
       }
     }
 

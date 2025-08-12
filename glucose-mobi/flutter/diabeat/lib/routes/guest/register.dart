@@ -1,5 +1,6 @@
 import 'package:diabeat/routes/network/request.dart' as request;
 import 'package:diabeat/routes/guest/auth_state.dart';
+import 'package:diabeat/routes/network/session.dart' as session;
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 
@@ -104,15 +105,20 @@ class _RegisterPageState extends AuthState<RegisterPage> {
       password: password,
     );
     if (!mounted) return;
+    final data = result.data as Map<String, dynamic>;
 
     if (result.ok) {
+      session.save(
+        username: _username,
+        accessToken: data['access'],
+        refreshToken: data['refresh'],
+      );
       Navigator.of(context).pushNamedAndRemoveUntil('/home', (route) => false);
+      //
     } else {
       setState(() {
         waiting = false;
-        if (!result.haveData) return;
 
-        final data = result.dataAsMap;
         if (data.containsKey('email')) {
           emailErr = switch (data['email'][0]) {
             'Enter a valid email address.' => 'Email 格式不正確',

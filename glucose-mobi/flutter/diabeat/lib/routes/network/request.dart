@@ -71,8 +71,7 @@ Future<Result> _handle(
       if (200 <= statusCode && statusCode < 300) {
         return Result.successful(body);
       } else if (statusCode == 401) {
-        if (!context.mounted ||
-            !await refresh(context, session.refreshToken)) {
+        if (!context.mounted || !await refresh(context, session.refreshToken)) {
           return Result.failed();
         }
         retry = true;
@@ -103,8 +102,8 @@ Future<Result> logIn(
   BuildContext context, {
   required String email,
   required String password,
-}) async {
-  final result = await _handle(context, () async {
+}) {
+  return _handle(context, () async {
     final res = await http
         .post(
           connection.makeUrl('/token'),
@@ -114,17 +113,6 @@ Future<Result> logIn(
 
     return (res.statusCode, res.body);
   });
-
-  if (result.ok) {
-    final data = result._data;
-    session.save(
-      username: data['username'],
-      accessToken: data['access'],
-      refreshToken: data['refresh'],
-    );
-  }
-
-  return result;
 }
 
 Future<Result> register(
@@ -132,8 +120,8 @@ Future<Result> register(
   required String email,
   required String username,
   required String password,
-}) async {
-  final result = await _handle(context, () async {
+}) {
+  return _handle(context, () async {
     final res = await http
         .post(
           connection.makeUrl('/register'),
@@ -143,17 +131,6 @@ Future<Result> register(
 
     return (res.statusCode, res.body);
   });
-
-  if (result.ok) {
-    final data = result._data;
-    session.save(
-      username: username,
-      accessToken: data['access'],
-      refreshToken: data['refresh'],
-    );
-  }
-
-  return result;
 }
 
 Future<Result> postRecord(
@@ -269,15 +246,11 @@ Map<String, String> _configHeaders(
 
 class Result {
   Result._(this.ok, [String? body])
-    : _data = body == null ? null : jsonDecode(body);
+    : data = body == null ? null : jsonDecode(body);
 
   Result.successful([String? body]) : this._(true, body);
   Result.failed([String? body]) : this._(false, body);
 
   final bool ok;
-  final dynamic _data;
-  bool get haveData => _data != null;
-  Map<String, dynamic> get dataAsMap => _data;
-  List<Map<String, dynamic>> get dataAsList =>
-      (_data as List).cast<Map<String, dynamic>>();
+  final dynamic data;
 }

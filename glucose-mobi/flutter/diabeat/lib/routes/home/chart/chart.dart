@@ -36,7 +36,7 @@ class ChartPageState extends State<ChartPage> {
         FilledButton(
           onPressed: () async {
             final result = await request.getRecords(context);
-            setState(() => data = result.dataAsList);
+            setState(() => data = result.data);
           },
           child: const Text('refresh'),
         ),
