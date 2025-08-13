@@ -81,7 +81,7 @@ class RecordPageState extends State<RecordPage> {
             FilledButton.icon(
               onPressed: _waiting ? null : _tryPostRecord,
               style: util.filledPageButtonStyle(),
-              icon: const Icon(Icons.send),
+              icon: const Icon(Icons.send_rounded),
               label: const Text('送出'),
             ),
             const Spacer(),

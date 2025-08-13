@@ -135,7 +135,7 @@ class _HomeState extends State<Home> {
             BottomNavigationBarItem(
               label: '紀錄',
               icon: Icon(Icons.create_outlined),
-              activeIcon: Icon(Icons.create),
+              activeIcon: Icon(Icons.create_rounded   ),
             ),
             BottomNavigationBarItem(
               label: '圖表',

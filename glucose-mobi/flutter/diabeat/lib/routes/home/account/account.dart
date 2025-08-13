@@ -35,7 +35,6 @@ class AccountPageState extends State<AccountPage> {
                     children: [
                       Ink.image(
                         image: const AssetImage('assets/images/insulin.jpg'),
-                        alignment: Alignment.topCenter,
                         fit: BoxFit.cover,
                       ),
                       const Positioned(
@@ -61,13 +60,12 @@ class AccountPageState extends State<AccountPage> {
                     children: [
                       Ink.image(
                         image: const AssetImage('assets/images/health.jpg'),
-                        alignment: Alignment.topCenter,
                         fit: BoxFit.cover,
                       ),
                       const Positioned(
                         top: 18,
                         right: 18,
-                        child: Text('智慧健康諮詢', style: TextStyle(fontSize: 18)),
+                        child: Text('AI 健康諮詢', style: TextStyle(fontSize: 18)),
                       ),
                     ],
                   ),
