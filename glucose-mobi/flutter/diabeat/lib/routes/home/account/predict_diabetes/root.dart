@@ -23,7 +23,11 @@ class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: util.backAppBar(context, '預測糖尿病'),
+      appBar: AppBar(
+        leading: util.backButton(context),
+        title: const Text('預測糖尿病'),
+        centerTitle: true,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: IndexedStack(

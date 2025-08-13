@@ -100,7 +100,15 @@ class Page0State extends State<Page0> {
             children: [
               const Spacer(),
               const SizedBox(width: 20),
-              util.nextPageButton(_tryGoNextPage),
+              Expanded(
+                child: FilledButton.icon(
+                  onPressed: _tryGoNextPage,
+                  style: util.filledPageButtonStyle(),
+                  icon: const Icon(Icons.arrow_forward_ios),
+                  iconAlignment: IconAlignment.end,
+                  label: const Text('下一頁'),
+                ),
+              ),
             ],
           ),
         ],

@@ -18,7 +18,10 @@ class _LoginPageState extends AuthState<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: util.backAppBar(context),
+      appBar: AppBar(
+        leading: util.backButton(context),
+        actions: [util.scanButton(context)],
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -57,19 +60,11 @@ class _LoginPageState extends AuthState<LoginPage> {
                         },
                 ),
                 const Spacer(flex: 2),
-                Row(
-                  children: [
-                    buildScanButton(),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: FilledButton.icon(
-                        onPressed: waiting ? null : _tryLogIn,
-                        style: util.filledPageButtonStyle(),
-                        icon: const Icon(Icons.login),
-                        label: const Text('登入'),
-                      ),
-                    ),
-                  ],
+                FilledButton.icon(
+                  onPressed: waiting ? null : _tryLogIn,
+                  style: util.filledPageButtonStyle(),
+                  icon: const Icon(Icons.login),
+                  label: const Text('登入'),
                 ),
               ],
             ),
@@ -90,7 +85,7 @@ class _LoginPageState extends AuthState<LoginPage> {
       password: password,
     );
     if (!mounted) return;
-    
+
     final data = result.data;
     if (result.ok) {
       session.save(

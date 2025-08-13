@@ -1,3 +1,4 @@
+import 'package:diabeat/routes/network/scanner.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -24,40 +25,22 @@ ButtonStyle outlinedPageButtonStyle() {
   );
 }
 
-Widget prevPageButton(void Function() onPressed) {
-  return Expanded(
-    child: OutlinedButton.icon(
-      onPressed: onPressed,
-      style: outlinedPageButtonStyle(),
-      icon: const Icon(Icons.arrow_back_ios_new),
-      label: const Text('上一頁'),
-    ),
-  );
-}
-
-Widget nextPageButton(void Function() onPressed) {
-  return Expanded(
-    child: FilledButton.icon(
-      onPressed: onPressed,
-      style: filledPageButtonStyle(),
-      icon: const Icon(Icons.arrow_forward_ios),
-      iconAlignment: IconAlignment.end,
-      label: const Text('下一頁'),
-    ),
-  );
-}
-
-AppBar backAppBar(BuildContext context, [String? title]) {
-  final backButton = IconButton(
+Widget backButton(BuildContext context) {
+  return IconButton(
     onPressed: () {
       Navigator.pop(context);
     },
-    icon: const Icon(Icons.arrow_back_ios_new),
+    icon: const Icon(Icons.arrow_back_ios_new_rounded),
   );
+}
 
-  return title == null
-      ? AppBar(leading: backButton)
-      : AppBar(leading: backButton, title: Text(title), centerTitle: true);
+Widget scanButton(BuildContext context) {
+  return IconButton(
+    onPressed: () {
+      ScannerPage.push(context);
+    },
+    icon: const Icon(Icons.qr_code_scanner_rounded),
+  );
 }
 
 InputDecoration inputBorder(String label) {

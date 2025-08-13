@@ -1,6 +1,6 @@
 import 'dart:async';
-
 import 'package:diabeat/routes/home/account/account.dart';
+import 'package:diabeat/routes/home/account/chat/chat.dart';
 import 'package:diabeat/routes/home/account/predict_diabetes/root.dart';
 import 'package:diabeat/routes/home/chart/chart.dart';
 import 'package:diabeat/routes/home/record/record.dart';
@@ -8,6 +8,7 @@ import 'package:diabeat/routes/network/dialog/refresh_failed_dialog.dart';
 import 'package:diabeat/routes/network/dialog/timeout.dart';
 import 'package:diabeat/routes/network/prefs.dart' as prefs;
 import 'package:diabeat/routes/network/request.dart' as request;
+import 'package:diabeat/routes/network/session.dart' as session;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -49,13 +50,15 @@ class _HomeState extends State<Home> {
 
   @override
   void initState() {
-    () async {
-      if (await _noSessionRefresh(context)) {
-        _recordPageKey.currentState!.update();
-        _chartPageKey.currentState!.update();
-        _accountPageKey.currentState!.update();
-      }
-    }();
+    if (!session.loggedIn) {
+      () async {
+        if (await _noSessionRefresh(context)) {
+          _recordPageKey.currentState!.update();
+          _chartPageKey.currentState!.update();
+          _accountPageKey.currentState!.update();
+        }
+      }();
+    }
     super.initState();
   }
 
@@ -114,6 +117,9 @@ class _HomeState extends State<Home> {
                   '/predict' => MaterialPageRoute(
                     builder: (context) => PredictDiabetesRoot(),
                   ),
+                  '/chat' => MaterialPageRoute(
+                    builder: (context) => ChatPage(),
+                  ),
                   _ => null,
                 };
               },
@@ -137,9 +143,9 @@ class _HomeState extends State<Home> {
               activeIcon: Icon(Icons.insert_chart),
             ),
             BottomNavigationBarItem(
-              label: '其他',
-              icon: Icon(Icons.widgets_outlined),
-              activeIcon: Icon(Icons.widgets),
+              label: '帳號',
+              icon: Icon(Icons.account_circle_outlined),
+              activeIcon: Icon(Icons.account_circle),
             ),
           ],
         ),

@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:diabeat/routes/network/dialog/image_picker_dialog.dart';
 import 'package:diabeat/routes/network/request.dart' as request;
+import 'package:diabeat/routes/network/session.dart' as session;
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -20,7 +21,7 @@ class RecordPageState extends State<RecordPage> {
     _UdoubleFieldManager('胰島素注射量 (U)'),
   ];
   final _picker = ImagePicker();
-  bool _waiting = true;
+  bool _waiting = !session.loggedIn;
 
   void update() {
     setState(() => _waiting = false);
@@ -64,8 +65,8 @@ class RecordPageState extends State<RecordPage> {
                       FilledButton.icon(
                         onPressed: _waiting ? null : _tryPredict,
                         style: util.filledPageButtonStyle(),
-                        icon: const Icon(Icons.auto_awesome),
-                        label: const Text('預測'),
+                        icon: const Icon(Icons.camera_alt),
+                        label: const Text('估算'),
                       ),
                     ],
                   ),
@@ -141,10 +142,12 @@ class RecordPageState extends State<RecordPage> {
   }
 
   Widget _uDoubleFormField(int index) {
+    final man = _managers[index];
+
     return TextFormField(
       validator: index == 0 ? util.nonEmptyValidator : null,
-      controller: _managers[index].controller,
-      focusNode: _managers[index].focusNode,
+      controller: man.controller,
+      focusNode: man.focusNode,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
       inputFormatters: const [util.UdoubleFormatter()],
       textInputAction: index == 3 ? TextInputAction.done : TextInputAction.next,
@@ -153,7 +156,7 @@ class RecordPageState extends State<RecordPage> {
           : (value) {
               _managers[index + 1].focusNode.requestFocus();
             },
-      decoration: util.inputBorder('碳水攝取量 (g)'),
+      decoration: util.inputBorder(man.labelText),
     );
   }
 }

@@ -33,7 +33,7 @@ Future<bool> refresh(BuildContext context, String oldRefreshToken) async {
         connection.makeUrl('/token/refresh'),
         body: {'refresh': oldRefreshToken},
       )
-      .timeout(const Duration(seconds: 1));
+      .timeout(const Duration(seconds: 3));
 
   final status = res.statusCode;
 
@@ -160,10 +160,12 @@ Future<Result> postRecord(
 
 Future<Result> getRecords(BuildContext context) {
   return _handle(context, () async {
-    final res = await http.get(
-      connection.makeUrl('/records'),
-      headers: _configHeaders(null, auth: true),
-    );
+    final res = await http
+        .get(
+          connection.makeUrl('/records'),
+          headers: _configHeaders(null, auth: true),
+        )
+        .timeout(const Duration(seconds: 3));
 
     return (res.statusCode, res.body);
   });
@@ -187,7 +189,7 @@ Future<Result> predictCarb(BuildContext context, XFile xFile) {
       ),
     );
 
-    final res = await request.send();
+    final res = await request.send().timeout(const Duration(seconds: 3));
     return (res.statusCode, await res.stream.bytesToString());
   });
 }
@@ -220,6 +222,17 @@ Future<Result> predictDiabetes(
           }),
         )
         .timeout(const Duration(seconds: 3));
+
+    return (res.statusCode, res.body);
+  });
+}
+
+Future<Result> chat(BuildContext context) {
+  return _handle(context, () async {
+    final res = await http.get(
+      connection.makeUrl('/chat'),
+      headers: _configHeaders(null, auth: true),
+    );
 
     return (res.statusCode, res.body);
   });

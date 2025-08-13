@@ -18,7 +18,10 @@ class _RegisterPageState extends AuthState<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: util.backAppBar(context),
+      appBar: AppBar(
+        leading: util.backButton(context),
+        actions: [util.scanButton(context)],
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -58,19 +61,11 @@ class _RegisterPageState extends AuthState<RegisterPage> {
                   decoration: passwordDecoration(),
                 ),
                 const Spacer(flex: 2),
-                Row(
-                  children: [
-                    buildScanButton(),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: FilledButton.icon(
-                        onPressed: waiting ? null : _tryRegister,
-                        style: util.filledPageButtonStyle(),
-                        icon: const Icon(Icons.create),
-                        label: const Text('註冊'),
-                      ),
-                    ),
-                  ],
+                FilledButton.icon(
+                  onPressed: waiting ? null : _tryRegister,
+                  style: util.filledPageButtonStyle(),
+                  icon: const Icon(Icons.create),
+                  label: const Text('註冊'),
                 ),
               ],
             ),

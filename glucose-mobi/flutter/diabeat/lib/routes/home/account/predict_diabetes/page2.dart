@@ -47,7 +47,14 @@ class Page2State extends State<Page2> {
           const Spacer(),
           Row(
             children: [
-              util.prevPageButton(widget.goPrevPage),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: widget.goPrevPage,
+                  style: util.outlinedPageButtonStyle(),
+                  icon: const Icon(Icons.arrow_back_ios_new),
+                  label: const Text('上一頁'),
+                ),
+              ),
               const SizedBox(width: 20),
               Expanded(
                 child: FilledButton.icon(

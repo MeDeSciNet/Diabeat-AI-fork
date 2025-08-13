@@ -55,10 +55,15 @@ class _ScannerPageState extends State<ScannerPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: util.backAppBar(context, '連接到伺服器'),
+      appBar: AppBar(
+        leading: util.backButton(context),
+        title: const Text('連接到伺服器'),
+        centerTitle: true,
+      ),
       body: SafeArea(
         child: Column(
           children: [
+            if (connection.existAddr) Text('目前連接 : ${connection.addr}'),
             Expanded(
               child: MobileScanner(
                 controller: _controller,

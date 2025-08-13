@@ -2,11 +2,7 @@ import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 
 class Page1 extends StatefulWidget {
-  const Page1({
-    super.key,
-    required this.goPrevPage,
-    required this.goNextPage,
-  });
+  const Page1({super.key, required this.goPrevPage, required this.goNextPage});
   final void Function() goPrevPage;
   final void Function() goNextPage;
 
@@ -82,9 +78,24 @@ class Page1State extends State<Page1> {
           const Spacer(),
           Row(
             children: [
-              util.prevPageButton(widget.goPrevPage),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: widget.goPrevPage,
+                  style: util.outlinedPageButtonStyle(),
+                  icon: const Icon(Icons.arrow_back_ios_new),
+                  label: const Text('上一頁'),
+                ),
+              ),
               const SizedBox(width: 20),
-              util.nextPageButton(_tryGoNextPage),
+              Expanded(
+                child: FilledButton.icon(
+                  onPressed: _tryGoNextPage,
+                  style: util.filledPageButtonStyle(),
+                  icon: const Icon(Icons.arrow_forward_ios),
+                  iconAlignment: IconAlignment.end,
+                  label: const Text('下一頁'),
+                ),
+              ),
             ],
           ),
         ],

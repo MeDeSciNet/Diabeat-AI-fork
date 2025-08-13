@@ -1,5 +1,3 @@
-import 'package:diabeat/routes/network/connection.dart' as connection;
-import 'package:diabeat/routes/network/scanner.dart';
 import 'package:diabeat/routes/network/session.dart' as session;
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
@@ -14,38 +12,67 @@ class AccountPage extends StatefulWidget {
 class AccountPageState extends State<AccountPage> {
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 10),
+    return Scaffold(
+      appBar: AppBar(
+        leading: const Icon(Icons.account_circle),
+        title: session.loggedIn ? Text(session.username) : null,
+        actions: [util.scanButton(context)],
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Spacer(),
-            if (session.loggedIn)
-              Text(
-                'Hello, ${session.username}',
-                style: const TextStyle(fontSize: 50),
-                textAlign: TextAlign.center,
+            Card(
+              clipBehavior: Clip.antiAlias,
+              child: InkWell(
+                onTap: () {
+                  Navigator.pushNamed(context, '/predict');
+                },
+                child: AspectRatio(
+                  aspectRatio: 16 / 9,
+                  child: Stack(
+                    children: [
+                      Ink.image(
+                        image: const AssetImage('assets/images/insulin.jpg'),
+                        alignment: Alignment.topCenter,
+                        fit: BoxFit.cover,
+                      ),
+                      const Positioned(
+                        top: 18,
+                        right: 18,
+                        child: Text('糖尿病風險檢測', style: TextStyle(fontSize: 18)),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            const Spacer(),
-            OutlinedButton.icon(
-              onPressed: () {
-                Navigator.pushNamed(context, '/predict');
-              },
-              style: util.outlinedPageButtonStyle(),
-              icon: const Icon(Icons.auto_awesome),
-              label: const Text('預測糖尿病'),
             ),
-            const SizedBox(height: 10),
-            OutlinedButton.icon(
-              onPressed: () async {
-                if (await ScannerPage.push(context) == true) {
-                  setState(() {});
-                }
-              },
-              style: util.outlinedPageButtonStyle(),
-              icon: const Icon(Icons.qr_code_scanner),
-              label: Text(connection.existAddr ? connection.addr : '連接'),
+            const SizedBox(height: 20),
+            Card(
+              clipBehavior: Clip.antiAlias,
+              child: InkWell(
+                onTap: () {
+                  Navigator.pushNamed(context, '/chat');
+                },
+                child: AspectRatio(
+                  aspectRatio: 16 / 9,
+                  child: Stack(
+                    children: [
+                      Ink.image(
+                        image: const AssetImage('assets/images/health.jpg'),
+                        alignment: Alignment.topCenter,
+                        fit: BoxFit.cover,
+                      ),
+                      const Positioned(
+                        top: 18,
+                        right: 18,
+                        child: Text('智慧健康諮詢', style: TextStyle(fontSize: 18)),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
             const Spacer(),
             FilledButton.icon(
@@ -60,7 +87,6 @@ class AccountPageState extends State<AccountPage> {
               icon: const Icon(Icons.logout),
               label: const Text('登出'),
             ),
-            const SizedBox(height: 10),
           ],
         ),
       ),

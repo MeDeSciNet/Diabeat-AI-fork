@@ -1,4 +1,3 @@
-import 'package:diabeat/routes/network/scanner.dart';
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 
@@ -65,19 +64,6 @@ abstract class AuthState<T extends StatefulWidget> extends State<T> {
     }
 
     return null;
-  }
-
-  OutlinedButton buildScanButton() {
-    return OutlinedButton.icon(
-      onPressed: waiting
-          ? null
-          : () {
-              ScannerPage.push(context);
-            },
-      style: util.outlinedPageButtonStyle(),
-      icon: const Icon(Icons.qr_code_scanner),
-      label: const Text('連線'),
-    );
   }
 
   FormState get formState => formKey.currentState!;
