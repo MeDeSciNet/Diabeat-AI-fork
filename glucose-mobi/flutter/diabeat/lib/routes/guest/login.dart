@@ -12,7 +12,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends AuthState<LoginPage> {
-  final _passwordFocus = FocusNode();
   String? _passwordErr;
 
   @override
@@ -43,7 +42,6 @@ class _LoginPageState extends AuthState<LoginPage> {
                   validator: passwordValidator,
                   forceErrorText: _passwordErr,
                   onSaved: (newValue) => password = newValue!,
-                  focusNode: _passwordFocus,
                   keyboardType: TextInputType.visiblePassword,
                   textInputAction: TextInputAction.send,
                   obscureText: passwordObscured,
@@ -97,8 +95,6 @@ class _LoginPageState extends AuthState<LoginPage> {
       Navigator.of(context).pushNamedAndRemoveUntil('/home', (route) => false);
       //
     } else {
-      _passwordFocus.requestFocus();
-
       setState(() {
         waiting = false;
 

@@ -145,15 +145,17 @@ class RecordPageState extends State<RecordPage> {
 
   Widget _uDoubleFormField(int index) {
     final man = _managers[index];
+    final isFirst = index == 0;
+    final isLast = index == 3;
 
     return TextFormField(
-      validator: index == 0 ? util.nonEmptyValidator : null,
+      validator: isFirst ? util.nonEmptyValidator : null,
       controller: man.controller,
       focusNode: man.focusNode,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
       inputFormatters: const [util.UdoubleFormatter()],
-      textInputAction: index == 3 ? TextInputAction.done : TextInputAction.next,
-      onFieldSubmitted: index == 3
+      textInputAction: isLast ? TextInputAction.done : TextInputAction.next,
+      onFieldSubmitted: isLast
           ? null
           : (value) {
               _managers[index + 1].focusNode.requestFocus();
