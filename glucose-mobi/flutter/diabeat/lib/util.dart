@@ -43,6 +43,15 @@ Widget scanButton(BuildContext context) {
   );
 }
 
+Widget shareButton(BuildContext context) {
+  return IconButton(
+    onPressed: () {
+      //
+    },
+    icon: const Icon(Icons.ios_share_rounded),
+  );
+}
+
 InputDecoration inputBorder(String label) {
   return InputDecoration(labelText: label, border: const OutlineInputBorder());
 }

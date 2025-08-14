@@ -51,7 +51,7 @@ class Page2State extends State<Page2> {
                 child: OutlinedButton.icon(
                   onPressed: widget.goPrevPage,
                   style: util.outlinedPageButtonStyle(),
-                  icon: const Icon(Icons.arrow_back_ios_new),
+                  icon: const Icon(Icons.arrow_back_ios_new_rounded),
                   label: const Text('上一頁'),
                 ),
               ),
@@ -60,7 +60,7 @@ class Page2State extends State<Page2> {
                 child: FilledButton.icon(
                   onPressed: _trySend,
                   style: util.filledPageButtonStyle(),
-                  icon: const Icon(Icons.send),
+                  icon: const Icon(Icons.send_rounded),
                   iconAlignment: IconAlignment.end,
                   label: const Text('送出'),
                 ),

@@ -65,7 +65,7 @@ class RecordPageState extends State<RecordPage> {
                       FilledButton.icon(
                         onPressed: _waiting ? null : _tryPredict,
                         style: util.filledPageButtonStyle(),
-                        icon: const Icon(Icons.camera_alt),
+                        icon: const Icon(Icons.camera_alt_rounded),
                         label: const Text('估算'),
                       ),
                     ],
@@ -101,8 +101,8 @@ class RecordPageState extends State<RecordPage> {
       exercise: _managers[2].value,
       insulin: _managers[3].value,
     );
-
     if (!mounted) return;
+
     setState(() => _waiting = false);
 
     if (result.ok) {
@@ -130,6 +130,8 @@ class RecordPageState extends State<RecordPage> {
     setState(() => _waiting = true);
 
     final result = await request.predictCarb(context, image);
+    if (!mounted) return;
+
     if (result.ok) {
       final value = result.data['predicted_value'] as double;
       _managers[1].controller.text = value.toStringAsFixed(1);

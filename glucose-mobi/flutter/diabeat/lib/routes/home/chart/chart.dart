@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:diabeat/routes/network/request.dart' as request;
 import 'package:flutter/material.dart';
 
@@ -9,29 +11,17 @@ class ChartPage extends StatefulWidget {
 }
 
 class ChartPageState extends State<ChartPage> {
-  List? data;
+  List? _data;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        actions: [
-          IconButton(
-            onPressed: () async {
-              final result = await request.getRecords(context);
-              if (!mounted) return;
-              setState(() => data = result.data);
-            },
-            icon: const Icon(Icons.refresh),
-          ),
-        ],
-      ),
-      body: Expanded(
-        child: ListView.builder(
-          itemCount: data?.length,
+    return Stack(
+      children: [
+        ListView.builder(
+          itemCount: _data?.length,
           itemBuilder: (context, index) {
-            if (data == null) return null;
-            final item = data![index];
+            if (_data == null) return null;
+            final item = _data![index];
             final time = DateTime.parse(item['created_at']).toLocal();
 
             final glucose = item['blood_glucose'];
@@ -124,7 +114,25 @@ class ChartPageState extends State<ChartPage> {
             );
           },
         ),
-      ),
+        Positioned(
+          bottom: 20,
+          right: 20,
+          child: FloatingActionButton.extended(
+            onPressed: () async {
+              final result = await request.getRecords(context);
+              if (!mounted) return;
+
+              if (result.ok) {
+                setState(() => _data = result.data);
+              } else {
+                log('get records failed');
+              }
+            },
+            icon: const Icon(Icons.refresh_rounded),
+            label: const Text('刷新'),
+          ),
+        ),
+      ],
     );
   }
 

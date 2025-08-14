@@ -14,7 +14,7 @@ class AccountPageState extends State<AccountPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: const Icon(Icons.account_circle),
+        leading: const Icon(Icons.account_circle_rounded),
         title: session.loggedIn ? Text(session.username) : null,
         actions: [util.scanButton(context)],
       ),
@@ -82,7 +82,7 @@ class AccountPageState extends State<AccountPage> {
                 ).pushReplacementNamed('/guest');
               },
               style: util.filledPageButtonStyle(),
-              icon: const Icon(Icons.logout),
+              icon: const Icon(Icons.logout_rounded),
               label: const Text('登出'),
             ),
           ],

@@ -63,7 +63,7 @@ class _LoginPageState extends AuthState<LoginPage> {
                 FilledButton.icon(
                   onPressed: waiting ? null : _tryLogIn,
                   style: util.filledPageButtonStyle(),
-                  icon: const Icon(Icons.login),
+                  icon: const Icon(Icons.login_rounded),
                   label: const Text('登入'),
                 ),
               ],

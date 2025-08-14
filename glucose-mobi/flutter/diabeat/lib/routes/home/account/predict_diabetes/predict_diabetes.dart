@@ -27,6 +27,7 @@ class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
         leading: util.backButton(context),
         title: const Text('預測糖尿病'),
         centerTitle: true,
+        actions: _index == 3 ? [util.shareButton(context)] : null,
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
@@ -89,6 +90,7 @@ class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
         glucose: glucose,
         hba1c: hba1c,
       );
+      if(!mounted) return;
 
       if (result.ok) {
         final predcition = result.data['prediction'] == 1;

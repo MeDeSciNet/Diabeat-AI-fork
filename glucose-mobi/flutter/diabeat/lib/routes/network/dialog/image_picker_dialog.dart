@@ -25,7 +25,7 @@ class ImagePickerDialog extends StatelessWidget {
           },
           style: util.filledPageButtonStyle(),
           label: const Text('拍照'),
-          icon: const Icon(Icons.camera_alt),
+          icon: const Icon(Icons.camera_alt_rounded),
         ),
         const SizedBox(height: 10),
         OutlinedButton.icon(
@@ -33,7 +33,7 @@ class ImagePickerDialog extends StatelessWidget {
             Navigator.pop(context, ImageSource.gallery);
           },
           style: util.outlinedPageButtonStyle(),
-          icon: const Icon(Icons.photo),
+          icon: const Icon(Icons.photo_rounded),
           label: const Text('圖庫'),
         ),
       ],

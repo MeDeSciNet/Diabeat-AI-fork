@@ -14,9 +14,10 @@ class DisconnectedDialog extends StatelessWidget {
       barrierDismissible: false,
       builder: (context) => const DisconnectedDialog._(),
     );
+    if (!context.mounted) return;
 
     return switch (nav) {
-      true when context.mounted => await ScannerPage.push(context),
+      true => await ScannerPage.push(context),
       _ => null,
     };
   }
@@ -34,7 +35,7 @@ class DisconnectedDialog extends StatelessWidget {
               Navigator.pop(context, true);
             },
             style: util.filledPageButtonStyle(),
-            icon: const Icon(Icons.qr_code_scanner),
+            icon: const Icon(Icons.qr_code_scanner_rounded),
             label: const Text('連線'),
           ),
           SizedBox(height: 10),
@@ -43,7 +44,7 @@ class DisconnectedDialog extends StatelessWidget {
               Navigator.pop(context);
             },
             style: util.outlinedPageButtonStyle(),
-            icon: const Icon(Icons.close),
+            icon: const Icon(Icons.close_rounded),
             label: const Text('取消'),
           ),
         ],

@@ -48,8 +48,8 @@ abstract class AuthState<T extends StatefulWidget> extends State<T> {
           setState(() => passwordObscured ^= true);
         },
         icon: passwordObscured
-            ? const Icon(Icons.visibility)
-            : const Icon(Icons.visibility_off),
+            ? const Icon(Icons.visibility_rounded)
+            : const Icon(Icons.visibility_off_rounded),
       ),
     );
   }

@@ -11,14 +11,13 @@ class RefreshFailedDialog extends StatelessWidget {
       barrierDismissible: false,
       builder: (context) => const RefreshFailedDialog._(),
     );
+    if (!context.mounted) return;
 
-    if (context.mounted) {
-      session.delete();
-      Navigator.of(
-        context,
-        rootNavigator: true,
-      ).pushNamedAndRemoveUntil('/guest', (route) => false);
-    }
+    session.delete();
+    Navigator.of(
+      context,
+      rootNavigator: true,
+    ).pushNamedAndRemoveUntil('/guest', (route) => false);
   }
 
   @override
@@ -34,7 +33,7 @@ class RefreshFailedDialog extends StatelessWidget {
               Navigator.pop(context);
             },
             style: util.filledPageButtonStyle(),
-            icon: const Icon(Icons.logout),
+            icon: const Icon(Icons.logout_rounded),
             label: const Text('登出'),
           ),
         ],

@@ -30,7 +30,7 @@ class GuestPage extends StatelessWidget {
                       },
                       iconSize: 55,
                       color: Colors.red,
-                      icon: const Icon(Icons.bloodtype),
+                      icon: const Icon(Icons.bloodtype_rounded),
                     ),
                   ],
                 ),
@@ -40,7 +40,7 @@ class GuestPage extends StatelessWidget {
                   Navigator.of(context).pushNamed('/guest/login');
                 },
                 style: util.filledPageButtonStyle(),
-                icon: const Icon(Icons.login),
+                icon: const Icon(Icons.login_rounded),
                 label: const Text('登入'),
               ),
               const SizedBox(height: 10),
@@ -49,7 +49,7 @@ class GuestPage extends StatelessWidget {
                   Navigator.of(context).pushNamed('/guest/register');
                 },
                 style: util.outlinedPageButtonStyle(),
-                icon: const Icon(Icons.create),
+                icon: const Icon(Icons.create_rounded),
                 label: const Text('註冊'),
               ),
             ],

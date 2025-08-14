@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:diabeat/routes/home/account/account.dart';
 import 'package:diabeat/routes/home/account/chat/chat.dart';
-import 'package:diabeat/routes/home/account/predict_diabetes/root.dart';
+import 'package:diabeat/routes/home/account/predict_diabetes/predict_diabetes.dart';
 import 'package:diabeat/routes/home/chart/chart.dart';
 import 'package:diabeat/routes/home/record/record.dart';
 import 'package:diabeat/routes/network/dialog/refresh_failed_dialog.dart';
@@ -30,16 +30,15 @@ class _HomeState extends State<Home> {
   final _accountPageKey = GlobalKey<AccountPageState>();
   int _index = 0;
 
-  Future<bool> _noSessionRefresh(BuildContext context) async {
+  Future<bool> _noSessionRefresh() async {
     final oldRefreshToken = await prefs.readRefreshToken();
     while (true) {
       try {
-        return context.mounted &&
-            await request.refresh(context, oldRefreshToken);
+        return mounted && await request.refresh(context, oldRefreshToken);
         //
       } on TimeoutException {
-        if (!context.mounted || await TimeoutDialog.show(context) == null) {
-          if (context.mounted) {
+        if (!mounted || await TimeoutDialog.show(context) == null) {
+          if (mounted) {
             RefreshFailedDialog.show(context);
           }
           return false;
@@ -52,7 +51,7 @@ class _HomeState extends State<Home> {
   void initState() {
     if (!session.loggedIn) {
       () async {
-        if (await _noSessionRefresh(context)) {
+        if (await _noSessionRefresh() && mounted) {
           _recordPageKey.currentState!.update();
           _chartPageKey.currentState!.update();
           _accountPageKey.currentState!.update();
@@ -135,17 +134,17 @@ class _HomeState extends State<Home> {
             BottomNavigationBarItem(
               label: '紀錄',
               icon: Icon(Icons.create_outlined),
-              activeIcon: Icon(Icons.create_rounded   ),
+              activeIcon: Icon(Icons.create_rounded),
             ),
             BottomNavigationBarItem(
               label: '圖表',
               icon: Icon(Icons.insert_chart_outlined),
-              activeIcon: Icon(Icons.insert_chart),
+              activeIcon: Icon(Icons.insert_chart_rounded),
             ),
             BottomNavigationBarItem(
               label: '帳號',
               icon: Icon(Icons.account_circle_outlined),
-              activeIcon: Icon(Icons.account_circle),
+              activeIcon: Icon(Icons.account_circle_rounded),
             ),
           ],
         ),

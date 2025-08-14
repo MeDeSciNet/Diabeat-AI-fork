@@ -37,7 +37,7 @@ class ConfirmScanDialog extends StatelessWidget {
               Navigator.pop(context, true);
             },
             style: util.filledPageButtonStyle(),
-            icon: const Icon(Icons.check),
+            icon: const Icon(Icons.check_rounded),
             label: const Text('確定'),
           ),
           const SizedBox(height: 10),
@@ -46,7 +46,7 @@ class ConfirmScanDialog extends StatelessWidget {
               Navigator.pop(context);
             },
             style: util.tonalPageButtonStyle(context),
-            icon: const Icon(Icons.qr_code_scanner),
+            icon: const Icon(Icons.qr_code_scanner_rounded),
             label: const Text('重掃'),
           ),
           const SizedBox(height: 10),
@@ -55,7 +55,7 @@ class ConfirmScanDialog extends StatelessWidget {
               Navigator.pop(context, false);
             },
             style: util.outlinedPageButtonStyle(),
-            icon: const Icon(Icons.close),
+            icon: const Icon(Icons.close_rounded),
             label: const Text('取消'),
           ),
         ],

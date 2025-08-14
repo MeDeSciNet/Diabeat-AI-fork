@@ -64,7 +64,7 @@ class _RegisterPageState extends AuthState<RegisterPage> {
                 FilledButton.icon(
                   onPressed: waiting ? null : _tryRegister,
                   style: util.filledPageButtonStyle(),
-                  icon: const Icon(Icons.create),
+                  icon: const Icon(Icons.create_rounded),
                   label: const Text('註冊'),
                 ),
               ],
