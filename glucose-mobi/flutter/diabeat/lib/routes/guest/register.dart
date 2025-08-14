@@ -104,6 +104,7 @@ class _RegisterPageState extends AuthState<RegisterPage> {
     final data = result.data as Map<String, dynamic>;
     if (result.ok) {
       session.save(
+        email: email,
         username: _username,
         accessToken: data['access'],
         refreshToken: data['refresh'],

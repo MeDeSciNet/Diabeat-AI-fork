@@ -3,16 +3,16 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 final _prefs = SharedPreferencesAsync();
 
-Future<String?> _readRawAddr() {
+Future<String?> _rawAddr() {
   return _prefs.getString('addr');
 }
 
 Future<bool> existAddr() async {
-  return await _readRawAddr() != null;
+  return await _rawAddr() != null;
 }
 
 Future<String> readAddr() async {
-  return (await _readRawAddr())!;
+  return (await _rawAddr())!;
 }
 
 void writeAddr(String addr) {
@@ -23,26 +23,54 @@ void writeAddr(String addr) {
 /* */
 /* ===== Encrypted Shared Prefs ===== */
 
+typedef Session = ({
+  String email,
+  String username,
+  String accessToken,
+  String refreshToken,
+});
+
 final _encryptedPrefs = const FlutterSecureStorage(
   aOptions: AndroidOptions(encryptedSharedPreferences: true),
 );
 
-Future<String?> _readRawRefreshToken() {
-  return _encryptedPrefs.read(key: 'refresh_token');
+Future<Session?> _rawSession() async {
+  final email = await _encryptedPrefs.read(key: 'email');
+  final username = await _encryptedPrefs.read(key: 'username');
+  final accessToken = await _encryptedPrefs.read(key: 'access_token');
+  final refreshToken = await _encryptedPrefs.read(key: 'refresh_token');
+
+  return email == null
+      ? null
+      : (
+          email: email,
+          username: username!,
+          accessToken: accessToken!,
+          refreshToken: refreshToken!,
+        );
 }
 
-Future<bool> existRefreshToken() async {
-  return await _readRawRefreshToken() != null;
+Future<bool> existSession() async {
+  return await _rawSession() != null;
 }
 
-Future<String> readRefreshToken() async {
-  return (await _readRawRefreshToken())!;
+Future<Session> readSession() async {
+  return (await _rawSession())!;
 }
 
-void writeRefreshToken(String refreshToken) {
-  _encryptedPrefs.write(key: 'refresh_token', value: refreshToken);
+void writeSession({
+  required String email,
+  required String username,
+  required String accessToken,
+  required String refreshToken,
+}) {
+  _encryptedPrefs
+    ..write(key: 'email', value: email)
+    ..write(key: 'username', value: username)
+    ..write(key: 'access_token', value: accessToken)
+    ..write(key: 'refresh_token', value: refreshToken);
 }
 
-void deleteRefreshToken() {
-  _encryptedPrefs.delete(key: 'refresh_token');
+void deleteSession() {
+  _encryptedPrefs.deleteAll();
 }

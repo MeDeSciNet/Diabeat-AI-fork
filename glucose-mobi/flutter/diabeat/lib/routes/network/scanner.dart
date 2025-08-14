@@ -37,7 +37,7 @@ class _ScannerPageState extends State<ScannerPage> {
       final addr = addrs.first.rawValue!.split(' ')[1];
       switch (await ConfirmScanDialog.show(context, addr)) {
         case true:
-          connection.connectTo(addr);
+          connection.save(addr);
           Navigator.pop(context, true);
           break;
 

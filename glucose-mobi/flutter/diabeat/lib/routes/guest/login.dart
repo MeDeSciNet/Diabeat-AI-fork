@@ -89,6 +89,7 @@ class _LoginPageState extends AuthState<LoginPage> {
     final data = result.data;
     if (result.ok) {
       session.save(
+        email: email,
         username: data['username'],
         accessToken: data['access'],
         refreshToken: data['refresh'],
