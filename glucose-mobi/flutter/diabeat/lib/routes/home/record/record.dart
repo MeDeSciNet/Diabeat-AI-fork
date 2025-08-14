@@ -66,7 +66,7 @@ class RecordPageState extends State<RecordPage> {
                         onPressed: _waiting ? null : _tryPredict,
                         style: util.filledPageButtonStyle(),
                         icon: const Icon(Icons.camera_alt_rounded),
-                        label: const Text('估算'),
+                        label: const Text('AI 估算'),
                       ),
                     ],
                   ),
