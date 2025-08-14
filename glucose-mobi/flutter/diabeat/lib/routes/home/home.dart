@@ -46,7 +46,9 @@ class _HomeState extends State<Home> {
               initialRoute: '/',
               onGenerateRoute: (settings) {
                 return switch (settings.name) {
-                  '/' => MaterialPageRoute(builder: (context) => RecordPage()),
+                  '/' => MaterialPageRoute(
+                    builder: (context) => const RecordPage(),
+                  ),
                   _ => null,
                 };
               },
@@ -56,7 +58,9 @@ class _HomeState extends State<Home> {
               initialRoute: '/',
               onGenerateRoute: (settings) {
                 return switch (settings.name) {
-                  '/' => MaterialPageRoute(builder: (context) => ChartPage()),
+                  '/' => MaterialPageRoute(
+                    builder: (context) => const ChartPage(),
+                  ),
                   _ => null,
                 };
               },
@@ -66,12 +70,14 @@ class _HomeState extends State<Home> {
               initialRoute: '/',
               onGenerateRoute: (settings) {
                 return switch (settings.name) {
-                  '/' => MaterialPageRoute(builder: (context) => AccountPage()),
+                  '/' => MaterialPageRoute(
+                    builder: (context) => const AccountPage(),
+                  ),
                   '/predict' => MaterialPageRoute(
-                    builder: (context) => PredictDiabetesRoot(),
+                    builder: (context) => const PredictDiabetesRoot(),
                   ),
                   '/chat' => MaterialPageRoute(
-                    builder: (context) => ChatPage(),
+                    builder: (context) => const ChatPage(),
                   ),
                   _ => null,
                 };

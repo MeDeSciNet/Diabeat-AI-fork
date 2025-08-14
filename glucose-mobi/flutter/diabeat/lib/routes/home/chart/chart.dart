@@ -153,8 +153,4 @@ class ChartPageState extends State<ChartPage> {
       ),
     );
   }
-
-  void update() {
-    setState(() {});
-  }
 }

@@ -41,7 +41,10 @@ class AccountPageState extends State<AccountPage> {
                       const Positioned(
                         top: 18,
                         right: 18,
-                        child: Text('AI 糖尿病風險檢測', style: TextStyle(fontSize: 18)),
+                        child: Text(
+                          'AI 糖尿病風險檢測',
+                          style: TextStyle(fontSize: 18),
+                        ),
                       ),
                     ],
                   ),
@@ -91,9 +94,5 @@ class AccountPageState extends State<AccountPage> {
         ),
       ),
     );
-  }
-
-  void update() {
-    setState(() {});
   }
 }

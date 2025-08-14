@@ -23,10 +23,6 @@ class RecordPageState extends State<RecordPage> {
   final _picker = ImagePicker();
   bool _waiting = !session.loggedIn;
 
-  void update() {
-    setState(() => _waiting = false);
-  }
-
   @override
   void dispose() {
     for (final man in _managers) {
