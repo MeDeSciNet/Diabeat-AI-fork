@@ -24,7 +24,11 @@ Future<Result> logIn(
   BuildContext context, {
   required String email,
   required String password,
-}) {
+}) async {
+  if (!await _connect(context) || !context.mounted) {
+    return Result.failed();
+  }
+
   return _handle(context, () async {
     final res = await http
         .post(
@@ -42,7 +46,11 @@ Future<Result> register(
   required String email,
   required String username,
   required String password,
-}) {
+}) async {
+  if (!await _connect(context) || !context.mounted) {
+    return Result.failed();
+  }
+
   return _handle(context, () async {
     final res = await http
         .post(
@@ -184,19 +192,10 @@ Map<String, String> _configHeaders(
 }
 
 Future<bool> _connect(BuildContext context) async {
-  if (connection.existAddr) {
+  if (connection.existAddr || await connection.load()) {
     return true;
   }
-
-  if (await connection.load()) {
-    return true;
-  }
-
-  if (context.mounted && await DisconnectedDialog.show(context) == true) {
-    return true;
-  }
-
-  return false;
+  return context.mounted && await DisconnectedDialog.show(context) == true;
 }
 
 Future<bool> _refresh(BuildContext context) async {
@@ -230,10 +229,7 @@ Future<Result> _handle(
   BuildContext context,
   Future<(int, String)> Function() request,
 ) async {
-  if (!await _connect(context)) {
-    return Result.failed();
-  }
-
+  //
   bool retry;
   do {
     retry = false;

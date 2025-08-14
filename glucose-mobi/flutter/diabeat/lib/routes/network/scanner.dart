@@ -22,7 +22,7 @@ class _ScannerPageState extends State<ScannerPage> {
   final _controller = MobileScannerController(
     formats: const [BarcodeFormat.qrCode],
   );
-  final _scale = ValueNotifier<double>(0);
+  double _scale = 0;
 
   void Function(BarcodeCapture) _detect(BuildContext context) {
     return (BarcodeCapture barcodes) async {
@@ -72,16 +72,13 @@ class _ScannerPageState extends State<ScannerPage> {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
-              child: ValueListenableBuilder(
-                valueListenable: _scale,
-                builder: (context, value, child) => Slider(
-                  value: _scale.value,
-                  onChanged: (value) {
-                    setState(() => _scale.value = value);
-                    _controller.setZoomScale(_scale.value);
-                  },
-                  year2023: false,
-                ),
+              child: Slider(
+                value: _scale,
+                onChanged: (value) {
+                  setState(() => _scale = value);
+                  _controller.setZoomScale(_scale);
+                },
+                year2023: false,
               ),
             ),
           ],

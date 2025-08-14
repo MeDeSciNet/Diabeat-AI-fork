@@ -1,8 +1,8 @@
 import 'package:diabeat/routes/network/prefs.dart' as prefs;
+import 'package:diabeat/routes/network/connection.dart' as connection;
 
 prefs.Session? _session;
 
-bool get loggedIn => _session != null;
 String get email => _session!.email;
 String get username => _session!.username;
 String get accessToken => _session!.accessToken;
@@ -20,6 +20,9 @@ Future<bool> load() async {
     accessToken: session.accessToken,
     refreshToken: session.refreshToken,
   );
+
+  connection.load();
+
   return true;
 }
 

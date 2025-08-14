@@ -10,12 +10,23 @@ class AccountPage extends StatefulWidget {
 }
 
 class AccountPageState extends State<AccountPage> {
+  /// username : true
+  /// email    : false
+  bool _usernameOrEmail = true;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: const Icon(Icons.account_circle_rounded),
-        title: session.loggedIn ? Text(session.username) : null,
+        leading: IconButton(
+          onPressed: () {
+            setState(() => _usernameOrEmail ^= true);
+          },
+          icon: _usernameOrEmail
+              ? const Icon(Icons.person)
+              : const Icon(Icons.email_rounded),
+        ),
+        title: Text(_usernameOrEmail ? session.username : session.email),
         actions: [util.scanButton(context)],
       ),
       body: Padding(

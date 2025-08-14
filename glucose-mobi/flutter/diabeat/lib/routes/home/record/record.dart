@@ -1,7 +1,6 @@
 import 'dart:developer';
 import 'package:diabeat/routes/network/dialog/image_picker_dialog.dart';
 import 'package:diabeat/routes/network/request.dart' as request;
-import 'package:diabeat/routes/network/session.dart' as session;
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -21,7 +20,7 @@ class RecordPageState extends State<RecordPage> {
     _UdoubleFieldManager('胰島素注射量 (U)'),
   ];
   final _picker = ImagePicker();
-  bool _waiting = !session.loggedIn;
+  bool _waiting = false;
 
   @override
   void dispose() {

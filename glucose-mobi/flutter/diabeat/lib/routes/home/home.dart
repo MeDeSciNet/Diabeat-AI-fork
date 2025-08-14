@@ -1,7 +1,7 @@
 import 'package:diabeat/routes/home/account/account.dart';
 import 'package:diabeat/routes/home/account/chat/chat.dart';
 import 'package:diabeat/routes/home/account/predict_diabetes/predict_diabetes.dart';
-import 'package:diabeat/routes/home/chart/chart.dart';
+import 'package:diabeat/routes/home/history/history.dart';
 import 'package:diabeat/routes/home/record/record.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -97,9 +97,9 @@ class _HomeState extends State<Home> {
               activeIcon: Icon(Icons.create_rounded),
             ),
             BottomNavigationBarItem(
-              label: '圖表',
-              icon: Icon(Icons.insert_chart_outlined),
-              activeIcon: Icon(Icons.insert_chart_rounded),
+              label: '歷史',
+              icon: Icon(Icons.history_outlined),
+              activeIcon: Icon(Icons.history_rounded),
             ),
             BottomNavigationBarItem(
               label: '帳號',
