@@ -1,7 +1,5 @@
-import 'dart:convert';
 import 'dart:developer';
 import 'package:diabeat/routes/network/request.dart' as request;
-import 'package:diabeat/routes/network/session.dart' as session;
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -17,7 +15,7 @@ class ConsultPage extends StatefulWidget {
 class _ConsultPageState extends State<ConsultPage>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
-  String? _chat;
+  String? _consultation;
   int _period = 0;
 
   @override
@@ -43,7 +41,9 @@ class _ConsultPageState extends State<ConsultPage>
 
       _controller.stop();
       if (result.ok) {
-        setState(() => _chat = result.data['response']['message']['content']);
+        setState(
+          () => _consultation = result.data['response']['message']['content'],
+        );
       } else {
         log('consult failed');
       }
@@ -70,14 +70,14 @@ class _ConsultPageState extends State<ConsultPage>
         title: const Text('AI 健康諮詢'),
         centerTitle: true,
         actions: [
-          if (_chat != null)
+          if (_consultation != null)
             IconButton(
               onPressed: _shareConsultation,
               icon: const Icon(Icons.ios_share_rounded),
             ),
         ],
       ),
-      body: _chat == null
+      body: _consultation == null
           ? SizedBox.expand(
               child: Stack(
                 alignment: Alignment.center,
@@ -89,24 +89,15 @@ class _ConsultPageState extends State<ConsultPage>
                       year2023: false,
                     ),
                   ),
-                  Text('$min:$sec', style: TextStyle(fontSize: 30)),
+                  Text('$min:$sec', style: const TextStyle(fontSize: 30)),
                 ],
               ),
             )
-          : Markdown(data: _chat!),
+          : Markdown(data: _consultation!),
     );
   }
 
-  void _shareConsultation() {
-    final bytes = utf8.encode(_chat!);
-
-    SharePlus.instance.share(
-      ShareParams(
-        files: [XFile.fromData(bytes)],
-        fileNameOverrides: [
-          '${session.username}_DiabeatConsult_${DateTime.now().toIso8601String()}.md',
-        ],
-      ),
-    );
+  Future<void> _shareConsultation() async {
+    SharePlus.instance.share(ShareParams(text: _consultation));
   }
 }

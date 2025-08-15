@@ -56,7 +56,7 @@ class _GuestPageState extends State<GuestPage> {
                       icon: _appOrOrgName
                           ? const Icon(Icons.bloodtype_rounded)
                           : Image.asset(
-                              'assets/images/medescinet.png',
+                              'assets/medescinet.png',
                               scale: 4,
                             ),
                     ),

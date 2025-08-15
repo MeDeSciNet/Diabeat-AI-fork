@@ -239,7 +239,7 @@ class HistoryPageState extends State<HistoryPage> {
 
     SharePlus.instance.share(
       ShareParams(
-        files: [XFile.fromData(bytes)],
+        files: [XFile.fromData(bytes, mimeType: 'text/csv')],
         fileNameOverrides: [
           '${session.username}_DiabeatHistory_${DateTime.now().toIso8601String()}.csv',
         ],

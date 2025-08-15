@@ -45,7 +45,7 @@ class _AccountPageState extends State<AccountPage> {
                   child: Stack(
                     children: [
                       Ink.image(
-                        image: const AssetImage('assets/images/insulin.jpg'),
+                        image: const AssetImage('assets/insulin.jpg'),
                         alignment: Alignment.topCenter,
                         fit: BoxFit.cover,
                       ),
@@ -74,7 +74,7 @@ class _AccountPageState extends State<AccountPage> {
                   child: Stack(
                     children: [
                       Ink.image(
-                        image: const AssetImage('assets/images/health.jpg'),
+                        image: const AssetImage('assets/health.jpg'),
                         alignment: Alignment.topCenter,
                         fit: BoxFit.cover,
                       ),

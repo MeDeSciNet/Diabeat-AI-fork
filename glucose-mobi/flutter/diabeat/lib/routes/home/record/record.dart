@@ -5,15 +5,16 @@ import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+enum PostStateEnum { never, posted, none }
+
 class RecordPage extends StatefulWidget {
-  const RecordPage(this.havePostedRecord, {super.key});
-  final List<bool> havePostedRecord; // reference hack
-  
+  const RecordPage({super.key});
+
   @override
-  State<RecordPage> createState() => _RecordPageState();
+  State<RecordPage> createState() => RecordPageState();
 }
 
-class _RecordPageState extends State<RecordPage> {
+class RecordPageState extends State<RecordPage> {
   final _managers = [
     _UdoubleFieldManager('血糖 (mg/dL)'),
     _UdoubleFieldManager('碳水攝取量 (g)'),
@@ -22,6 +23,7 @@ class _RecordPageState extends State<RecordPage> {
   ];
   final _picker = ImagePicker();
   bool _waiting = false;
+  var postState = PostStateEnum.never;
 
   @override
   void dispose() {
@@ -113,7 +115,7 @@ class _RecordPageState extends State<RecordPage> {
         ),
       );
 
-      widget.havePostedRecord[0] = true; // reference hack
+      postState = PostStateEnum.posted;
     } else {
       log('post record failed');
     }
