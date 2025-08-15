@@ -1,7 +1,11 @@
+import 'dart:convert';
 import 'dart:developer';
+import 'package:csv/csv.dart';
 import 'package:diabeat/routes/network/request.dart' as request;
+import 'package:diabeat/routes/network/session.dart' as session;
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 
 class _Record {
   _Record(dynamic data)
@@ -10,6 +14,17 @@ class _Record {
       carb = data['carbohydrate_intake'],
       exercise = data['exercise_duration'],
       insulin = data['insulin_injection'];
+
+  List<String?> toCsvRow() {
+    return [
+      _humanDate(dateTime),
+      _humanTime(dateTime),
+      glucose.toString(),
+      carb?.toString(),
+      exercise?.toString(),
+      insulin?.toString(),
+    ];
+  }
 
   final DateTime dateTime;
   final double glucose;
@@ -26,9 +41,10 @@ class HistoryPage extends StatefulWidget {
 }
 
 class HistoryPageState extends State<HistoryPage> {
+  final _csvSerializer = const ListToCsvConverter();
   final _records = <DateTime, List<_Record>>{};
   final _firstDate = DateTime(2024);
-  var _date = _today();
+  var _date = _todayDate();
 
   @override
   void initState() {
@@ -58,7 +74,7 @@ class HistoryPageState extends State<HistoryPage> {
             final dateTime = await showDatePicker(
               context: context,
               firstDate: _firstDate,
-              lastDate: _today(),
+              lastDate: _todayDate(),
               initialDate: _date,
             );
 
@@ -67,10 +83,10 @@ class HistoryPageState extends State<HistoryPage> {
             }
           },
           style: util.filledPageButtonStyle(),
-          child: Text('${_date.year} / ${_date.month} / ${_date.day}'),
+          child: Text(_humanDate(_date)),
         ),
         actions: [
-          if (_date != _today())
+          if (_date != _todayDate())
             IconButton(
               onPressed: () {
                 setState(() => _date = _date.add(const Duration(days: 1)));
@@ -127,9 +143,7 @@ class HistoryPageState extends State<HistoryPage> {
 
                 return Card.outlined(
                   child: ListTile(
-                    title: Text(
-                      '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}',
-                    ),
+                    title: Text(_humanTime(time)),
                     subtitle: Table(
                       columnWidths: const {
                         0: IntrinsicColumnWidth(),
@@ -150,12 +164,26 @@ class HistoryPageState extends State<HistoryPage> {
             Positioned(
               bottom: 0,
               right: 0,
-              child: FloatingActionButton.extended(
-                onPressed: () {
-                  getRecords(goToToday: true);
-                },
-                icon: const Icon(Icons.refresh_rounded),
-                label: const Text('重新整理'),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  FloatingActionButton.extended(
+                    heroTag: '#refresh',
+                    onPressed: () {
+                      getRecords(goToToday: true);
+                    },
+                    icon: const Icon(Icons.refresh_rounded),
+                    label: const Text('重新整理'),
+                  ),
+                  const SizedBox(height: 20),
+                  FloatingActionButton.extended(
+                    heroTag: '#export',
+                    onPressed: _export,
+                    icon: const Icon(Icons.ios_share_rounded),
+                    label: const Text('匯出紀錄'),
+                  ),
+                ],
               ),
             ),
           ],
@@ -178,12 +206,42 @@ class HistoryPageState extends State<HistoryPage> {
               .putIfAbsent(_onlyDate(record.dateTime), () => [])
               .add(record);
 
-          _date = _today();
+          _date = _todayDate();
         }
       });
     } else {
       log('get records failed');
     }
+  }
+
+  Future<void> _export() async {
+    final csvTable = <List<String?>>[];
+    csvTable.add([
+      '日期',
+      '時間',
+      '血糖 (mg/dL)',
+      '碳水攝取量 (g)',
+      '運動時長 (min)',
+      '胰島素注射量 (U)',
+    ]);
+
+    for (final theDayRecords in _records.values) {
+      for (final record in theDayRecords) {
+        csvTable.add(record.toCsvRow());
+      }
+    }
+
+    final csvString = _csvSerializer.convert(csvTable).replaceAll('null', '');
+    final bytes = utf8.encode(csvString);
+
+    SharePlus.instance.share(
+      ShareParams(
+        files: [XFile.fromData(bytes)],
+        fileNameOverrides: [
+          '${session.username}_${DateTime.now().toIso8601String()}.csv',
+        ],
+      ),
+    );
   }
 }
 
@@ -191,14 +249,26 @@ class HistoryPageState extends State<HistoryPage> {
 /* */
 /* */
 
+Widget _paddingText(String text) {
+  return Padding(padding: const EdgeInsets.only(right: 20), child: Text(text));
+}
+
 DateTime _onlyDate(DateTime dateTime) {
   return DateTime(dateTime.year, dateTime.month, dateTime.day);
 }
 
-DateTime _today() {
+DateTime _todayDate() {
   return _onlyDate(DateTime.now());
 }
 
-Widget _paddingText(String text) {
-  return Padding(padding: const EdgeInsets.only(right: 20), child: Text(text));
+String _pad2Zero(dynamic obj) {
+  return obj.toString().padLeft(2, '0');
+}
+
+String _humanDate(DateTime dateTime) {
+  return '${dateTime.year}-${_pad2Zero(dateTime.month)}-${_pad2Zero(dateTime.day)}';
+}
+
+String _humanTime(DateTime dateTime) {
+  return '${_pad2Zero(dateTime.hour)}:${_pad2Zero(dateTime.minute)}';
 }

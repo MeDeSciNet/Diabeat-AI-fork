@@ -2,8 +2,17 @@ import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class GuestPage extends StatelessWidget {
+class GuestPage extends StatefulWidget {
   const GuestPage({super.key});
+
+  @override
+  State<GuestPage> createState() => _GuestPageState();
+}
+
+class _GuestPageState extends State<GuestPage> {
+  /// app name : true
+  /// org name : false
+  bool _appOrOrgName = true;
 
   @override
   Widget build(BuildContext context) {
@@ -18,19 +27,38 @@ class GuestPage extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const SizedBox(width: 20),
-                    const Text('Diabeat', style: TextStyle(fontSize: 55)),
+                    InkWell(
+                      onTap: () {
+                        setState(() => _appOrOrgName ^= true);
+                      },
+                      child: _appOrOrgName
+                          ? const Text(
+                              ' Diabeat',
+                              style: TextStyle(fontSize: 55),
+                            )
+                          : const Text(
+                              'MeDeSciNet ',
+                              style: TextStyle(fontSize: 40),
+                            ),
+                    ),
                     IconButton(
                       onPressed: () {
                         launchUrl(
                           Uri.parse(
-                            'https://github.com/MeDeSciNet/Diabeat-AI-fork',
+                            _appOrOrgName
+                                ? 'https://github.com/MeDeSciNet/Diabeat-AI-fork'
+                                : 'https://github.com/MeDeSciNet',
                           ),
                         );
                       },
                       iconSize: 55,
                       color: Colors.red,
-                      icon: const Icon(Icons.bloodtype_rounded),
+                      icon: _appOrOrgName
+                          ? const Icon(Icons.bloodtype_rounded)
+                          : Image.asset(
+                              'assets/images/medescinet.png',
+                              scale: 4,
+                            ),
                     ),
                   ],
                 ),
