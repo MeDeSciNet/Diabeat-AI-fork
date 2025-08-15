@@ -67,7 +67,7 @@ class _AccountPageState extends State<AccountPage> {
               clipBehavior: Clip.antiAlias,
               child: InkWell(
                 onTap: () {
-                  Navigator.pushNamed(context, '/chat');
+                  Navigator.pushNamed(context, '/consult');
                 },
                 child: AspectRatio(
                   aspectRatio: 16 / 9,

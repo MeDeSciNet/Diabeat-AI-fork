@@ -2,6 +2,10 @@ import 'package:diabeat/routes/network/scanner.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+/* */
+/* */
+/* ===== UI ===== */
+
 ButtonStyle filledPageButtonStyle() {
   return FilledButton.styleFrom(
     fixedSize: const Size.fromHeight(50),
@@ -43,22 +47,13 @@ Widget scanIconButton(BuildContext context) {
   );
 }
 
-Widget shareIconButton(BuildContext context) {
-  return IconButton(
-    onPressed: () {
-      //
-    },
-    icon: const Icon(Icons.ios_share_rounded),
-  );
-}
-
 InputDecoration inputBorder(String label) {
   return InputDecoration(labelText: label, border: const OutlineInputBorder());
 }
 
-String? nonEmptyValidator(String? value) {
-  return value == null || value.isEmpty ? '必填' : null;
-}
+/* */
+/* */
+/* ===== Util ===== */
 
 class UdoubleFormatter extends TextInputFormatter {
   const UdoubleFormatter();
@@ -76,4 +71,20 @@ class UdoubleFormatter extends TextInputFormatter {
     final value = double.tryParse(newText);
     return value == null || value < 0 ? oldValue : newValue;
   }
+}
+
+String? nonEmptyValidator(String? value) {
+  return value == null || value.isEmpty ? '必填' : null;
+}
+
+String pad2Zero(dynamic obj) {
+  return obj.toString().padLeft(2, '0');
+}
+
+String humanDate(DateTime dateTime) {
+  return '${dateTime.year}-${pad2Zero(dateTime.month)}-${pad2Zero(dateTime.day)}';
+}
+
+String humanTime(DateTime dateTime) {
+  return '${pad2Zero(dateTime.hour)}:${pad2Zero(dateTime.minute)}';
 }

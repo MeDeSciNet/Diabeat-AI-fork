@@ -17,8 +17,8 @@ class _Record {
 
   List<String?> toCsvRow() {
     return [
-      _humanDate(dateTime),
-      _humanTime(dateTime),
+      util.humanDate(dateTime),
+      util.humanTime(dateTime),
       glucose.toString(),
       carb?.toString(),
       exercise?.toString(),
@@ -48,6 +48,7 @@ class HistoryPageState extends State<HistoryPage> {
 
   @override
   void initState() {
+    // fix timeout problem
     getRecords(goToToday: true);
     super.initState();
   }
@@ -83,7 +84,7 @@ class HistoryPageState extends State<HistoryPage> {
             }
           },
           style: util.filledPageButtonStyle(),
-          child: Text(_humanDate(_date)),
+          child: Text(util.humanDate(_date)),
         ),
         actions: [
           if (_date != _todayDate())
@@ -143,7 +144,7 @@ class HistoryPageState extends State<HistoryPage> {
 
                 return Card.outlined(
                   child: ListTile(
-                    title: Text(_humanTime(time)),
+                    title: Text(util.humanTime(time)),
                     subtitle: Table(
                       columnWidths: const {
                         0: IntrinsicColumnWidth(),
@@ -169,7 +170,7 @@ class HistoryPageState extends State<HistoryPage> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   FloatingActionButton.extended(
-                    heroTag: '#refresh',
+                    heroTag: '#getRecords',
                     onPressed: () {
                       getRecords(goToToday: true);
                     },
@@ -206,7 +207,9 @@ class HistoryPageState extends State<HistoryPage> {
               .putIfAbsent(_onlyDate(record.dateTime), () => [])
               .add(record);
 
-          _date = _todayDate();
+          if (goToToday) {
+            _date = _todayDate();
+          }
         }
       });
     } else {
@@ -214,7 +217,7 @@ class HistoryPageState extends State<HistoryPage> {
     }
   }
 
-  Future<void> _export() async {
+  void _export() {
     final csvTable = <List<String?>>[];
     csvTable.add([
       '日期',
@@ -238,7 +241,7 @@ class HistoryPageState extends State<HistoryPage> {
       ShareParams(
         files: [XFile.fromData(bytes)],
         fileNameOverrides: [
-          '${session.username}_${DateTime.now().toIso8601String()}.csv',
+          '${session.username}_DiabeatHistory_${DateTime.now().toIso8601String()}.csv',
         ],
       ),
     );
@@ -259,16 +262,4 @@ DateTime _onlyDate(DateTime dateTime) {
 
 DateTime _todayDate() {
   return _onlyDate(DateTime.now());
-}
-
-String _pad2Zero(dynamic obj) {
-  return obj.toString().padLeft(2, '0');
-}
-
-String _humanDate(DateTime dateTime) {
-  return '${dateTime.year}-${_pad2Zero(dateTime.month)}-${_pad2Zero(dateTime.day)}';
-}
-
-String _humanTime(DateTime dateTime) {
-  return '${_pad2Zero(dateTime.hour)}:${_pad2Zero(dateTime.minute)}';
 }

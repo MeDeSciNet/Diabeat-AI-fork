@@ -1,15 +1,14 @@
 import 'dart:developer';
-import 'package:diabeat/routes/home/history/history.dart';
-import 'package:diabeat/routes/network/dialog/image_picker_dialog.dart';
+import 'package:diabeat/routes/home/record/image_picker_dialog.dart';
 import 'package:diabeat/routes/network/request.dart' as request;
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class RecordPage extends StatefulWidget {
-  const RecordPage({super.key, required this.historyKey});
-  final GlobalKey<HistoryPageState> historyKey;
-
+  const RecordPage(this.havePostedRecord, {super.key});
+  final List<bool> havePostedRecord; // reference hack
+  
   @override
   State<RecordPage> createState() => _RecordPageState();
 }
@@ -114,7 +113,7 @@ class _RecordPageState extends State<RecordPage> {
         ),
       );
 
-      widget.historyKey.currentState!.getRecords(goToToday: false);
+      widget.havePostedRecord[0] = true; // reference hack
     } else {
       log('post record failed');
     }

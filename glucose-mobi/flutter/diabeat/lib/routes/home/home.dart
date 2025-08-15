@@ -1,5 +1,5 @@
 import 'package:diabeat/routes/home/account/account.dart';
-import 'package:diabeat/routes/home/account/chat/chat.dart';
+import 'package:diabeat/routes/home/account/consult/consult.dart';
 import 'package:diabeat/routes/home/account/predict_diabetes/predict_diabetes.dart';
 import 'package:diabeat/routes/home/history/history.dart';
 import 'package:diabeat/routes/home/record/record.dart';
@@ -21,6 +21,7 @@ class _HomeState extends State<Home> {
   ];
   final _historyKey = GlobalKey<HistoryPageState>();
   int _index = 0;
+  final _havePostedRecord = [false];
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +49,7 @@ class _HomeState extends State<Home> {
               onGenerateRoute: (settings) {
                 return switch (settings.name) {
                   '/' => MaterialPageRoute(
-                    builder: (context) => RecordPage(historyKey: _historyKey),
+                    builder: (context) => RecordPage(_havePostedRecord),
                   ),
                   _ => null,
                 };
@@ -77,8 +78,8 @@ class _HomeState extends State<Home> {
                   '/predict' => MaterialPageRoute(
                     builder: (context) => const PredictDiabetesRoot(),
                   ),
-                  '/chat' => MaterialPageRoute(
-                    builder: (context) => const ChatPage(),
+                  '/consult' => MaterialPageRoute(
+                    builder: (context) => const ConsultPage(),
                   ),
                   _ => null,
                 };
@@ -89,6 +90,10 @@ class _HomeState extends State<Home> {
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: _index,
           onTap: (value) {
+            if (value == 1 && _havePostedRecord[0]) {
+              _havePostedRecord[0] = false;
+              _historyKey.currentState!.getRecords(goToToday: false);
+            }
             setState(() => _index = value);
           },
           items: const [

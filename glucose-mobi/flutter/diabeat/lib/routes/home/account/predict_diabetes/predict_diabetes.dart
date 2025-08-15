@@ -25,9 +25,17 @@ class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
     return Scaffold(
       appBar: AppBar(
         leading: util.backIconButton(context),
-        title: const Text('預測糖尿病'),
+        title: const Text('AI 糖尿病風險檢測'),
         centerTitle: true,
-        actions: _index == 3 ? [util.shareIconButton(context)] : null,
+        actions: [
+          if (_index == 3)
+            IconButton(
+              onPressed: () {
+                //
+              },
+              icon: const Icon(Icons.ios_share_rounded),
+            ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
@@ -90,7 +98,7 @@ class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
         glucose: glucose,
         hba1c: hba1c,
       );
-      if(!mounted) return;
+      if (!mounted) return;
 
       if (result.ok) {
         final predcition = result.data['prediction'] == 1;
