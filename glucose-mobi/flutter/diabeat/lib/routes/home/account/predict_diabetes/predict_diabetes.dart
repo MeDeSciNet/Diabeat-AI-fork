@@ -24,10 +24,10 @@ class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: util.backButton(context),
+        leading: util.backIconButton(context),
         title: const Text('預測糖尿病'),
         centerTitle: true,
-        actions: _index == 3 ? [util.shareButton(context)] : null,
+        actions: _index == 3 ? [util.shareIconButton(context)] : null,
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),

@@ -18,8 +18,8 @@ class _LoginPageState extends AuthState<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: util.backButton(context),
-        actions: [util.scanButton(context)],
+        leading: util.backIconButton(context),
+        actions: [util.scanIconButton(context)],
       ),
       body: SafeArea(
         child: Padding(

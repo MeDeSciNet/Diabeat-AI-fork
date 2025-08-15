@@ -63,10 +63,10 @@ class _ChatPageState extends State<ChatPage>
 
     return Scaffold(
       appBar: AppBar(
-        leading: util.backButton(context),
+        leading: util.backIconButton(context),
         title: const Text('智慧血糖建議'),
         centerTitle: true,
-        actions: [util.shareButton(context)],
+        actions: [util.shareIconButton(context)],
       ),
       body: _chat == null
           ? SizedBox.expand(

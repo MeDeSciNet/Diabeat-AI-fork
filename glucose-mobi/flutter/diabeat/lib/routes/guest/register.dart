@@ -19,8 +19,8 @@ class _RegisterPageState extends AuthState<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: util.backButton(context),
-        actions: [util.scanButton(context)],
+        leading: util.backIconButton(context),
+        actions: [util.scanIconButton(context)],
       ),
       body: SafeArea(
         child: Padding(

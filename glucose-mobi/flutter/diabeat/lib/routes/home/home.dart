@@ -19,6 +19,7 @@ class _HomeState extends State<Home> {
     GlobalKey<NavigatorState>(),
     GlobalKey<NavigatorState>(),
   ];
+  final _historyKey = GlobalKey<HistoryPageState>();
   int _index = 0;
 
   @override
@@ -47,7 +48,7 @@ class _HomeState extends State<Home> {
               onGenerateRoute: (settings) {
                 return switch (settings.name) {
                   '/' => MaterialPageRoute(
-                    builder: (context) => const RecordPage(),
+                    builder: (context) => RecordPage(historyKey: _historyKey),
                   ),
                   _ => null,
                 };
@@ -59,7 +60,7 @@ class _HomeState extends State<Home> {
               onGenerateRoute: (settings) {
                 return switch (settings.name) {
                   '/' => MaterialPageRoute(
-                    builder: (context) => const ChartPage(),
+                    builder: (context) => HistoryPage(key: _historyKey),
                   ),
                   _ => null,
                 };

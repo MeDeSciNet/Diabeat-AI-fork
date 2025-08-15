@@ -6,10 +6,10 @@ class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
 
   @override
-  State<AccountPage> createState() => AccountPageState();
+  State<AccountPage> createState() => _AccountPageState();
 }
 
-class AccountPageState extends State<AccountPage> {
+class _AccountPageState extends State<AccountPage> {
   /// username : true
   /// email    : false
   bool _usernameOrEmail = true;
@@ -27,7 +27,7 @@ class AccountPageState extends State<AccountPage> {
               : const Icon(Icons.email_rounded),
         ),
         title: Text(_usernameOrEmail ? session.username : session.email),
-        actions: [util.scanButton(context)],
+        actions: [util.scanIconButton(context)],
       ),
       body: Padding(
         padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),

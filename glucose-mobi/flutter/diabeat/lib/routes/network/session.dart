@@ -8,7 +8,7 @@ String get username => _session!.username;
 String get accessToken => _session!.accessToken;
 String get refreshToken => _session!.refreshToken;
 
-Future<bool> load() async {
+Future<bool> loadAndLoad() async {
   if (!await prefs.existSession()) {
     return false;
   }
@@ -21,7 +21,7 @@ Future<bool> load() async {
     refreshToken: session.refreshToken,
   );
 
-  connection.load();
+  await connection.load();
 
   return true;
 }

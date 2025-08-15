@@ -104,7 +104,7 @@ class Page0State extends State<Page0> {
                 child: FilledButton.icon(
                   onPressed: _tryGoNextPage,
                   style: util.filledPageButtonStyle(),
-                  icon: const Icon(Icons.arrow_forward_ios_rounded),
+                  icon: const Icon(Icons.arrow_forward_rounded),
                   iconAlignment: IconAlignment.end,
                   label: const Text('下一頁'),
                 ),

@@ -56,7 +56,7 @@ class _ScannerPageState extends State<ScannerPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: util.backButton(context),
+        leading: util.backIconButton(context),
         title: const Text('連接到伺服器'),
         centerTitle: true,
       ),

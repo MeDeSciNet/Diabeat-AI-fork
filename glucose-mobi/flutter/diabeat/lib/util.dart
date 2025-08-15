@@ -25,7 +25,7 @@ ButtonStyle outlinedPageButtonStyle() {
   );
 }
 
-Widget backButton(BuildContext context) {
+Widget backIconButton(BuildContext context) {
   return IconButton(
     onPressed: () {
       Navigator.pop(context);
@@ -34,7 +34,7 @@ Widget backButton(BuildContext context) {
   );
 }
 
-Widget scanButton(BuildContext context) {
+Widget scanIconButton(BuildContext context) {
   return IconButton(
     onPressed: () {
       ScannerPage.push(context);
@@ -43,7 +43,7 @@ Widget scanButton(BuildContext context) {
   );
 }
 
-Widget shareButton(BuildContext context) {
+Widget shareIconButton(BuildContext context) {
   return IconButton(
     onPressed: () {
       //

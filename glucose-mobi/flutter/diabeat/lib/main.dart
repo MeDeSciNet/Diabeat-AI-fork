@@ -9,7 +9,7 @@ import 'package:dynamic_color/dynamic_color.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final existSession = await session.load();
+  final existSession = await session.loadAndLoad();
   runApp(_MainApp(existSession));
 }
 

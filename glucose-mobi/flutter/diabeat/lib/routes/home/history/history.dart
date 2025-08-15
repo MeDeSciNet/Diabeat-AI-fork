@@ -18,17 +18,23 @@ class _Record {
   final double? insulin;
 }
 
-class ChartPage extends StatefulWidget {
-  const ChartPage({super.key});
+class HistoryPage extends StatefulWidget {
+  const HistoryPage({super.key});
 
   @override
-  State<ChartPage> createState() => ChartPageState();
+  State<HistoryPage> createState() => HistoryPageState();
 }
 
-class ChartPageState extends State<ChartPage> {
+class HistoryPageState extends State<HistoryPage> {
   final _records = <DateTime, List<_Record>>{};
   final _firstDate = DateTime(2024);
   var _date = _today();
+
+  @override
+  void initState() {
+    getRecords(goToToday: true);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +50,7 @@ class ChartPageState extends State<ChartPage> {
                     () => _date = _date.subtract(const Duration(days: 1)),
                   );
                 },
-                icon: const Icon(Icons.arrow_back_ios_new_rounded),
+                icon: const Icon(Icons.arrow_back_rounded),
               ),
         centerTitle: true,
         title: TextButton(
@@ -69,7 +75,7 @@ class ChartPageState extends State<ChartPage> {
               onPressed: () {
                 setState(() => _date = _date.add(const Duration(days: 1)));
               },
-              icon: const Icon(Icons.arrow_forward_ios_rounded),
+              icon: const Icon(Icons.arrow_forward_rounded),
             ),
         ],
       ),
@@ -125,7 +131,7 @@ class ChartPageState extends State<ChartPage> {
                       '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}',
                     ),
                     subtitle: Table(
-                      columnWidths: {
+                      columnWidths: const {
                         0: IntrinsicColumnWidth(),
                         1: IntrinsicColumnWidth(),
                         2: FlexColumnWidth(),
@@ -145,7 +151,9 @@ class ChartPageState extends State<ChartPage> {
               bottom: 0,
               right: 0,
               child: FloatingActionButton.extended(
-                onPressed: _getRecords,
+                onPressed: () {
+                  getRecords(goToToday: true);
+                },
                 icon: const Icon(Icons.refresh_rounded),
                 label: const Text('重新整理'),
               ),
@@ -156,7 +164,7 @@ class ChartPageState extends State<ChartPage> {
     );
   }
 
-  Future<void> _getRecords() async {
+  Future<void> getRecords({required bool goToToday}) async {
     final result = await request.getRecords(context);
     if (!mounted) return;
 
