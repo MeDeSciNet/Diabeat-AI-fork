@@ -8,18 +8,18 @@ class Page3 extends StatefulWidget {
 }
 
 class Page3State extends State<Page3> {
-  bool? _prediction;
+  bool? prediction;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(_prediction == null ? '預測中' : (_prediction! ? '是' : '否')),
+        Text(prediction == null ? '預測中' : (prediction! ? '是' : '否')),
       ],
     );
   }
 
   void update(bool prediction) {
-    setState(() => _prediction = prediction);
+    setState(() => this.prediction = prediction);
   }
 }

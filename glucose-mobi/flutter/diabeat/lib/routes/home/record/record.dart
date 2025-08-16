@@ -134,7 +134,7 @@ class RecordPageState extends State<RecordPage> {
       final value = result.data['predicted_value'] as double;
       _managers[1].controller.text = value.toStringAsFixed(1);
     } else {
-      log('predict carb failed');
+      log('predict carbs failed');
     }
 
     if (!mounted) return;

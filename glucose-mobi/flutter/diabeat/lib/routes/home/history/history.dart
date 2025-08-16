@@ -7,14 +7,13 @@ import 'package:diabeat/routes/network/session.dart' as session;
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
 class _Record {
   _Record(dynamic data)
     : dateTime = DateTime.parse(data['created_at']).toLocal(),
       glucose = data['blood_glucose'],
-      carb = data['carbohydrate_intake'],
+      carbs = data['carbohydrate_intake'],
       exercise = data['exercise_duration'],
       insulin = data['insulin_injection'];
 
@@ -23,7 +22,7 @@ class _Record {
       util.humanDate(dateTime),
       util.humanTime(dateTime),
       glucose.toString(),
-      carb?.toString(),
+      carbs?.toString(),
       exercise?.toString(),
       insulin?.toString(),
     ];
@@ -31,7 +30,7 @@ class _Record {
 
   final DateTime dateTime;
   final double glucose;
-  final double? carb;
+  final double? carbs;
   final double? exercise;
   final double? insulin;
 }
@@ -119,11 +118,11 @@ class HistoryPageState extends State<HistoryPage> {
                 ];
 
                 final text1 = _paddingText('碳水');
-                final row1 = item.carb == null
+                final row1 = item.carbs == null
                     ? [text1, const SizedBox(), const SizedBox()]
                     : [
                         text1,
-                        _paddingText(item.carb.toString()),
+                        _paddingText(item.carbs.toString()),
                         _paddingText('g'),
                       ];
 
@@ -255,17 +254,13 @@ class HistoryPageState extends State<HistoryPage> {
               margin: pw.EdgeInsets.all(10),
               build: (pw.Context context) {
                 return pw.Table(
-                  children: csvTable
-                      .map(
-                        (row) => pw.TableRow(
-                          children: row
-                              .map(
-                                (e) => e == null ? pw.SizedBox() : pw.Text(e),
-                              )
-                              .toList(),
-                        ),
-                      )
-                      .toList(),
+                  children: csvTable.map((row) {
+                    return pw.TableRow(
+                      children: row
+                          .map((e) => e == null ? pw.SizedBox() : pw.Text(e))
+                          .toList(),
+                    );
+                  }).toList(),
                 );
               },
             ),
