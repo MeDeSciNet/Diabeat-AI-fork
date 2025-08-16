@@ -249,19 +249,12 @@ class HistoryPageState extends State<HistoryPage> {
           final pdf = pw.Document();
 
           pdf.addPage(
-            pw.Page(
-              margin: pw.EdgeInsets.all(10),
-              build: (pw.Context context) {
-                return pw.Table(
-                  children: csvTable.map((row) {
-                    return pw.TableRow(
-                      children: row
-                          .map((e) => e == null ? pw.SizedBox() : pw.Text(e))
-                          .toList(),
-                    );
-                  }).toList(),
-                );
-              },
+            pw.MultiPage(
+              maxPages: 10000,
+              margin: const pw.EdgeInsets.all(20),
+              build: (pw.Context context) => [
+                pw.TableHelper.fromTextArray(data: csvTable),
+              ],
             ),
           );
 
