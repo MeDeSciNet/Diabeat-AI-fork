@@ -36,14 +36,12 @@ class _ConsultPageState extends State<ConsultPage>
           ..forward();
 
     () async {
-      final result = await request.chat(context);
+      final (ok, data) = await request.chat(context);
       if (!mounted) return;
 
       _controller.stop();
-      if (result.ok) {
-        setState(
-          () => _consultation = result.data['response']['message']['content'],
-        );
+      if (ok) {
+        setState(() => _consultation = data['response']['message']['content']);
       } else {
         log('consult failed');
       }

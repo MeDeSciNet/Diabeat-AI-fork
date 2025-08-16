@@ -90,7 +90,7 @@ class RecordPageState extends State<RecordPage> {
   Future<void> _tryPostRecord() async {
     setState(() => _waiting = true);
 
-    final result = await request.postRecord(
+    final (ok, data) = await request.postRecord(
       context,
       glucose: _managers[0].value!,
       carbohydrate: _managers[1].value,
@@ -101,7 +101,7 @@ class RecordPageState extends State<RecordPage> {
 
     setState(() => _waiting = false);
 
-    if (result.ok) {
+    if (ok) {
       for (final man in _managers) {
         man.controller.clear();
       }
@@ -127,11 +127,11 @@ class RecordPageState extends State<RecordPage> {
     if (image == null || !mounted) return;
     setState(() => _waiting = true);
 
-    final result = await request.predictCarb(context, image);
+    final (ok, data) = await request.predictCarbs(context, image);
     if (!mounted) return;
 
-    if (result.ok) {
-      final value = result.data['predicted_value'] as double;
+    if (ok) {
+      final value = data['predicted_value'] as double;
       _managers[1].controller.text = value.toStringAsFixed(1);
     } else {
       log('predict carbs failed');

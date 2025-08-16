@@ -144,7 +144,7 @@ class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
           final bmi =
               PredictDiabetesField().weight! / (heightInMeter * heightInMeter);
 
-          final result = await request.predictDiabetes(
+          final (ok, data) = await request.predictDiabetes(
             context,
             gender: PredictDiabetesField().gender!,
             age: PredictDiabetesField().age!,
@@ -155,13 +155,11 @@ class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
             glucose: PredictDiabetesField().glucose!,
             hba1c: PredictDiabetesField().hba1c!,
           );
-
           if (!mounted) return;
 
-          if (result.ok) {
+          if (ok) {
             _page3Key.currentState!.setState(() {
-              PredictDiabetesField().prediction =
-                  result.data['prediction'] == 1;
+              PredictDiabetesField().prediction = data['prediction'] == 1;
             });
           } else {
             log('predict diabetes failed');

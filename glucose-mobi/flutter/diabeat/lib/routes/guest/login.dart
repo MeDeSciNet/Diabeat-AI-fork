@@ -77,15 +77,14 @@ class _LoginPageState extends AuthState<LoginPage> {
     formState.save();
     setState(() => waiting = true);
 
-    final result = await request.logIn(
+    final (ok, data) = await request.logIn(
       context,
       email: email,
       password: password,
     );
     if (!mounted) return;
 
-    final data = result.data;
-    if (result.ok) {
+    if (ok) {
       session.save(
         email: email,
         username: data['username'],

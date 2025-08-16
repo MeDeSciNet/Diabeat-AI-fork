@@ -9,61 +9,50 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 
-class Result {
-  Result._(this.ok, [String? body])
-    : data = body == null ? null : jsonDecode(body);
-
-  Result.successful([String? body]) : this._(true, body);
-  Result.failed([String? body]) : this._(false, body);
-
-  final bool ok;
-  final dynamic data;
-}
-
-Future<Result> logIn(
+Future<(bool, dynamic)> logIn(
   BuildContext context, {
   required String email,
   required String password,
 }) async {
   if (!await _connect(context) || !context.mounted) {
-    return Result.failed();
+    return (false, null);
   }
 
   return _handle(context, () async {
-    final res = await http
-        .post(
-          connection.makeUrl('/token'),
-          body: {'username_or_email': email, 'password': password},
-        )
-        .timeout(_shortTimeout());
+    final res = await _sec3(
+      http.post(
+        connection.makeUrl('/token'),
+        body: {'username_or_email': email, 'password': password},
+      ),
+    );
 
     return (res.statusCode, res.body);
   });
 }
 
-Future<Result> register(
+Future<(bool, dynamic)> register(
   BuildContext context, {
   required String email,
   required String username,
   required String password,
 }) async {
   if (!await _connect(context) || !context.mounted) {
-    return Result.failed();
+    return (false, null);
   }
 
   return _handle(context, () async {
-    final res = await http
-        .post(
-          connection.makeUrl('/register'),
-          body: {'email': email, 'username': username, 'password': password},
-        )
-        .timeout(_shortTimeout());
+    final res = await _sec3(
+      http.post(
+        connection.makeUrl('/register'),
+        body: {'email': email, 'username': username, 'password': password},
+      ),
+    );
 
     return (res.statusCode, res.body);
   });
 }
 
-Future<Result> postRecord(
+Future<(bool, dynamic)> postRecord(
   BuildContext context, {
   required double glucose,
   double? carbohydrate,
@@ -71,37 +60,37 @@ Future<Result> postRecord(
   double? insulin,
 }) {
   return _handle(context, () async {
-    final res = await http
-        .post(
-          connection.makeUrl('/records'),
-          headers: _configHeaders(null, json: true, auth: true),
-          body: jsonEncode({
-            'blood_glucose': glucose,
-            'carbohydrate_intake': carbohydrate,
-            'exercise_duration': exercise,
-            'insulin_injection': insulin,
-          }),
-        )
-        .timeout(_shortTimeout());
+    final res = await _sec3(
+      http.post(
+        connection.makeUrl('/records'),
+        headers: _configHeaders({}, json: true, auth: true),
+        body: jsonEncode({
+          'blood_glucose': glucose,
+          'carbohydrate_intake': carbohydrate,
+          'exercise_duration': exercise,
+          'insulin_injection': insulin,
+        }),
+      ),
+    );
 
     return (res.statusCode, res.body);
   });
 }
 
-Future<Result> getRecords(BuildContext context) {
+Future<(bool, dynamic)> getRecords(BuildContext context) {
   return _handle(context, () async {
-    final res = await http
-        .get(
-          connection.makeUrl('/records'),
-          headers: _configHeaders(null, auth: true),
-        )
-        .timeout(_shortTimeout());
+    final res = await _sec3(
+      http.get(
+        connection.makeUrl('/records'),
+        headers: _configHeaders({}, auth: true),
+      ),
+    );
 
     return (res.statusCode, res.body);
   });
 }
 
-Future<Result> predictCarb(BuildContext context, XFile xFile) {
+Future<(bool, dynamic)> predictCarbs(BuildContext context, XFile xFile) {
   return _handle(context, () async {
     final request = http.MultipartRequest(
       'POST',
@@ -119,12 +108,12 @@ Future<Result> predictCarb(BuildContext context, XFile xFile) {
       ),
     );
 
-    final res = await request.send().timeout(_shortTimeout());
+    final res = await _sec3(request.send());
     return (res.statusCode, await res.stream.bytesToString());
   });
 }
 
-Future<Result> predictDiabetes(
+Future<(bool, dynamic)> predictDiabetes(
   BuildContext context, {
   required String gender,
   required int age,
@@ -136,32 +125,32 @@ Future<Result> predictDiabetes(
   required double hba1c,
 }) {
   return _handle(context, () async {
-    final res = await http
-        .post(
-          connection.makeUrl('/predictform'),
-          headers: _configHeaders(null, json: true, auth: true),
-          body: jsonEncode({
-            'gender': gender,
-            'age': age,
-            'bmi': bmi,
-            'hypertension': hypertension,
-            'heart_disease': heartDisease,
-            'smoking_history': smokingHistory,
-            'HbA1c_level': hba1c,
-            'blood_glucose_level': glucose,
-          }),
-        )
-        .timeout(_shortTimeout());
+    final res = await _sec3(
+      http.post(
+        connection.makeUrl('/predictform'),
+        headers: _configHeaders({}, json: true, auth: true),
+        body: jsonEncode({
+          'gender': gender,
+          'age': age,
+          'bmi': bmi,
+          'hypertension': hypertension,
+          'heart_disease': heartDisease,
+          'smoking_history': smokingHistory,
+          'HbA1c_level': hba1c,
+          'blood_glucose_level': glucose,
+        }),
+      ),
+    );
 
     return (res.statusCode, res.body);
   });
 }
 
-Future<Result> chat(BuildContext context) {
+Future<(bool, dynamic)> chat(BuildContext context) {
   return _handle(context, () async {
     final res = await http.get(
       connection.makeUrl('/chat'),
-      headers: _configHeaders(null, auth: true),
+      headers: _configHeaders({}, auth: true),
     );
 
     return (res.statusCode, res.body);
@@ -172,16 +161,15 @@ Future<Result> chat(BuildContext context) {
 /* */
 /* */
 
-Duration _shortTimeout() {
-  return const Duration(seconds: 3);
+Future<T> _sec3<T>(Future<T> future) {
+  return future.timeout(const Duration(seconds: 3));
 }
 
 Map<String, String> _configHeaders(
-  Map<String, String>? origin, {
+  Map<String, String> origin, {
   bool json = false,
   bool auth = false,
 }) {
-  origin ??= {};
   if (json) {
     origin['Content-Type'] = 'application/json';
   }
@@ -192,19 +180,16 @@ Map<String, String> _configHeaders(
 }
 
 Future<bool> _connect(BuildContext context) async {
-  if (connection.existAddr || await connection.load()) {
-    return true;
-  }
-  return context.mounted && await DisconnectedDialog.show(context) == true;
+  return connection.existAddr || await DisconnectedDialog.show(context) == true;
 }
 
-Future<bool> _refreshToken(BuildContext context) async {
-  final res = await http
-      .post(
-        connection.makeUrl('/token/refresh'),
-        body: {'refresh': session.refreshToken},
-      )
-      .timeout(_shortTimeout());
+Future<bool> _refresh(BuildContext context) async {
+  final res = await _sec3(
+    http.post(
+      connection.makeUrl('/token/refresh'),
+      body: {'refresh': session.refreshToken},
+    ),
+  );
 
   final status = res.statusCode;
 
@@ -225,7 +210,7 @@ Future<bool> _refreshToken(BuildContext context) async {
   return false;
 }
 
-Future<Result> _handle(
+Future<(bool, dynamic)> _handle(
   BuildContext context,
   Future<(int, String)> Function() request,
 ) async {
@@ -235,33 +220,34 @@ Future<Result> _handle(
     retry = false;
 
     try {
-      final (statusCode, body) = await request();
+      final (status, body) = await request();
 
-      if (200 <= statusCode && statusCode < 300) {
-        return Result.successful(body);
-      } else if (statusCode == 401) {
-        if (!context.mounted || !await _refreshToken(context)) {
-          return Result.failed();
-        }
-        retry = true;
-      } else {
-        return Result.failed(body);
-      }
-    } on TimeoutException {
-      if (!context.mounted) {
-        return Result.failed();
+      // 200 ~ 300
+      if (200 <= status && status < 300) {
+        return (true, jsonDecode(body));
       }
 
-      switch (await TimeoutDialog.show(context)) {
-        case true:
+      // 401
+      if (status == 401) {
+        if (context.mounted && await _refresh(context)) {
           retry = true;
-          break;
-
-        default:
-          return Result.failed();
+          continue;
+        }
+        break;
       }
+
+      // others
+      return (false, jsonDecode(body));
+      //
+    } on TimeoutException {
+      if (context.mounted && await TimeoutDialog.show(context) == true) {
+        retry = true;
+        continue;
+      }
+      break;
     }
   } while (retry);
 
-  return Result.failed();
+  // failure sewer
+  return (false, null);
 }

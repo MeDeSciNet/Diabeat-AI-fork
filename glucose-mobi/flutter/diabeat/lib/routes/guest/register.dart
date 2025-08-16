@@ -93,7 +93,7 @@ class _RegisterPageState extends AuthState<RegisterPage> {
 
     setState(() => waiting = true);
 
-    final result = await request.register(
+    final (ok, data) = await request.register(
       context,
       email: email,
       username: _username,
@@ -101,8 +101,7 @@ class _RegisterPageState extends AuthState<RegisterPage> {
     );
     if (!mounted) return;
 
-    final data = result.data;
-    if (result.ok) {
+    if (ok) {
       session.save(
         email: email,
         username: _username,

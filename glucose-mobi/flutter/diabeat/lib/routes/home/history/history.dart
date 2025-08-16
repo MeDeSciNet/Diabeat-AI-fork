@@ -196,14 +196,13 @@ class HistoryPageState extends State<HistoryPage> {
   }
 
   Future<void> getRecords({required bool goToToday}) async {
-    final result = await request.getRecords(context);
+    final (ok, multiData) = await request.getRecords(context);
     if (!mounted) return;
 
-    final multipleData = result.data;
     _records.clear();
-    if (result.ok) {
+    if (ok) {
       setState(() {
-        for (final data in multipleData) {
+        for (final data in multiData) {
           final record = _Record(data);
           _records
               .putIfAbsent(_onlyDate(record.dateTime), () => [])
