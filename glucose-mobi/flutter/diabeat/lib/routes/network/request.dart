@@ -161,7 +161,7 @@ Future<(bool, dynamic)> chat(BuildContext context) {
 /* */
 /* */
 
-Future<T> _sec3<T>(Future<T> future) {
+Future<T> _sec3<T extends http.BaseResponse>(Future<T> future) {
   return future.timeout(const Duration(seconds: 3));
 }
 

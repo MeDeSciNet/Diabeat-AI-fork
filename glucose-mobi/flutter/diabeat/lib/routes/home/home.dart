@@ -90,6 +90,10 @@ class _HomeState extends State<Home> {
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: _index,
           onTap: (value) {
+            // unfocus textfield of current navigator
+            // prevent keyboard pop up when dismiss dialog
+            _navigatorKeys[_index].currentState!.focusNode.unfocus();
+
             if (value == 1 && _recordKey.currentState!.shouldRefresh) {
               _recordKey.currentState!.shouldRefresh = false;
               _historyKey.currentState!.getRecords(goToToday: false);

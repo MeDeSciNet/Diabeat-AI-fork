@@ -73,7 +73,7 @@ class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
                   Row(
                     children: [
                       _prevPageButton(),
-                      const Spacer(),
+                      const SizedBox(width: 20),
                       _nextPageButton(),
                     ],
                   ),
@@ -89,7 +89,7 @@ class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
                   Row(
                     children: [
                       _prevPageButton(),
-                      const Spacer(),
+                      const SizedBox(width: 20),
                       _sendButton(),
                     ],
                   ),
@@ -127,6 +127,7 @@ class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
         },
         style: util.filledPageButtonStyle(),
         icon: const Icon(Icons.arrow_forward_rounded),
+        iconAlignment: IconAlignment.end,
         label: const Text('下一頁'),
       ),
     );
@@ -166,6 +167,7 @@ class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
           }
         },
         style: util.filledPageButtonStyle(),
+        iconAlignment: IconAlignment.end,
         icon: const Icon(Icons.send_rounded),
         label: const Text('送出'),
       ),
