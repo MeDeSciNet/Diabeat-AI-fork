@@ -1,5 +1,6 @@
 import 'package:diabeat/routes/guest/login.dart';
 import 'package:diabeat/routes/guest/register.dart';
+import 'package:diabeat/routes/network/connection.dart' as connection;
 import 'package:diabeat/routes/network/session.dart' as session;
 import 'package:diabeat/routes/network/scanner.dart';
 import 'package:diabeat/routes/guest/guest.dart';
@@ -9,7 +10,8 @@ import 'package:dynamic_color/dynamic_color.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final existSession = await session.loadAndLoad();
+  await connection.load();
+  final existSession = await session.load();
   runApp(_MainApp(existSession));
 }
 

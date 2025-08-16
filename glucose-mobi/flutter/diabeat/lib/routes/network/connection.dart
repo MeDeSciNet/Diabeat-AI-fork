@@ -9,12 +9,11 @@ Uri makeUrl(String path) {
 }
 
 Future<bool> load() async {
-  if (!await prefs.existAddr()) {
-    return false;
+  if (await prefs.existAddr()) {
+    _addr = await prefs.readAddr();
+    return true;
   }
-
-  _addr = await prefs.readAddr();
-  return true;
+  return false;
 }
 
 void save(String addr) {
