@@ -1,3 +1,4 @@
+import 'package:diabeat/routes/home/account/predict_diabetes/fields.dart';
 import 'package:flutter/material.dart';
 
 class Page3 extends StatefulWidget {
@@ -8,18 +9,16 @@ class Page3 extends StatefulWidget {
 }
 
 class Page3State extends State<Page3> {
-  bool? prediction;
-
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(prediction == null ? '預測中' : (prediction! ? '是' : '否')),
+        Text(switch (PredictDiabetesField().prediction) {
+          true => '是',
+          false => '否',
+          _ => '預測中',
+        }),
       ],
     );
-  }
-
-  void update(bool prediction) {
-    setState(() => this.prediction = prediction);
   }
 }

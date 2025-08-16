@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:diabeat/routes/home/account/predict_diabetes/fields.dart';
 import 'package:diabeat/routes/home/account/predict_diabetes/page0.dart';
 import 'package:diabeat/routes/home/account/predict_diabetes/page1.dart';
 import 'package:diabeat/routes/home/account/predict_diabetes/page2.dart';
@@ -15,11 +16,15 @@ class PredictDiabetesRoot extends StatefulWidget {
 }
 
 class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
-  final _page0Key = GlobalKey<Page0State>();
-  final _page1Key = GlobalKey<Page1State>();
-  final _page2Key = GlobalKey<Page2State>();
+  final _formKeys = [
+    GlobalKey<FormState>(),
+    GlobalKey<FormState>(),
+    GlobalKey<FormState>(),
+  ];
   final _page3Key = GlobalKey<Page3State>();
   int _index = 0;
+
+  FormState get _formState => _formKeys[_index].currentState!;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +37,7 @@ class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
           if (_index == 3)
             IconButton(
               onPressed: () {
-                //
+                // share
               },
               icon: const Icon(Icons.ios_share_rounded),
             ),
@@ -43,16 +48,53 @@ class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
         child: IndexedStack(
           index: _index,
           children: [
-            Page0(key: _page0Key, goNextPage: goNextPage),
-            Page1(
-              key: _page1Key,
-              goPrevPage: goPrevPage,
-              goNextPage: goNextPage,
+            Form(
+              key: _formKeys[0],
+              child: Column(
+                children: [
+                  Page0(),
+                  const Spacer(),
+                  Row(
+                    children: [
+                      const Spacer(),
+                      const SizedBox(width: 20),
+                      _nextPageButton(),
+                    ],
+                  ),
+                ],
+              ),
             ),
-            Page2(
-              key: _page2Key,
-              goPrevPage: goPrevPage,
-              goSendPage: goSendPage,
+            Form(
+              key: _formKeys[1],
+              child: Column(
+                children: [
+                  const Page1(),
+                  const Spacer(),
+                  Row(
+                    children: [
+                      _prevPageButton(),
+                      const Spacer(),
+                      _nextPageButton(),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Form(
+              key: _formKeys[2],
+              child: Column(
+                children: [
+                  Page2(),
+                  const Spacer(),
+                  Row(
+                    children: [
+                      _prevPageButton(),
+                      const Spacer(),
+                      _sendButton(),
+                    ],
+                  ),
+                ],
+              ),
             ),
             Page3(key: _page3Key),
           ],
@@ -61,52 +103,74 @@ class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
     );
   }
 
-  void goPrevPage() {
-    setState(() => _index--);
+  Widget _prevPageButton() {
+    return Expanded(
+      child: OutlinedButton.icon(
+        onPressed: () {
+          setState(() => _index--);
+        },
+        style: util.outlinedPageButtonStyle(),
+        icon: const Icon(Icons.arrow_back_rounded),
+        label: const Text('上一頁'),
+      ),
+    );
   }
 
-  void goNextPage() {
-    setState(() => _index++);
+  Widget _nextPageButton() {
+    return Expanded(
+      child: FilledButton.icon(
+        onPressed: () {
+          if (_formState.validate()) {
+            _formState.save();
+            setState(() => _index++);
+          }
+        },
+        style: util.filledPageButtonStyle(),
+        icon: const Icon(Icons.arrow_forward_rounded),
+        label: const Text('下一頁'),
+      ),
+    );
   }
 
-  void goSendPage() {
-    setState(() => _index = 3);
-    () async {
-      final p0 = _page0Key.currentState!;
-      final gender = p0.gender!;
-      final age = p0.age!;
-      final heightInMeter = p0.height! / 100;
-      final weight = p0.weight!;
-      final bmi = weight / (heightInMeter * heightInMeter);
+  Widget _sendButton() {
+    return Expanded(
+      child: FilledButton.icon(
+        onPressed: () async {
+          if (!_formState.validate()) return;
+          _formState.save();
+          setState(() => _index++);
 
-      final p1 = _page1Key.currentState!;
-      final hypertension = p1.hypertension;
-      final heartDisease = p1.heartDisease;
-      final smokingHistory = p1.smokingHistory!;
+          final heightInMeter = PredictDiabetesField().height! / 100;
+          final bmi =
+              PredictDiabetesField().weight! / (heightInMeter * heightInMeter);
 
-      final p2 = _page2Key.currentState!;
-      final glucose = p2.glucose!;
-      final hba1c = p2.hba1c!;
+          final result = await request.predictDiabetes(
+            context,
+            gender: PredictDiabetesField().gender!,
+            age: PredictDiabetesField().age!,
+            bmi: bmi,
+            hypertension: PredictDiabetesField().hypertension,
+            heartDisease: PredictDiabetesField().heartDisease,
+            smokingHistory: PredictDiabetesField().smokingHistory!,
+            glucose: PredictDiabetesField().glucose!,
+            hba1c: PredictDiabetesField().hba1c!,
+          );
 
-      final result = await request.predictDiabetes(
-        context,
-        gender: gender,
-        age: age,
-        bmi: bmi,
-        hypertension: hypertension,
-        heartDisease: heartDisease,
-        smokingHistory: smokingHistory,
-        glucose: glucose,
-        hba1c: hba1c,
-      );
-      if (!mounted) return;
+          if (!mounted) return;
 
-      if (result.ok) {
-        final predcition = result.data['prediction'] == 1;
-        _page3Key.currentState!.update(predcition);
-      } else {
-        log('predict diabetes failed');
-      }
-    }();
+          if (result.ok) {
+            _page3Key.currentState!.setState(() {
+              PredictDiabetesField().prediction =
+                  result.data['prediction'] == 1;
+            });
+          } else {
+            log('predict diabetes failed');
+          }
+        },
+        style: util.filledPageButtonStyle(),
+        icon: const Icon(Icons.send_rounded),
+        label: const Text('送出'),
+      ),
+    );
   }
 }
