@@ -1,11 +1,14 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:csv/csv.dart';
+import 'package:diabeat/routes/home/history/pdf_csv_dialog.dart';
 import 'package:diabeat/routes/network/request.dart' as request;
 import 'package:diabeat/routes/network/session.dart' as session;
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
 
 class _Record {
   _Record(dynamic data)
@@ -217,16 +220,20 @@ class HistoryPageState extends State<HistoryPage> {
     }
   }
 
-  void _export() {
-    final csvTable = <List<String?>>[];
-    csvTable.add([
-      '日期',
-      '時間',
-      '血糖 (mg/dL)',
-      '碳水攝取量 (g)',
-      '運動時長 (min)',
-      '胰島素注射量 (U)',
-    ]);
+  Future<void> _export() async {
+    final nav = await PdfCsvDialog.show(context);
+    if (nav == null) return;
+
+    final csvTable = <List<String?>>[
+      [
+        'Date',
+        'Time',
+        'Glucose (mg/dL)',
+        'Carbs (g)',
+        'Exercise (min)',
+        'Insulin (U)',
+      ],
+    ];
 
     for (final theDayRecords in _records.values) {
       for (final record in theDayRecords) {
@@ -234,17 +241,61 @@ class HistoryPageState extends State<HistoryPage> {
       }
     }
 
-    final csvString = _csvSerializer.convert(csvTable).replaceAll('null', '');
-    final bytes = utf8.encode(csvString);
+    final filename =
+        '${session.username}_DiabeatHistory_${DateTime.now().toIso8601String()}';
 
-    SharePlus.instance.share(
-      ShareParams(
-        files: [XFile.fromData(bytes, mimeType: 'text/csv')],
-        fileNameOverrides: [
-          '${session.username}_DiabeatHistory_${DateTime.now().toIso8601String()}.csv',
-        ],
-      ),
-    );
+    final ShareParams shareParams;
+    switch (nav) {
+      case PdfCsvEnum.pdf:
+        {
+          final pdf = pw.Document();
+
+          pdf.addPage(
+            pw.Page(
+              margin: pw.EdgeInsets.all(10),
+              build: (pw.Context context) {
+                return pw.Table(
+                  children: csvTable
+                      .map(
+                        (row) => pw.TableRow(
+                          children: row
+                              .map(
+                                (e) => e == null ? pw.SizedBox() : pw.Text(e),
+                              )
+                              .toList(),
+                        ),
+                      )
+                      .toList(),
+                );
+              },
+            ),
+          );
+
+          final bytes = await pdf.save();
+          shareParams = ShareParams(
+            files: [XFile.fromData(bytes, mimeType: 'application/pdf')],
+            fileNameOverrides: ['$filename.pdf'],
+          );
+
+          break;
+        }
+
+      case PdfCsvEnum.csv:
+        {
+          final csvString = _csvSerializer
+              .convert(csvTable)
+              .replaceAll('null', '');
+          final bytes = utf8.encode(csvString);
+          shareParams = ShareParams(
+            files: [XFile.fromData(bytes, mimeType: 'text/csv')],
+            fileNameOverrides: ['$filename.csv'],
+          );
+
+          break;
+        }
+    }
+
+    await SharePlus.instance.share(shareParams);
   }
 }
 

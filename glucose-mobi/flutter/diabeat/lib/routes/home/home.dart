@@ -90,9 +90,8 @@ class _HomeState extends State<Home> {
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: _index,
           onTap: (value) {
-            if (value == 1 &&
-                _recordKey.currentState!.postState != PostStateEnum.none) {
-              _recordKey.currentState!.postState = PostStateEnum.none;
+            if (value == 1 && _recordKey.currentState!.shouldRefresh) {
+              _recordKey.currentState!.shouldRefresh = false;
               _historyKey.currentState!.getRecords(goToToday: false);
             }
             setState(() => _index = value);

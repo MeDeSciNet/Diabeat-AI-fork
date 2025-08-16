@@ -98,14 +98,16 @@ class _LoginPageState extends AuthState<LoginPage> {
       setState(() {
         waiting = false;
 
-        switch (data['non_field_errors'][0]) {
-          case 'Email does not exist.':
-            emailErr = 'Email 不存在';
-            break;
+        if (data != null) {
+          switch (data['non_field_errors'][0]) {
+            case 'Email does not exist.':
+              emailErr = 'Email 不存在';
+              break;
 
-          case 'Incorrect password.':
-            _passwordErr = '密碼錯誤';
-            break;
+            case 'Incorrect password.':
+              _passwordErr = '密碼錯誤';
+              break;
+          }
         }
       });
     }

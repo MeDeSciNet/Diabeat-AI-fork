@@ -5,8 +5,6 @@ import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-enum PostStateEnum { never, posted, none }
-
 class RecordPage extends StatefulWidget {
   const RecordPage({super.key});
 
@@ -23,7 +21,7 @@ class RecordPageState extends State<RecordPage> {
   ];
   final _picker = ImagePicker();
   bool _waiting = false;
-  var postState = PostStateEnum.never;
+  bool shouldRefresh = true;
 
   @override
   void dispose() {
@@ -115,7 +113,7 @@ class RecordPageState extends State<RecordPage> {
         ),
       );
 
-      postState = PostStateEnum.posted;
+      shouldRefresh = true;
     } else {
       log('post record failed');
     }

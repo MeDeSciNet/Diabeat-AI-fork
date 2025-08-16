@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:diabeat/routes/home/account/predict_diabetes/page0.dart';
 import 'package:diabeat/routes/home/account/predict_diabetes/page1.dart';
 import 'package:diabeat/routes/home/account/predict_diabetes/page2.dart';
@@ -104,7 +105,7 @@ class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
         final predcition = result.data['prediction'] == 1;
         _page3Key.currentState!.update(predcition);
       } else {
-        // result.failed
+        log('predict diabetes failed');
       }
     }();
   }

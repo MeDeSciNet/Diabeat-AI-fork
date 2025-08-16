@@ -101,7 +101,7 @@ class _RegisterPageState extends AuthState<RegisterPage> {
     );
     if (!mounted) return;
 
-    final data = result.data as Map<String, dynamic>;
+    final data = result.data;
     if (result.ok) {
       session.save(
         email: email,
@@ -115,19 +115,21 @@ class _RegisterPageState extends AuthState<RegisterPage> {
       setState(() {
         waiting = false;
 
-        if (data.containsKey('email')) {
-          emailErr = switch (data['email'][0]) {
-            'Enter a valid email address.' => 'Email 格式不正確',
-            'custom user with this email already exists.' => '此 Email 已被使用',
-            _ => '錯誤',
-          };
-        }
-        if (data.containsKey('username')) {
-          _usernameErr = switch (data['username'][0]) {
-            'custom user with this username already exists.' =>
-              '此 Username 已被使用',
-            _ => '錯誤',
-          };
+        if (data != null) {
+          if (data.containsKey('email')) {
+            emailErr = switch (data['email'][0]) {
+              'Enter a valid email address.' => 'Email 格式不正確',
+              'custom user with this email already exists.' => '此 Email 已被使用',
+              _ => '錯誤',
+            };
+          }
+          if (data.containsKey('username')) {
+            _usernameErr = switch (data['username'][0]) {
+              'custom user with this username already exists.' =>
+                '此 Username 已被使用',
+              _ => '錯誤',
+            };
+          }
         }
       });
     }

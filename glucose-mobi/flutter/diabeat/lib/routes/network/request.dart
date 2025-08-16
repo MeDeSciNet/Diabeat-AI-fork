@@ -198,7 +198,7 @@ Future<bool> _connect(BuildContext context) async {
   return context.mounted && await DisconnectedDialog.show(context) == true;
 }
 
-Future<bool> _refresh(BuildContext context) async {
+Future<bool> _refreshToken(BuildContext context) async {
   final res = await http
       .post(
         connection.makeUrl('/token/refresh'),
@@ -240,7 +240,7 @@ Future<Result> _handle(
       if (200 <= statusCode && statusCode < 300) {
         return Result.successful(body);
       } else if (statusCode == 401) {
-        if (!context.mounted || !await _refresh(context)) {
+        if (!context.mounted || !await _refreshToken(context)) {
           return Result.failed();
         }
         retry = true;
