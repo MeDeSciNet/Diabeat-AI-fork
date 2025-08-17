@@ -13,7 +13,7 @@ class _Page1State extends State<Page1> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('疾病史', style: TextStyle(fontSize: 16)),
         CheckboxListTile(
@@ -39,7 +39,7 @@ class _Page1State extends State<Page1> {
             PredictDiabetesFields.smokingHistory = newValue;
           },
           builder: (field) => Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text.rich(
                 TextSpan(

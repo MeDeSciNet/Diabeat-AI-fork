@@ -9,7 +9,6 @@ class Page2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         TextFormField(
           validator: util.nonEmptyValidator,
@@ -24,7 +23,7 @@ class Page2 extends StatelessWidget {
           },
           decoration: util.inputBorder('血糖值 (mg/dL)'),
         ),
-        const SizedBox(height: 30),
+        const SizedBox(height: 20),
         TextFormField(
           focusNode: _hba1cFocus,
           validator: util.nonEmptyValidator,

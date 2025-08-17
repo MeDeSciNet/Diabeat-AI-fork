@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:diabeat/routes/home/account/predict_diabetes/fields.dart';
 import 'package:diabeat/routes/home/account/predict_diabetes/page0.dart';
 import 'package:diabeat/routes/home/account/predict_diabetes/page1.dart';
@@ -25,7 +24,7 @@ class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
   final _page3Key = GlobalKey<Page3State>();
   int _index = 0;
 
-  FormState get _formState => _formKeys[_index].currentState!;
+  GlobalKey<FormState> get _thisFormKey => _formKeys[_index];
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +34,7 @@ class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
         title: const Text('AI 糖尿病風險檢測'),
         centerTitle: true,
         actions: [
-          if (_index == 3)
+          if (_index == 3 && _page3Key.currentState!.waiting == false)
             IconButton(
               onPressed: _share,
               icon: const Icon(Icons.ios_share_rounded),
@@ -106,7 +105,7 @@ class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
     return Expanded(
       child: OutlinedButton.icon(
         onPressed: () {
-          FocusScope.of(_formState.context).unfocus();
+          util.formUnfocus(_thisFormKey);
           setState(() => _index--);
         },
         style: util.outlinedPageButtonStyle(),
@@ -120,9 +119,9 @@ class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
     return Expanded(
       child: FilledButton.icon(
         onPressed: () {
-          if (_formState.validate()) {
-            _formState.save();
-            FocusScope.of(_formState.context).unfocus();
+          if (_thisFormKey.currentState!.validate()) {
+            _thisFormKey.currentState!.save();
+            util.formUnfocus(_thisFormKey);
             setState(() => _index++);
           }
         },
@@ -138,14 +137,15 @@ class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
     return Expanded(
       child: FilledButton.icon(
         onPressed: () async {
-          if (!_formState.validate()) return;
-          _formState.save();
-          FocusScope.of(_formState.context).unfocus();
+          if (!_thisFormKey.currentState!.validate()) return;
+          _thisFormKey.currentState!.save();
+          util.formUnfocus(_thisFormKey);
           setState(() => _index++);
 
           final heightInMeter = PredictDiabetesFields.height! / 100;
           final bmi =
               PredictDiabetesFields.weight! / (heightInMeter * heightInMeter);
+
           PredictDiabetesFields.bmi = double.parse(bmi.toStringAsFixed(1));
 
           final (ok, data) = await request.predictDiabetes(
@@ -159,14 +159,17 @@ class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
             glucose: PredictDiabetesFields.glucose!,
             hba1c: PredictDiabetesFields.hba1c!,
           );
-          if (!mounted) return;
+          if (!_page3Key.currentState!.mounted) return;
 
           if (ok) {
             _page3Key.currentState!.setState(() {
+              _page3Key.currentState!.waiting = false;
               PredictDiabetesFields.prediction = data['prediction'] == 1;
             });
           } else {
-            log('predict diabetes failed');
+            _page3Key.currentState!.setState(() {
+              _page3Key.currentState!.waiting = null;
+            });
           }
         },
         style: util.filledPageButtonStyle(),
@@ -199,7 +202,7 @@ BMI: ${PredictDiabetesFields.bmi} kg/m^2
 糖化血色素: ${PredictDiabetesFields.hba1c} %
 
 [檢測結果]
-${PredictDiabetesFields.predictionText}
+${PredictDiabetesFields.prediction ? '有' : '無'}
 ''';
 
     SharePlus.instance.share(ShareParams(text: text));

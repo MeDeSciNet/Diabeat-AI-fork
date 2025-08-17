@@ -10,7 +10,6 @@ class Page0 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         FormField<String>(
           validator: util.nonEmptyValidator,
@@ -18,7 +17,7 @@ class Page0 extends StatelessWidget {
             PredictDiabetesFields.gender = newValue;
           },
           builder: (field) => Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text.rich(
                 TextSpan(
@@ -48,7 +47,7 @@ class Page0 extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 10),
         TextFormField(
           keyboardType: TextInputType.number,
           textInputAction: TextInputAction.next,
@@ -61,7 +60,7 @@ class Page0 extends StatelessWidget {
             PredictDiabetesFields.age = int.parse(newValue!);
           },
         ),
-        const SizedBox(height: 30),
+        const SizedBox(height: 20),
         TextFormField(
           focusNode: _heightFocus,
           keyboardType: TextInputType.numberWithOptions(decimal: true),
@@ -76,7 +75,7 @@ class Page0 extends StatelessWidget {
             PredictDiabetesFields.height = double.parse(newValue!);
           },
         ),
-        const SizedBox(height: 30),
+        const SizedBox(height: 20),
         TextFormField(
           focusNode: _weightFocus,
           keyboardType: TextInputType.numberWithOptions(decimal: true),
