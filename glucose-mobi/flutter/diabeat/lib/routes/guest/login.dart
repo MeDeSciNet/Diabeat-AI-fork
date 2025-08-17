@@ -19,7 +19,7 @@ class _LoginPageState extends AuthState<LoginPage> {
     return Scaffold(
       appBar: AppBar(
         leading: util.backIconButton(context),
-        actions: [util.scanIconButton(context, waiting)],
+        actions: [util.scanIconButton(context, waiting: waiting)],
       ),
       body: SafeArea(
         child: Padding(
@@ -62,12 +62,7 @@ class _LoginPageState extends AuthState<LoginPage> {
                   onPressed: waiting ? null : _tryLogIn,
                   style: util.filledPageButtonStyle(),
                   icon: waiting
-                      ? Transform.scale(
-                          scale: 0.5,
-                          child: const CircularProgressIndicator(
-                            year2023: false,
-                          ),
-                        )
+                      ? util.smallCircularProgressIndicator()
                       : const Icon(Icons.login_rounded),
                   label: waiting ? const Text('登入中') : const Text('登入'),
                 ),
@@ -80,9 +75,9 @@ class _LoginPageState extends AuthState<LoginPage> {
   }
 
   Future<void> _tryLogIn() async {
-    if (!formState.validate()) return;
-    formState.save();
-    unfocus();
+    if (!formKey.currentState!.validate()) return;
+    formKey.currentState!.save();
+    util.formUnfocus(formKey);
     setState(() => waiting = true);
 
     final (ok, data) = await request.logIn(

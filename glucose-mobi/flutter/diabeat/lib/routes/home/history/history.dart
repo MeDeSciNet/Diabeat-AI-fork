@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'package:csv/csv.dart';
 import 'package:diabeat/routes/home/history/pdf_csv_dialog.dart';
 import 'package:diabeat/routes/network/request.dart' as request;
@@ -46,8 +45,10 @@ class HistoryPageState extends State<HistoryPage> {
   final _csvSerializer = const ListToCsvConverter();
   final _records = <DateTime, List<_Record>>{};
   final _firstDate = DateTime(2024);
-  var _date = _todayDate();
-  
+  DateTime _date = _todayDate();
+  bool _waitingRefresh = false;
+  bool _waitingMakeDumps = false;
+
   @override
   Widget build(BuildContext context) {
     final thisDayRecord = _records[_date];
@@ -165,19 +166,39 @@ class HistoryPageState extends State<HistoryPage> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   FloatingActionButton.extended(
-                    heroTag: '#getRecords',
-                    onPressed: () {
-                      getRecords(goToToday: true);
-                    },
-                    icon: const Icon(Icons.refresh_rounded),
-                    label: const Text('重新整理'),
+                    heroTag:
+                        '#getRecords', // idk why this necessary when have multiple FABs
+                    onPressed: _waitingRefresh
+                        ? null
+                        : () {
+                            getRecords(goToToday: true);
+                          },
+                    icon: _waitingRefresh
+                        ? util.smallCircularProgressIndicator()
+                        : const Icon(Icons.refresh_rounded),
+                    label: _waitingRefresh
+                        ? const Text('更新紀錄中')
+                        : const Text('重新整理'),
                   ),
                   const SizedBox(height: 20),
                   FloatingActionButton.extended(
                     heroTag: '#export',
-                    onPressed: _export,
-                    icon: const Icon(Icons.ios_share_rounded),
-                    label: const Text('匯出紀錄'),
+                    onPressed: _waitingMakeDumps
+                        ? null
+                        : () async {
+                            final nav = await PdfCsvDialog.show(context);
+                            if (nav == null) return;
+
+                            setState(() => _waitingMakeDumps = true);
+                            await _export(nav);
+                            setState(() => _waitingMakeDumps = false);
+                          },
+                    icon: _waitingMakeDumps
+                        ? util.smallCircularProgressIndicator()
+                        : const Icon(Icons.ios_share_rounded),
+                    label: _waitingMakeDumps
+                        ? const Text('製作中')
+                        : const Text('匯出紀錄'),
                   ),
                 ],
               ),
@@ -189,32 +210,33 @@ class HistoryPageState extends State<HistoryPage> {
   }
 
   Future<void> getRecords({required bool goToToday}) async {
+    setState(() => _waitingRefresh = true);
+
     final (ok, multiData) = await request.getRecords(context);
     if (!mounted) return;
 
-    _records.clear();
     if (ok) {
       setState(() {
+        _waitingRefresh = false;
+
+        _records.clear();
         for (final data in multiData) {
           final record = _Record(data);
           _records
               .putIfAbsent(_onlyDate(record.dateTime), () => [])
               .add(record);
+        }
 
-          if (goToToday) {
-            _date = _todayDate();
-          }
+        if (goToToday) {
+          _date = _todayDate();
         }
       });
     } else {
-      log('get records failed');
+      setState(() => _waitingRefresh = false);
     }
   }
 
-  Future<void> _export() async {
-    final nav = await PdfCsvDialog.show(context);
-    if (nav == null) return;
-
+  Future<void> _export(PdfCsvEnum nav) async {
     final csvTable = <List<String?>>[
       [
         'Date',

@@ -29,7 +29,7 @@ class _AccountPageState extends State<AccountPage> {
               : const Icon(Icons.email_rounded),
         ),
         title: Text(_usernameOrEmail ? session.username : session.email),
-        actions: [util.scanIconButton(context, true)],
+        actions: [util.scanIconButton(context, waiting: false)],
       ),
       body: Padding(
         padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),

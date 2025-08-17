@@ -38,7 +38,7 @@ Widget backIconButton(BuildContext context) {
   );
 }
 
-Widget scanIconButton(BuildContext context, bool waiting) {
+Widget scanIconButton(BuildContext context, {required bool waiting}) {
   return IconButton(
     onPressed: waiting
         ? null
@@ -53,8 +53,19 @@ Widget paddingText(String text) {
   return Padding(padding: const EdgeInsets.only(right: 20), child: Text(text));
 }
 
+Widget smallCircularProgressIndicator() {
+  return Transform.scale(
+    scale: 0.5,
+    child: const CircularProgressIndicator(year2023: false),
+  );
+}
+
 InputDecoration inputBorder(String label) {
   return InputDecoration(labelText: label, border: const OutlineInputBorder());
+}
+
+void formUnfocus(GlobalKey<FormState> formKey) {
+  FocusScope.of(formKey.currentContext!).unfocus();
 }
 
 /* */

@@ -9,8 +9,6 @@ abstract class AuthState<T extends StatefulWidget> extends State<T> {
   late String email;
   late String password;
 
-  FormState get formState => formKey.currentState!;
-
   Widget buildEmailField() {
     return TextFormField(
       validator: (value) {
@@ -64,9 +62,5 @@ abstract class AuthState<T extends StatefulWidget> extends State<T> {
     }
 
     return null;
-  }
-
-  void unfocus() {
-    FocusScope.of(formState.context).unfocus();
   }
 }

@@ -20,7 +20,7 @@ class _RegisterPageState extends AuthState<RegisterPage> {
     return Scaffold(
       appBar: AppBar(
         leading: util.backIconButton(context),
-        actions: [util.scanIconButton(context, waiting)],
+        actions: [util.scanIconButton(context, waiting: waiting)],
       ),
       body: SafeArea(
         child: Padding(
@@ -65,10 +65,7 @@ class _RegisterPageState extends AuthState<RegisterPage> {
                   onPressed: waiting ? null : _tryRegister,
                   style: util.filledPageButtonStyle(),
                   icon: waiting
-                      ? Transform.scale(
-                          scale: 0.5,
-                          child: CircularProgressIndicator(year2023: false),
-                        )
+                      ? util.smallCircularProgressIndicator()
                       : const Icon(Icons.create_rounded),
                   label: waiting ? const Text('註冊中') : const Text('註冊'),
                 ),
@@ -93,9 +90,9 @@ class _RegisterPageState extends AuthState<RegisterPage> {
   }
 
   Future<void> _tryRegister() async {
-    if (!formState.validate()) return;
-    formState.save();
-    unfocus();
+    if (!formKey.currentState!.validate()) return;
+    formKey.currentState!.save();
+    util.formUnfocus(formKey);
     setState(() => waiting = true);
 
     final (ok, data) = await request.register(
