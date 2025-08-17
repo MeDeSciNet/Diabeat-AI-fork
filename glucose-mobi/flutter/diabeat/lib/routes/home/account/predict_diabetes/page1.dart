@@ -36,7 +36,7 @@ class _Page1State extends State<Page1> {
         FormField<String>(
           validator: util.nonEmptyValidator,
           onSaved: (newValue) {
-            PredictDiabetesFields.smokingHistory = newValue;
+            PredictDiabetesFields.smokingHistory = newValue!;
           },
           builder: (field) => Column(
             crossAxisAlignment: CrossAxisAlignment.start,

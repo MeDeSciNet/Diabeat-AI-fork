@@ -142,22 +142,22 @@ class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
           util.formUnfocus(_thisFormKey);
           setState(() => _index++);
 
-          final heightInMeter = PredictDiabetesFields.height! / 100;
+          final heightInMeter = PredictDiabetesFields.height / 100;
           final bmi =
-              PredictDiabetesFields.weight! / (heightInMeter * heightInMeter);
+              PredictDiabetesFields.weight / (heightInMeter * heightInMeter);
 
           PredictDiabetesFields.bmi = double.parse(bmi.toStringAsFixed(1));
 
           final (ok, data) = await request.predictDiabetes(
             context,
-            gender: PredictDiabetesFields.gender!,
-            age: PredictDiabetesFields.age!,
-            bmi: PredictDiabetesFields.bmi!,
+            gender: PredictDiabetesFields.gender,
+            age: PredictDiabetesFields.age,
+            bmi: PredictDiabetesFields.bmi,
             hypertension: PredictDiabetesFields.hypertension,
             heartDisease: PredictDiabetesFields.heartDisease,
-            smokingHistory: PredictDiabetesFields.smokingHistory!,
-            glucose: PredictDiabetesFields.glucose!,
-            hba1c: PredictDiabetesFields.hba1c!,
+            smokingHistory: PredictDiabetesFields.smokingHistory,
+            glucose: PredictDiabetesFields.glucose,
+            hba1c: PredictDiabetesFields.hba1c,
           );
           if (!_page3Key.currentState!.mounted) return;
 

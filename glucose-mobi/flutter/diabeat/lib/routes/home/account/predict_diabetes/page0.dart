@@ -14,7 +14,7 @@ class Page0 extends StatelessWidget {
         FormField<String>(
           validator: util.nonEmptyValidator,
           onSaved: (newValue) {
-            PredictDiabetesFields.gender = newValue;
+            PredictDiabetesFields.gender = newValue!;
           },
           builder: (field) => Column(
             crossAxisAlignment: CrossAxisAlignment.start,
