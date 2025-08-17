@@ -47,14 +47,7 @@ class HistoryPageState extends State<HistoryPage> {
   final _records = <DateTime, List<_Record>>{};
   final _firstDate = DateTime(2024);
   var _date = _todayDate();
-
-  @override
-  void initState() {
-    // fix timeout problem
-    getRecords(goToToday: true);
-    super.initState();
-  }
-
+  
   @override
   Widget build(BuildContext context) {
     final thisDayRecord = _records[_date];
