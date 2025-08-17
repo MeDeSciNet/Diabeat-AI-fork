@@ -2,6 +2,8 @@ import 'package:diabeat/routes/network/session.dart' as session;
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 
+const _white90 = Color.fromARGB(230, 255, 255, 255);
+
 class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
 
@@ -54,7 +56,7 @@ class _AccountPageState extends State<AccountPage> {
                         right: 18,
                         child: Text(
                           'AI 糖尿病風險檢測',
-                          style: TextStyle(fontSize: 18),
+                          style: TextStyle(fontSize: 18, color: _white90),
                         ),
                       ),
                     ],
@@ -81,7 +83,10 @@ class _AccountPageState extends State<AccountPage> {
                       const Positioned(
                         top: 18,
                         right: 18,
-                        child: Text('AI 健康諮詢', style: TextStyle(fontSize: 18)),
+                        child: Text(
+                          'AI 健康諮詢',
+                          style: TextStyle(fontSize: 18, color: _white90),
+                        ),
                       ),
                     ],
                   ),

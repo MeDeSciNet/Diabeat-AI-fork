@@ -7,6 +7,7 @@ import 'package:diabeat/routes/home/account/predict_diabetes/page3.dart';
 import 'package:diabeat/routes/network/request.dart' as request;
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 
 class PredictDiabetesRoot extends StatefulWidget {
   const PredictDiabetesRoot({super.key});
@@ -36,15 +37,13 @@ class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
         actions: [
           if (_index == 3)
             IconButton(
-              onPressed: () {
-                // share
-              },
+              onPressed: _share,
               icon: const Icon(Icons.ios_share_rounded),
             ),
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
         child: IndexedStack(
           index: _index,
           children: [
@@ -68,7 +67,7 @@ class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
               key: _formKeys[1],
               child: Column(
                 children: [
-                  const Page1(),
+                  Page1(),
                   const Spacer(),
                   Row(
                     children: [
@@ -107,6 +106,7 @@ class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
     return Expanded(
       child: OutlinedButton.icon(
         onPressed: () {
+          FocusScope.of(_formState.context).unfocus();
           setState(() => _index--);
         },
         style: util.outlinedPageButtonStyle(),
@@ -122,6 +122,7 @@ class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
         onPressed: () {
           if (_formState.validate()) {
             _formState.save();
+            FocusScope.of(_formState.context).unfocus();
             setState(() => _index++);
           }
         },
@@ -139,28 +140,30 @@ class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
         onPressed: () async {
           if (!_formState.validate()) return;
           _formState.save();
+          FocusScope.of(_formState.context).unfocus();
           setState(() => _index++);
 
-          final heightInMeter = PredictDiabetesField().height! / 100;
+          final heightInMeter = PredictDiabetesFields.height! / 100;
           final bmi =
-              PredictDiabetesField().weight! / (heightInMeter * heightInMeter);
+              PredictDiabetesFields.weight! / (heightInMeter * heightInMeter);
+          PredictDiabetesFields.bmi = double.parse(bmi.toStringAsFixed(1));
 
           final (ok, data) = await request.predictDiabetes(
             context,
-            gender: PredictDiabetesField().gender!,
-            age: PredictDiabetesField().age!,
-            bmi: bmi,
-            hypertension: PredictDiabetesField().hypertension,
-            heartDisease: PredictDiabetesField().heartDisease,
-            smokingHistory: PredictDiabetesField().smokingHistory!,
-            glucose: PredictDiabetesField().glucose!,
-            hba1c: PredictDiabetesField().hba1c!,
+            gender: PredictDiabetesFields.gender!,
+            age: PredictDiabetesFields.age!,
+            bmi: PredictDiabetesFields.bmi!,
+            hypertension: PredictDiabetesFields.hypertension,
+            heartDisease: PredictDiabetesFields.heartDisease,
+            smokingHistory: PredictDiabetesFields.smokingHistory!,
+            glucose: PredictDiabetesFields.glucose!,
+            hba1c: PredictDiabetesFields.hba1c!,
           );
           if (!mounted) return;
 
           if (ok) {
             _page3Key.currentState!.setState(() {
-              PredictDiabetesField().prediction = data['prediction'] == 1;
+              PredictDiabetesFields.prediction = data['prediction'] == 1;
             });
           } else {
             log('predict diabetes failed');
@@ -172,5 +175,33 @@ class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
         label: const Text('送出'),
       ),
     );
+  }
+
+  void _share() {
+    final text =
+        '''
+[[ Diabeat - AI糖尿病風險檢測 ]]
+
+[基本資料]
+性別: ${PredictDiabetesFields.genderText}
+年齡: ${PredictDiabetesFields.age} 歲
+身高: ${PredictDiabetesFields.height} cm
+體重: ${PredictDiabetesFields.weight} kg
+BMI: ${PredictDiabetesFields.bmi} kg/m^2
+
+[疾病史/吸菸史]
+高血壓: ${PredictDiabetesFields.hypertension ? '有' : '無'}
+心臟病: ${PredictDiabetesFields.heartDisease ? '有' : '無'}
+吸菸史: ${PredictDiabetesFields.smokingHistoryText}
+
+[血糖值/糖化血色素]
+血糖值: ${PredictDiabetesFields.glucose} mg/dL
+糖化血色素: ${PredictDiabetesFields.hba1c} %
+
+[檢測結果]
+${PredictDiabetesFields.predictionText}
+''';
+
+    SharePlus.instance.share(ShareParams(text: text));
   }
 }

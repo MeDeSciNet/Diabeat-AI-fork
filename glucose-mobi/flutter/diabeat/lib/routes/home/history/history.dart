@@ -112,36 +112,36 @@ class HistoryPageState extends State<HistoryPage> {
                 final time = item.dateTime;
 
                 final row0 = [
-                  _paddingText('血糖'),
-                  _paddingText(item.glucose.toString()),
-                  _paddingText('mg/dL'),
+                  util.paddingText('血糖'),
+                  util.paddingText(item.glucose.toString()),
+                  util.paddingText('mg/dL'),
                 ];
 
-                final text1 = _paddingText('碳水');
+                final text1 = util.paddingText('碳水');
                 final row1 = item.carbs == null
                     ? [text1, const SizedBox(), const SizedBox()]
                     : [
                         text1,
-                        _paddingText(item.carbs.toString()),
-                        _paddingText('g'),
+                        util.paddingText(item.carbs.toString()),
+                        util.paddingText('g'),
                       ];
 
-                final text2 = _paddingText('運動');
+                final text2 = util.paddingText('運動');
                 final row2 = item.exercise == null
                     ? [text2, const SizedBox(), const SizedBox()]
                     : [
                         text2,
-                        _paddingText(item.exercise.toString()),
-                        _paddingText('min'),
+                        util.paddingText(item.exercise.toString()),
+                        util.paddingText('min'),
                       ];
 
-                final text3 = _paddingText('胰島素');
+                final text3 = util.paddingText('胰島素');
                 final row3 = item.insulin == null
                     ? [text3, const SizedBox(), const SizedBox()]
                     : [
                         text3,
-                        _paddingText(item.insulin.toString()),
-                        _paddingText('U'),
+                        util.paddingText(item.insulin.toString()),
+                        util.paddingText('U'),
                       ];
 
                 return Card.outlined(
@@ -289,10 +289,6 @@ class HistoryPageState extends State<HistoryPage> {
 /* */
 /* */
 /* */
-
-Widget _paddingText(String text) {
-  return Padding(padding: const EdgeInsets.only(right: 20), child: Text(text));
-}
 
 DateTime _onlyDate(DateTime dateTime) {
   return DateTime(dateTime.year, dateTime.month, dateTime.day);

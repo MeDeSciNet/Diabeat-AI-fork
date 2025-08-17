@@ -15,20 +15,20 @@ class _Page1State extends State<Page1> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Text('疾病史'),
+        Text('疾病史', style: TextStyle(fontSize: 16)),
         CheckboxListTile(
           title: const Text('高血壓'),
-          value: PredictDiabetesField().hypertension,
+          value: PredictDiabetesFields.hypertension,
           onChanged: (value) {
-            setState(() => PredictDiabetesField().hypertension = value!);
+            setState(() => PredictDiabetesFields.hypertension = value!);
           },
           controlAffinity: ListTileControlAffinity.leading,
         ),
         CheckboxListTile(
-          title: const Text('心臟病'),
-          value: PredictDiabetesField().heartDisease,
+          title: const Text('心臟病', style: TextStyle(fontSize: 16)),
+          value: PredictDiabetesFields.heartDisease,
           onChanged: (value) {
-            setState(() => PredictDiabetesField().heartDisease = value!);
+            setState(() => PredictDiabetesFields.heartDisease = value!);
           },
           controlAffinity: ListTileControlAffinity.leading,
         ),
@@ -36,7 +36,7 @@ class _Page1State extends State<Page1> {
         FormField<String>(
           validator: util.nonEmptyValidator,
           onSaved: (newValue) {
-            PredictDiabetesField().smokingHistory = newValue;
+            PredictDiabetesFields.smokingHistory = newValue;
           },
           builder: (field) => Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -52,16 +52,12 @@ class _Page1State extends State<Page1> {
                       ),
                   ],
                 ),
+                style: TextStyle(fontSize: 16),
               ),
-              ...[
-                ('從不吸菸', 'never'),
-                ('曾經吸菸', 'former'),
-                ('目前沒有吸菸', 'not current'),
-                ('目前有吸菸', 'current'),
-              ].map(
+              ...PredictDiabetesFields.smokingHistoryMap.entries.map(
                 (e) => RadioListTile(
-                  title: Text(e.$1),
-                  value: e.$2,
+                  title: Text(e.value),
+                  value: e.key,
                   groupValue: field.value,
                   onChanged: field.didChange,
                 ),

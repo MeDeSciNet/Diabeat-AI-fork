@@ -14,7 +14,7 @@ class Page2 extends StatelessWidget {
         TextFormField(
           validator: util.nonEmptyValidator,
           onSaved: (newValue) {
-            PredictDiabetesField().glucose = double.parse(newValue!);
+            PredictDiabetesFields.glucose = double.parse(newValue!);
           },
           keyboardType: TextInputType.numberWithOptions(decimal: true),
           inputFormatters: const [util.UdoubleFormatter()],
@@ -22,19 +22,19 @@ class Page2 extends StatelessWidget {
           onFieldSubmitted: (value) {
             _hba1cFocus.requestFocus();
           },
-          decoration: util.inputBorder('血糖 (mg/dL)'),
+          decoration: util.inputBorder('血糖值 (mg/dL)'),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 30),
         TextFormField(
           focusNode: _hba1cFocus,
           validator: util.nonEmptyValidator,
           onSaved: (newValue) {
-            PredictDiabetesField().hba1c = double.parse(newValue!);
+            PredictDiabetesFields.hba1c = double.parse(newValue!);
           },
           keyboardType: TextInputType.numberWithOptions(decimal: true),
           inputFormatters: const [util.UdoubleFormatter()],
           textInputAction: TextInputAction.done,
-          decoration: util.inputBorder('HbA1c (%)'),
+          decoration: util.inputBorder('糖化血色素 (%)'),
         ),
       ],
     );

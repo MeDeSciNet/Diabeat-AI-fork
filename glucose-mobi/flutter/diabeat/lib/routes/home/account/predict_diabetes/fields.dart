@@ -1,26 +1,40 @@
-class PredictDiabetesField {
-  static final _instance = PredictDiabetesField._();
-
-  PredictDiabetesField._();
-  factory PredictDiabetesField() {
-    return _instance;
-  }
+class PredictDiabetesFields {
+  const PredictDiabetesFields._();
 
   // page 0
-  String? gender;
-  int? age;
-  double? height;
-  double? weight;
+  static String? gender;
+  static int? age;
+  static double? height;
+  static double? weight;
+  static double? bmi;
+  static String get genderText => switch (gender) {
+    'male' => '男',
+    'female' => '女',
+    _ => 'null',
+  };
 
   // page 1
-  bool hypertension = false;
-  bool heartDisease = false;
-  String? smokingHistory;
+  static bool hypertension = false;
+  static bool heartDisease = false;
+  static String? smokingHistory;
+  static final smokingHistoryMap = const {
+    'never': '從不吸菸',
+    'former': '曾經吸菸 (已戒菸)',
+    'not current': '目前未吸菸',
+    'current': '目前有吸菸',
+  };
+  static String get smokingHistoryText =>
+      smokingHistoryMap[smokingHistory] ?? 'null';
 
   // page 2
-  double? glucose;
-  double? hba1c;
+  static double? glucose;
+  static double? hba1c;
 
   // page 3
-  bool? prediction;
+  static bool? prediction;
+  static String get predictionText => switch (prediction) {
+    true => '建議追蹤',
+    false => '狀況良好',
+    _ => 'null',
+  };
 }

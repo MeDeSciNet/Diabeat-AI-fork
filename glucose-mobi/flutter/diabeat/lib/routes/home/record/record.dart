@@ -14,7 +14,7 @@ class RecordPage extends StatefulWidget {
 
 class RecordPageState extends State<RecordPage> {
   final _managers = [
-    _UdoubleFieldManager('血糖 (mg/dL)'),
+    _UdoubleFieldManager('血糖值 (mg/dL)'),
     _UdoubleFieldManager('碳水攝取量 (g)'),
     _UdoubleFieldManager('運動時長 (min)'),
     _UdoubleFieldManager('胰島素注射量 (U)'),

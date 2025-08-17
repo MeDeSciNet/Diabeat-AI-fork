@@ -47,6 +47,10 @@ Widget scanIconButton(BuildContext context) {
   );
 }
 
+Widget paddingText(String text) {
+  return Padding(padding: const EdgeInsets.only(right: 20), child: Text(text));
+}
+
 InputDecoration inputBorder(String label) {
   return InputDecoration(labelText: label, border: const OutlineInputBorder());
 }

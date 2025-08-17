@@ -15,7 +15,7 @@ class Page0 extends StatelessWidget {
         FormField<String>(
           validator: util.nonEmptyValidator,
           onSaved: (newValue) {
-            PredictDiabetesField().gender = newValue;
+            PredictDiabetesFields.gender = newValue;
           },
           builder: (field) => Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -31,6 +31,7 @@ class Page0 extends StatelessWidget {
                       ),
                   ],
                 ),
+                style: TextStyle(fontSize: 16),
               ),
               RadioListTile(
                 title: const Text('男'),
@@ -57,10 +58,10 @@ class Page0 extends StatelessWidget {
           decoration: util.inputBorder('年齡'),
           validator: util.nonEmptyValidator,
           onSaved: (newValue) {
-            PredictDiabetesField().age = int.parse(newValue!);
+            PredictDiabetesFields.age = int.parse(newValue!);
           },
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 30),
         TextFormField(
           focusNode: _heightFocus,
           keyboardType: TextInputType.numberWithOptions(decimal: true),
@@ -72,10 +73,10 @@ class Page0 extends StatelessWidget {
           decoration: util.inputBorder('身高 (cm)'),
           validator: util.nonEmptyValidator,
           onSaved: (newValue) {
-            PredictDiabetesField().height = double.parse(newValue!);
+            PredictDiabetesFields.height = double.parse(newValue!);
           },
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 30),
         TextFormField(
           focusNode: _weightFocus,
           keyboardType: TextInputType.numberWithOptions(decimal: true),
@@ -84,7 +85,7 @@ class Page0 extends StatelessWidget {
           decoration: util.inputBorder('體重 (kg)'),
           validator: util.nonEmptyValidator,
           onSaved: (newValue) {
-            PredictDiabetesField().weight = double.parse(newValue!);
+            PredictDiabetesFields.weight = double.parse(newValue!);
           },
         ),
       ],
