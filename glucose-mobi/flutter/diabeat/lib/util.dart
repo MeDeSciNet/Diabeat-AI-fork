@@ -38,11 +38,13 @@ Widget backIconButton(BuildContext context) {
   );
 }
 
-Widget scanIconButton(BuildContext context) {
+Widget scanIconButton(BuildContext context, bool waiting) {
   return IconButton(
-    onPressed: () {
-      ScannerPage.push(context);
-    },
+    onPressed: waiting
+        ? null
+        : () {
+            ScannerPage.push(context);
+          },
     icon: const Icon(Icons.qr_code_scanner_rounded),
   );
 }

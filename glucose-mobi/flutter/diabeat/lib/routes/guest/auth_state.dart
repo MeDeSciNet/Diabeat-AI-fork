@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 
 abstract class AuthState<T extends StatefulWidget> extends State<T> {
   final formKey = GlobalKey<FormState>();
-
   String? emailErr;
   bool passwordObscured = true;
   bool waiting = false;
-
   late String email;
   late String password;
+
+  FormState get formState => formKey.currentState!;
 
   Widget buildEmailField() {
     return TextFormField(
@@ -66,5 +66,7 @@ abstract class AuthState<T extends StatefulWidget> extends State<T> {
     return null;
   }
 
-  FormState get formState => formKey.currentState!;
+  void unfocus() {
+    FocusScope.of(formState.context).unfocus();
+  }
 }
