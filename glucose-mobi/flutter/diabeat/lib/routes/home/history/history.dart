@@ -98,7 +98,7 @@ class HistoryPageState extends State<HistoryPage> {
           children: [
             ListView.separated(
               itemCount: thisDayRecord?.length ?? 0,
-              separatorBuilder: (context, index) => SizedBox(height: 10),
+              separatorBuilder: (context, index) => const SizedBox(height: 10),
               itemBuilder: (context, index) {
                 if (thisDayRecord == null) return null;
 

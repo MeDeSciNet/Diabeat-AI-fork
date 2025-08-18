@@ -15,7 +15,7 @@ class _Page1State extends State<Page1> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('疾病史', style: TextStyle(fontSize: 16)),
+        const Text('疾病史', style: TextStyle(fontSize: 16)),
         CheckboxListTile(
           title: const Text('高血壓'),
           value: PredictDiabetesFields.hypertension,
@@ -46,13 +46,13 @@ class _Page1State extends State<Page1> {
                   text: '吸菸史 ',
                   children: [
                     if (field.hasError)
-                      TextSpan(
+                      const TextSpan(
                         text: '(必填)',
-                        style: const TextStyle(color: Colors.red),
+                        style: TextStyle(color: Colors.red),
                       ),
                   ],
                 ),
-                style: TextStyle(fontSize: 16),
+                style: const TextStyle(fontSize: 16),
               ),
               ...PredictDiabetesFields.smokingHistoryMap.entries.map(
                 (e) => RadioListTile(

@@ -15,7 +15,7 @@ class Page2 extends StatelessWidget {
           onSaved: (newValue) {
             PredictDiabetesFields.glucose = double.parse(newValue!);
           },
-          keyboardType: TextInputType.numberWithOptions(decimal: true),
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
           inputFormatters: const [util.UdoubleFormatter()],
           textInputAction: TextInputAction.next,
           onFieldSubmitted: (value) {
@@ -30,7 +30,7 @@ class Page2 extends StatelessWidget {
           onSaved: (newValue) {
             PredictDiabetesFields.hba1c = double.parse(newValue!);
           },
-          keyboardType: TextInputType.numberWithOptions(decimal: true),
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
           inputFormatters: const [util.UdoubleFormatter()],
           textInputAction: TextInputAction.done,
           decoration: util.inputBorder('糖化血色素 (%)'),

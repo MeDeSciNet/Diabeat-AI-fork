@@ -44,7 +44,7 @@ class _MainApp extends StatelessWidget {
             '/guest': (context) => const GuestPage(),
             '/guest/login': (context) => const LoginPage(),
             '/guest/register': (context) => const RegisterPage(),
-            '/scanner': (context) => ScannerPage(),
+            '/scanner': (context) => const ScannerPage(),
           },
           theme: ThemeData(useMaterial3: true, colorScheme: lightDynamic),
           darkTheme: ThemeData(useMaterial3: true, colorScheme: darkDynamic),

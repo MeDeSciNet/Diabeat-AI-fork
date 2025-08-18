@@ -38,7 +38,7 @@ class DisconnectedDialog extends StatelessWidget {
             icon: const Icon(Icons.qr_code_scanner_rounded),
             label: const Text('連線'),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           OutlinedButton.icon(
             onPressed: () {
               Navigator.pop(context);

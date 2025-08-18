@@ -24,13 +24,13 @@ class Page0 extends StatelessWidget {
                   text: '性別 ',
                   children: [
                     if (field.hasError)
-                      TextSpan(
+                      const TextSpan(
                         text: '(必填)',
-                        style: const TextStyle(color: Colors.red),
+                        style: TextStyle(color: Colors.red),
                       ),
                   ],
                 ),
-                style: TextStyle(fontSize: 16),
+                style: const TextStyle(fontSize: 16),
               ),
               RadioListTile(
                 title: const Text('男'),
@@ -63,7 +63,7 @@ class Page0 extends StatelessWidget {
         const SizedBox(height: 20),
         TextFormField(
           focusNode: _heightFocus,
-          keyboardType: TextInputType.numberWithOptions(decimal: true),
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
           inputFormatters: const [util.UdoubleFormatter()],
           textInputAction: TextInputAction.next,
           onFieldSubmitted: (value) {
@@ -78,7 +78,7 @@ class Page0 extends StatelessWidget {
         const SizedBox(height: 20),
         TextFormField(
           focusNode: _weightFocus,
-          keyboardType: TextInputType.numberWithOptions(decimal: true),
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
           inputFormatters: const [util.UdoubleFormatter()],
           textInputAction: TextInputAction.done,
           decoration: util.inputBorder('體重 (kg)'),

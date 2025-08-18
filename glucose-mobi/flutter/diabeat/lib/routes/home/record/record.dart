@@ -37,7 +37,7 @@ class RecordPageState extends State<RecordPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 50),
+        padding: const EdgeInsets.symmetric(horizontal: 50),
         child: Form(
           key: _formKey,
           child: Column(
@@ -122,8 +122,8 @@ class RecordPageState extends State<RecordPage> {
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('送出成功'),
+        const SnackBar(
+          content: Text('送出成功'),
           behavior: SnackBarBehavior.floating,
         ),
       );

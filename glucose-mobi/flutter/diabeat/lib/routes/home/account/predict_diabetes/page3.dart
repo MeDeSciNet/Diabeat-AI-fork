@@ -21,7 +21,7 @@ class Page3State extends State<Page3> {
           children: [
             Transform.scale(
               scale: 2,
-              child: CircularProgressIndicator(year2023: false),
+              child: const CircularProgressIndicator(year2023: false),
             ),
             const SizedBox(height: 40),
             _predictionText('檢測中'),
@@ -32,7 +32,11 @@ class Page3State extends State<Page3> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.sms_failed_rounded, size: 100, color: Colors.redAccent),
+            const Icon(
+              Icons.sms_failed_rounded,
+              size: 100,
+              color: Colors.redAccent,
+            ),
             _predictionText('連線失敗'),
           ],
         ),
@@ -42,7 +46,7 @@ class Page3State extends State<Page3> {
           Row(
             children: PredictDiabetesFields.prediction
                 ? [
-                    Icon(
+                    const Icon(
                       Icons.warning_rounded,
                       size: 100,
                       color: Colors.amberAccent,
@@ -50,7 +54,7 @@ class Page3State extends State<Page3> {
                     Expanded(child: _predictionText('建議追蹤')),
                   ]
                 : [
-                    Icon(
+                    const Icon(
                       Icons.check_circle_rounded,
                       size: 100,
                       color: Colors.green,
@@ -184,7 +188,7 @@ class Page3State extends State<Page3> {
     return Text(
       text,
       textAlign: TextAlign.center,
-      style: TextStyle(fontSize: 30),
+      style: const TextStyle(fontSize: 30),
     );
   }
 }

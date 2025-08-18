@@ -66,7 +66,7 @@ class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
               key: _formKeys[1],
               child: Column(
                 children: [
-                  Page1(),
+                  const Page1(),
                   const Spacer(),
                   Row(
                     children: [
@@ -171,6 +171,7 @@ class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
               _page3Key.currentState!.waiting = null;
             });
           }
+          setState(() {});
         },
         style: util.filledPageButtonStyle(),
         iconAlignment: IconAlignment.end,

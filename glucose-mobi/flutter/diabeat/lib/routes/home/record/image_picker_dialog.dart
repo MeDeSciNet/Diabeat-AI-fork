@@ -14,7 +14,7 @@ class ImagePickerDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: Text('選擇來源', textAlign: TextAlign.center),
+    title: const Text('選擇來源', textAlign: TextAlign.center),
     content: Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,

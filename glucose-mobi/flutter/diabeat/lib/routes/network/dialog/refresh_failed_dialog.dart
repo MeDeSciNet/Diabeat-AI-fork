@@ -23,7 +23,7 @@ class RefreshFailedDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Token 刷新失敗', textAlign: TextAlign.center),
+      title: const Text('Token 刷新失敗', textAlign: TextAlign.center),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,

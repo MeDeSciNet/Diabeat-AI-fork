@@ -97,7 +97,7 @@ class _ConsultPageState extends State<ConsultPage>
           ),
         ),
         false => Markdown(data: _consultation),
-        null => Center(
+        null => const Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

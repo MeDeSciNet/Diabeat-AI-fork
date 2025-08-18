@@ -28,7 +28,7 @@ class TimeoutDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('連線逾時', textAlign: TextAlign.center),
+      title: const Text('連線逾時', textAlign: TextAlign.center),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
