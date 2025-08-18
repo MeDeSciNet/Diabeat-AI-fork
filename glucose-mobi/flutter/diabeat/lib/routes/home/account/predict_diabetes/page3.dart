@@ -50,7 +50,11 @@ class Page3State extends State<Page3> {
                     Expanded(child: _predictionText('建議追蹤')),
                   ]
                 : [
-                    Icon(Icons.warning_rounded, size: 100, color: Colors.green),
+                    Icon(
+                      Icons.check_circle_rounded,
+                      size: 100,
+                      color: Colors.green,
+                    ),
                     Expanded(child: _predictionText('狀況良好')),
                   ],
           ),

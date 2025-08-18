@@ -19,7 +19,7 @@ Future<(bool, dynamic)> logIn(
   }
 
   return _handle(context, () async {
-    final res = await _sec3(
+    final res = await _timeout(
       http.post(
         connection.makeUrl('/token'),
         body: {'username_or_email': email, 'password': password},
@@ -41,7 +41,7 @@ Future<(bool, dynamic)> register(
   }
 
   return _handle(context, () async {
-    final res = await _sec3(
+    final res = await _timeout(
       http.post(
         connection.makeUrl('/register'),
         body: {'email': email, 'username': username, 'password': password},
@@ -60,7 +60,7 @@ Future<(bool, dynamic)> postRecord(
   double? insulin,
 }) {
   return _handle(context, () async {
-    final res = await _sec3(
+    final res = await _timeout(
       http.post(
         connection.makeUrl('/records'),
         headers: _configHeaders({}, json: true, auth: true),
@@ -79,7 +79,7 @@ Future<(bool, dynamic)> postRecord(
 
 Future<(bool, dynamic)> getRecords(BuildContext context) {
   return _handle(context, () async {
-    final res = await _sec3(
+    final res = await _timeout(
       http.get(
         connection.makeUrl('/records'),
         headers: _configHeaders({}, auth: true),
@@ -108,7 +108,7 @@ Future<(bool, dynamic)> predictCarbs(BuildContext context, XFile xFile) {
       ),
     );
 
-    final res = await _sec3(request.send());
+    final res = await _timeout(request.send());
     return (res.statusCode, await res.stream.bytesToString());
   });
 }
@@ -125,7 +125,7 @@ Future<(bool, dynamic)> predictDiabetes(
   required double hba1c,
 }) {
   return _handle(context, () async {
-    final res = await _sec3(
+    final res = await _timeout(
       http.post(
         connection.makeUrl('/predictform'),
         headers: _configHeaders({}, json: true, auth: true),
@@ -146,7 +146,7 @@ Future<(bool, dynamic)> predictDiabetes(
   });
 }
 
-Future<(bool, dynamic)> chat(BuildContext context) {
+Future<(bool, dynamic)> consult(BuildContext context) {
   return _handle(context, () async {
     final res = await http.get(
       connection.makeUrl('/chat'),
@@ -154,16 +154,12 @@ Future<(bool, dynamic)> chat(BuildContext context) {
     );
 
     return (res.statusCode, res.body);
-  });
+  }, refreshFirst: true);
 }
 
 /* */
 /* */
 /* */
-
-Future<T> _sec3<T extends http.BaseResponse>(Future<T> future) {
-  return future.timeout(const Duration(seconds: 3));
-}
 
 Map<String, String> _configHeaders(
   Map<String, String> origin, {
@@ -179,21 +175,25 @@ Map<String, String> _configHeaders(
   return origin;
 }
 
+Future<T> _timeout<T extends http.BaseResponse>(Future<T> future) {
+  return future.timeout(const Duration(seconds: 3));
+}
+
+/// should only be called in "login" and "register"
 Future<bool> _connect(BuildContext context) async {
   return connection.existAddr || await DisconnectedDialog.show(context) == true;
 }
 
+/// should only be called in "_handle"
 Future<bool> _refresh(BuildContext context) async {
-  final res = await _sec3(
+  final res = await _timeout(
     http.post(
       connection.makeUrl('/token/refresh'),
       body: {'refresh': session.refreshToken},
     ),
   );
 
-  final status = res.statusCode;
-
-  if (status == 200) {
+  if (res.statusCode == 200) {
     final data = jsonDecode(res.body);
     session.save(
       email: session.email,
@@ -212,14 +212,19 @@ Future<bool> _refresh(BuildContext context) async {
 
 Future<(bool, dynamic)> _handle(
   BuildContext context,
-  Future<(int, String)> Function() request,
-) async {
+  Future<(int, String)> Function() request, {
+  bool refreshFirst = false,
+}) async {
   //
   bool retry;
   do {
     retry = false;
 
     try {
+      if (refreshFirst && !await _refresh(context)) {
+        break;
+      }
+
       final (status, body) = await request();
 
       // 200 ~ 300

@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:diabeat/routes/network/request.dart' as request;
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
@@ -15,8 +14,11 @@ class ConsultPage extends StatefulWidget {
 class _ConsultPageState extends State<ConsultPage>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
-  String? _consultation;
   int _period = 0;
+
+  // null when consult failed
+  bool? _waiting = true;
+  late String _consultation;
 
   @override
   void initState() {
@@ -36,14 +38,17 @@ class _ConsultPageState extends State<ConsultPage>
           ..forward();
 
     () async {
-      final (ok, data) = await request.chat(context);
+      final (ok, data) = await request.consult(context);
       if (!mounted) return;
 
       _controller.stop();
       if (ok) {
-        setState(() => _consultation = data['response']['message']['content']);
+        setState(() {
+          _waiting = false;
+          _consultation = data['response']['message']['content'];
+        });
       } else {
-        log('consult failed');
+        setState(() => _waiting = null);
       }
     }();
 
@@ -68,34 +73,48 @@ class _ConsultPageState extends State<ConsultPage>
         title: const Text('AI 健康諮詢'),
         centerTitle: true,
         actions: [
-          if (_consultation != null)
+          if (_waiting == false)
             IconButton(
               onPressed: _shareConsultation,
               icon: const Icon(Icons.ios_share_rounded),
             ),
         ],
       ),
-      body: _consultation == null
-          ? SizedBox.expand(
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  Transform.scale(
-                    scale: 6,
-                    child: CircularProgressIndicator(
-                      value: _controller.value,
-                      year2023: false,
-                    ),
-                  ),
-                  Text('$min:$sec', style: const TextStyle(fontSize: 30)),
-                ],
+      body: switch (_waiting) {
+        true => Center(
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Transform.scale(
+                scale: 6,
+                child: CircularProgressIndicator(
+                  value: _controller.value,
+                  year2023: false,
+                ),
               ),
-            )
-          : Markdown(data: _consultation!),
+              Text('$min:$sec', style: const TextStyle(fontSize: 30)),
+            ],
+          ),
+        ),
+        false => Markdown(data: _consultation),
+        null => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.sms_failed_rounded,
+                size: 100,
+                color: Colors.redAccent,
+              ),
+              Text('連線失敗', style: TextStyle(fontSize: 30)),
+            ],
+          ),
+        ),
+      },
     );
   }
 
-  Future<void> _shareConsultation() async {
+  void _shareConsultation() {
     SharePlus.instance.share(ShareParams(text: _consultation));
   }
 }
