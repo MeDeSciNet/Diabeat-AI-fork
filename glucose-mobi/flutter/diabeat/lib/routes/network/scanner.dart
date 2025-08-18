@@ -24,32 +24,30 @@ class _ScannerPageState extends State<ScannerPage> {
   );
   double _scale = 0;
 
-  void Function(BarcodeCapture) _detect(BuildContext context) {
-    return (BarcodeCapture barcodes) async {
-      final addrs = barcodes.barcodes.where(
-        (element) => element.rawValue?.startsWith('Diabeat ') ?? false,
-      );
+  Future<void> _detect(BarcodeCapture barcodes) async {
+    final addrs = barcodes.barcodes.where(
+      (element) => element.rawValue?.startsWith('Diabeat ') ?? false,
+    );
 
-      if (addrs.isEmpty) return;
-      await _controller.stop(); // pause() has stupid bug
+    if (addrs.isEmpty) return;
+    await _controller.stop(); // pause() has stupid bug
 
-      if (!context.mounted) return;
-      final addr = addrs.first.rawValue!.split(' ')[1];
-      switch (await ConfirmScanDialog.show(context, addr)) {
-        case true:
-          connection.save(addr);
-          Navigator.pop(context, true);
-          break;
+    if (!mounted) return;
+    final addr = addrs.first.rawValue!.split(' ')[1];
+    switch (await ConfirmScanDialog.show(context, addr)) {
+      case true:
+        connection.save(addr);
+        Navigator.pop(context, true);
+        break;
 
-        case false:
-          Navigator.pop(context);
-          break;
+      case false:
+        Navigator.pop(context);
+        break;
 
-        default:
-          _controller.start();
-          break;
-      }
-    };
+      default:
+        _controller.start();
+        break;
+    }
   }
 
   @override
@@ -65,10 +63,7 @@ class _ScannerPageState extends State<ScannerPage> {
           children: [
             if (connection.existAddr) Text('目前連接 : ${connection.addr}'),
             Expanded(
-              child: MobileScanner(
-                controller: _controller,
-                onDetect: _detect(context),
-              ),
+              child: MobileScanner(controller: _controller, onDetect: _detect),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
