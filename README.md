@@ -1,59 +1,41 @@
-# 2025-AI-glucose
+# Diabeat
 
-## Pre-installation
-- [Node.js](https://nodejs.org/)
+## Requirements
 - [Python 3](https://www.python.org/)
-- Git clone this project repo
+- [Node.js](https://nodejs.org/)
+- Git clone this project
 
 ## Installation
-- Windows: Run `batch\install.bat`.
-- Linux/macOS: From the project root directory, run:
 
-    ```sh
-    npm install -g pnpm
-    cd glucose-FE
-    pnpm install
-    cd ../glucose-BE
-    pip install -r requirements.txt
-    ```
-    
-    If you encounter an `externally-managed-environment` error during `pip install -r requirements.txt`, create a virtual environment **(venv)** and install the dependencies within it.
+```sh
+# Project root directory
+
+cd ./glucose-BE/glucoseBE
+# It is recommend to use venv instead of global environment
+# Activate venv here if you have one
+pip install -r requirements.txt
+
+cd ../glucose-FE
+npm -g pnpm
+pnpm install
+```
 
 ## Run server
-- Windows: Run `batch\server.bat`.
-- Linux/macOS: From the `glucose-BE/glucoseBE` directory, run:
 
-    ```sh
-    python3 manage.py migrate
-    python3 manage.py runserver 0.0.0.0:8000
-    ```
+```sh
+# Project root directory
 
-## Test server
-This process will delete the existing database and restart the server.
-
-- Windows: Run `batch\test-server.bat`.
-- Linux/macOS: From the `glucose-BE/glucoseBE` directory, run:
-
-    ```sh
-    rm db.sqlite3
-    python3 manage.py migrate
-    python3 manage.py runserver 0.0.0.0:8000
-    ```
+cd ./glucose-BE/glucoseBE
+# Activate venv here if you have one
+python manage.py migrate
+python manage.py runserver 0.0.0.0:8000 --noreload
+```
 
 ## Run web demo
-- Windows: Run `batch\web.bat`.
-- Linux/macOS: From the `glucose-FE` directory, run:
 
-    ```sh
-    pnpm dev --open
-    ```
+```sh
+# Project root directory
 
-## Run Android demo
-
-1. Download the APK from [releases](https://github.com/creaper9487/2025-AI-glucose/releases) and install it.
-
-2. Make sure your phone and computer are on the same network.
-
-3. Run the server.
-
-4. Open the app and enter the IPv4 address shown in the server terminal into the start-up AlertDialog to connect.
+cd ./glucose-FE
+pnpm dev --open
+```
