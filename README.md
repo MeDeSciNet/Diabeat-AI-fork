@@ -31,7 +31,7 @@ python manage.py migrate
 python manage.py runserver 0.0.0.0:8000 --noreload
 ```
 
-## Run web demo
+## Run website
 
 ```sh
 # Project root directory
@@ -39,3 +39,7 @@ python manage.py runserver 0.0.0.0:8000 --noreload
 cd ./glucose-FE
 pnpm dev --open
 ```
+
+## Run Android app
+
+Download APK from [releases](https://github.com/MeDeSciNet/Diabeat-AI-fork/releases) and install.
