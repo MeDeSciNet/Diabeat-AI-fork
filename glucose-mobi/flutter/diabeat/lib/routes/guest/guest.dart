@@ -10,9 +10,22 @@ class GuestPage extends StatefulWidget {
 }
 
 class _GuestPageState extends State<GuestPage> {
+  static const _medescinetImageProvider = ExactAssetImage(
+    'assets/medescinet.png',
+    scale: 4,
+  );
+
   /// app name : true
   /// org name : false
   bool _appOrOrgName = true;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      precacheImage(_medescinetImageProvider, context);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +68,7 @@ class _GuestPageState extends State<GuestPage> {
                       color: Colors.red,
                       icon: _appOrOrgName
                           ? const Icon(Icons.bloodtype_rounded)
-                          : Image.asset('assets/medescinet.png', scale: 4),
+                          : const Image(image: _medescinetImageProvider),
                     ),
                   ],
                 ),

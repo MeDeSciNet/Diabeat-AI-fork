@@ -22,6 +22,8 @@ class _ConsultPageState extends State<ConsultPage>
 
   @override
   void initState() {
+    super.initState();
+
     _controller =
         AnimationController(vsync: this, duration: const Duration(seconds: 15))
           ..addStatusListener((status) {
@@ -37,7 +39,7 @@ class _ConsultPageState extends State<ConsultPage>
           })
           ..forward();
 
-    () async {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       final (ok, data) = await request.consult(context);
       if (!mounted) return;
 
@@ -50,9 +52,7 @@ class _ConsultPageState extends State<ConsultPage>
       } else {
         setState(() => _waiting = null);
       }
-    }();
-
-    super.initState();
+    });
   }
 
   @override

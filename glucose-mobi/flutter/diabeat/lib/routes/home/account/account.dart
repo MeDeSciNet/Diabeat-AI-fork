@@ -2,8 +2,6 @@ import 'package:diabeat/routes/network/session.dart' as session;
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 
-const _white90 = Color.fromARGB(230, 255, 255, 255);
-
 class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
 
@@ -12,9 +10,22 @@ class AccountPage extends StatefulWidget {
 }
 
 class _AccountPageState extends State<AccountPage> {
+  static const _white90 = Color.fromARGB(230, 255, 255, 255);
+  static const _insulinImageProvider = AssetImage('assets/insulin.jpg');
+  static const _healthImageProvider = AssetImage('assets/health.jpg');
+
   /// username : true
   /// email    : false
   bool _usernameOrEmail = true;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      precacheImage(_insulinImageProvider, context);
+      precacheImage(_healthImageProvider, context);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +58,7 @@ class _AccountPageState extends State<AccountPage> {
                   child: Stack(
                     children: [
                       Ink.image(
-                        image: const AssetImage('assets/insulin.jpg'),
+                        image: _insulinImageProvider,
                         alignment: Alignment.topCenter,
                         fit: BoxFit.cover,
                       ),
@@ -76,7 +87,7 @@ class _AccountPageState extends State<AccountPage> {
                   child: Stack(
                     children: [
                       Ink.image(
-                        image: const AssetImage('assets/health.jpg'),
+                        image: _healthImageProvider,
                         alignment: Alignment.topCenter,
                         fit: BoxFit.cover,
                       ),

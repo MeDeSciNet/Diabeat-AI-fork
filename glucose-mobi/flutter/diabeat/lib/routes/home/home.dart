@@ -87,9 +87,9 @@ class _HomeState extends State<Home> {
             ),
           ],
         ),
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _index,
-          onTap: (value) {
+        bottomNavigationBar:NavigationBar(
+          selectedIndex: _index,
+          onDestinationSelected: (value) {
             // unfocus textfield of current navigator
             // prevent keyboard pop up when dismiss dialog
             _navigatorKeys[_index].currentState!.focusNode.unfocus();
@@ -100,21 +100,21 @@ class _HomeState extends State<Home> {
             }
             setState(() => _index = value);
           },
-          items: const [
-            BottomNavigationBarItem(
+          destinations: const [
+            NavigationDestination(
               label: '紀錄',
               icon: Icon(Icons.create_outlined),
-              activeIcon: Icon(Icons.create_rounded),
+              selectedIcon: Icon(Icons.create_rounded),
             ),
-            BottomNavigationBarItem(
+            NavigationDestination(
               label: '歷史',
               icon: Icon(Icons.history_outlined),
-              activeIcon: Icon(Icons.history_rounded),
+              selectedIcon: Icon(Icons.history_rounded),
             ),
-            BottomNavigationBarItem(
+            NavigationDestination(
               label: '帳號',
               icon: Icon(Icons.account_circle_outlined),
-              activeIcon: Icon(Icons.account_circle_rounded),
+              selectedIcon: Icon(Icons.account_circle_rounded),
             ),
           ],
         ),
