@@ -39,11 +39,11 @@ class DisconnectedDialog extends StatelessWidget {
             label: const Text('連線'),
           ),
           const SizedBox(height: 10),
-          OutlinedButton.icon(
+          FilledButton.tonalIcon(
             onPressed: () {
               Navigator.pop(context);
             },
-            style: util.outlinedPageButtonStyle(),
+            style: util.tonalPageButtonStyle(context),
             icon: const Icon(Icons.close_rounded),
             label: const Text('取消'),
           ),

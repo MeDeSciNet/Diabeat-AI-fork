@@ -82,11 +82,11 @@ class _GuestPageState extends State<GuestPage> {
                 label: const Text('登入'),
               ),
               const SizedBox(height: 10),
-              OutlinedButton.icon(
+              FilledButton.tonalIcon(
                 onPressed: () {
                   Navigator.of(context).pushNamed('/guest/register');
                 },
-                style: util.outlinedPageButtonStyle(),
+                style: util.tonalPageButtonStyle(context),
                 icon: const Icon(Icons.create_rounded),
                 label: const Text('註冊'),
               ),

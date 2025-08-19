@@ -8,8 +8,8 @@ import 'package:flutter/services.dart';
 
 ButtonStyle filledPageButtonStyle() {
   return FilledButton.styleFrom(
-    fixedSize: const Size.fromHeight(50),
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+    fixedSize: const Size.fromHeight(56),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
   );
 }
 
@@ -17,15 +17,15 @@ ButtonStyle tonalPageButtonStyle(BuildContext context) {
   return FilledButton.styleFrom(
     backgroundColor: ColorScheme.of(context).secondaryContainer,
     foregroundColor: ColorScheme.of(context).onSecondaryContainer,
-    fixedSize: const Size.fromHeight(50),
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+    fixedSize: const Size.fromHeight(56),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
   );
 }
 
 ButtonStyle outlinedPageButtonStyle() {
   return OutlinedButton.styleFrom(
-    fixedSize: const Size.fromHeight(50),
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+    fixedSize: const Size.fromHeight(56),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
   );
 }
 
@@ -49,10 +49,6 @@ Widget scanIconButton(BuildContext context, {required bool waiting}) {
   );
 }
 
-Widget paddingText(String text) {
-  return Padding(padding: const EdgeInsets.only(right: 20), child: Text(text));
-}
-
 Widget smallCircularProgressIndicator() {
   return Transform.scale(
     scale: 0.5,
@@ -70,7 +66,36 @@ void formUnfocus(GlobalKey<FormState> formKey) {
 
 /* */
 /* */
-/* ===== Util ===== */
+/* ===== Table ===== */
+
+TableRow figureRow(String col1, dynamic col2, [String? col3]) {
+  final haveCol2 = col2 != null;
+  final haveCol3 = col3 != null;
+
+  return TableRow(
+    children: [
+      Text(col1),
+      const SizedBox(width: 20),
+      haveCol2 ? Text(col2.toString()) : const SizedBox(),
+      const SizedBox(width: 20),
+      haveCol3 ? (haveCol2 ? Text(col3) : const SizedBox()) : const SizedBox(),
+    ],
+  );
+}
+
+Map<int, TableColumnWidth> figureTableColumnWidths() {
+  return const {
+    0: IntrinsicColumnWidth(),
+    1: IntrinsicColumnWidth(),
+    2: IntrinsicColumnWidth(),
+    3: IntrinsicColumnWidth(),
+    4: FlexColumnWidth(),
+  };
+}
+
+/* */
+/* */
+/* ===== Misc ===== */
 
 class UdoubleFormatter extends TextInputFormatter {
   const UdoubleFormatter();
@@ -96,12 +121,4 @@ String? nonEmptyValidator(String? value) {
 
 String pad2Zero(dynamic obj) {
   return obj.toString().padLeft(2, '0');
-}
-
-String humanDate(DateTime dateTime) {
-  return '${dateTime.year}-${pad2Zero(dateTime.month)}-${pad2Zero(dateTime.day)}';
-}
-
-String humanTime(DateTime dateTime) {
-  return '${pad2Zero(dateTime.hour)}:${pad2Zero(dateTime.minute)}';
 }

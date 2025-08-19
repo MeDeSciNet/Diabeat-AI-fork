@@ -18,8 +18,8 @@ class _Record {
 
   List<String?> toCsvRow() {
     return [
-      util.humanDate(dateTime),
-      util.humanTime(dateTime),
+      _humanDate(dateTime),
+      _humanTime(dateTime),
       glucose.toString(),
       carbs?.toString(),
       exercise?.toString(),
@@ -80,7 +80,7 @@ class HistoryPageState extends State<HistoryPage> {
             }
           },
           style: util.filledPageButtonStyle(),
-          child: Text(util.humanDate(_date)),
+          child: Text(_humanDate(_date)),
         ),
         actions: [
           if (_date != _todayDate())
@@ -101,57 +101,18 @@ class HistoryPageState extends State<HistoryPage> {
               separatorBuilder: (context, index) => const SizedBox(height: 10),
               itemBuilder: (context, index) {
                 if (thisDayRecord == null) return null;
-
                 final item = thisDayRecord[index];
-                final time = item.dateTime;
-
-                final row0 = [
-                  util.paddingText('血糖'),
-                  util.paddingText(item.glucose.toString()),
-                  util.paddingText('mg/dL'),
-                ];
-
-                final text1 = util.paddingText('碳水');
-                final row1 = item.carbs == null
-                    ? [text1, const SizedBox(), const SizedBox()]
-                    : [
-                        text1,
-                        util.paddingText(item.carbs.toString()),
-                        util.paddingText('g'),
-                      ];
-
-                final text2 = util.paddingText('運動');
-                final row2 = item.exercise == null
-                    ? [text2, const SizedBox(), const SizedBox()]
-                    : [
-                        text2,
-                        util.paddingText(item.exercise.toString()),
-                        util.paddingText('min'),
-                      ];
-
-                final text3 = util.paddingText('胰島素');
-                final row3 = item.insulin == null
-                    ? [text3, const SizedBox(), const SizedBox()]
-                    : [
-                        text3,
-                        util.paddingText(item.insulin.toString()),
-                        util.paddingText('U'),
-                      ];
 
                 return Card.outlined(
                   child: ListTile(
-                    title: Text(util.humanTime(time)),
+                    title: Text(_humanTime(item.dateTime)),
                     subtitle: Table(
-                      columnWidths: const {
-                        0: IntrinsicColumnWidth(),
-                        1: IntrinsicColumnWidth(),
-                        2: FlexColumnWidth(),
-                      },
+                      columnWidths: util.figureTableColumnWidths(),
                       children: [
-                        TableRow(children: row0),
-                        TableRow(children: row1),
-                        TableRow(children: row2),
-                        TableRow(children: row3),
+                        util.figureRow('血糖', item.glucose, 'mg/dL'),
+                        util.figureRow('碳水', item.carbs, 'g'),
+                        util.figureRow('運動', item.exercise, 'min'),
+                        util.figureRow('胰島素', item.insulin, 'U'),
                       ],
                     ),
                   ),
@@ -166,8 +127,7 @@ class HistoryPageState extends State<HistoryPage> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   FloatingActionButton.extended(
-                    heroTag:
-                        '#getRecords', // idk why this necessary when have multiple FABs
+                    heroTag: '#getRecords',
                     onPressed: _waitingRefresh
                         ? null
                         : () {
@@ -311,4 +271,12 @@ DateTime _onlyDate(DateTime dateTime) {
 
 DateTime _todayDate() {
   return _onlyDate(DateTime.now());
+}
+
+String _humanDate(DateTime dateTime) {
+  return '${dateTime.year}-${util.pad2Zero(dateTime.month)}-${util.pad2Zero(dateTime.day)}';
+}
+
+String _humanTime(DateTime dateTime) {
+  return '${util.pad2Zero(dateTime.hour)}:${util.pad2Zero(dateTime.minute)}';
 }

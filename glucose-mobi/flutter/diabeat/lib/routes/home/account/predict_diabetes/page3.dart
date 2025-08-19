@@ -67,47 +67,13 @@ class Page3State extends State<Page3> {
             child: ListTile(
               title: const Text('基本資料'),
               subtitle: Table(
-                columnWidths: const {
-                  0: IntrinsicColumnWidth(),
-                  1: IntrinsicColumnWidth(),
-                  2: FlexColumnWidth(),
-                },
+                columnWidths: util.figureTableColumnWidths(),
                 children: [
-                  TableRow(
-                    children: [
-                      util.paddingText('性別'),
-                      util.paddingText(PredictDiabetesFields.genderText),
-                      const SizedBox(),
-                    ],
-                  ),
-                  TableRow(
-                    children: [
-                      util.paddingText('年齡'),
-                      util.paddingText(PredictDiabetesFields.age.toString()),
-                      const Text('歲'),
-                    ],
-                  ),
-                  TableRow(
-                    children: [
-                      util.paddingText('身高'),
-                      util.paddingText(PredictDiabetesFields.height.toString()),
-                      const Text('cm'),
-                    ],
-                  ),
-                  TableRow(
-                    children: [
-                      util.paddingText('體重'),
-                      util.paddingText(PredictDiabetesFields.weight.toString()),
-                      const Text('kg'),
-                    ],
-                  ),
-                  TableRow(
-                    children: [
-                      util.paddingText('BMI'),
-                      util.paddingText(PredictDiabetesFields.bmi.toString()),
-                      const Text('kg/m^2'),
-                    ],
-                  ),
+                  util.figureRow('性別', PredictDiabetesFields.genderText, null),
+                  util.figureRow('年齡', PredictDiabetesFields.age, '歲'),
+                  util.figureRow('身高', PredictDiabetesFields.height, 'cm'),
+                  util.figureRow('體重', PredictDiabetesFields.weight, 'kg'),
+                  util.figureRow('BMI', PredictDiabetesFields.bmi, 'kg/m^2'),
                 ],
               ),
             ),
@@ -117,32 +83,22 @@ class Page3State extends State<Page3> {
             child: ListTile(
               title: const Text('疾病史 / 吸菸史'),
               subtitle: Table(
-                columnWidths: const {
-                  0: IntrinsicColumnWidth(),
-                  1: FlexColumnWidth(),
-                },
+                columnWidths: util.figureTableColumnWidths(),
                 children: [
-                  TableRow(
-                    children: [
-                      util.paddingText('高血壓'),
-                      PredictDiabetesFields.hypertension
-                          ? const Text('有')
-                          : const Text('無'),
-                    ],
+                  util.figureRow(
+                    '高血壓',
+                    PredictDiabetesFields.hypertension ? '有' : '無',
+                    null,
                   ),
-                  TableRow(
-                    children: [
-                      util.paddingText('心臟病'),
-                      PredictDiabetesFields.heartDisease
-                          ? const Text('有')
-                          : const Text('無'),
-                    ],
+                  util.figureRow(
+                    '心臟病',
+                    PredictDiabetesFields.heartDisease ? '有' : '無',
+                    null,
                   ),
-                  TableRow(
-                    children: [
-                      util.paddingText('吸菸史'),
-                      Text(PredictDiabetesFields.smokingHistoryText),
-                    ],
+                  util.figureRow(
+                    '吸菸史',
+                    PredictDiabetesFields.smokingHistoryText,
+                    null,
                   ),
                 ],
               ),
@@ -153,28 +109,10 @@ class Page3State extends State<Page3> {
             child: ListTile(
               title: const Text('血糖值 / 糖化血色素'),
               subtitle: Table(
-                columnWidths: const {
-                  0: IntrinsicColumnWidth(),
-                  1: IntrinsicColumnWidth(),
-                  2: FlexColumnWidth(),
-                },
+                columnWidths: util.figureTableColumnWidths(),
                 children: [
-                  TableRow(
-                    children: [
-                      util.paddingText('血糖值'),
-                      util.paddingText(
-                        PredictDiabetesFields.glucose.toString(),
-                      ),
-                      const Text('mg/dL'),
-                    ],
-                  ),
-                  TableRow(
-                    children: [
-                      util.paddingText('糖化血色素'),
-                      util.paddingText(PredictDiabetesFields.hba1c.toString()),
-                      const Text('%'),
-                    ],
-                  ),
+                  util.figureRow('血糖值', PredictDiabetesFields.glucose, 'mg/dL'),
+                  util.figureRow('糖化血色素', PredictDiabetesFields.hba1c, '%'),
                 ],
               ),
             ),

@@ -28,11 +28,11 @@ class ImagePickerDialog extends StatelessWidget {
           icon: const Icon(Icons.camera_alt_rounded),
         ),
         const SizedBox(height: 10),
-        OutlinedButton.icon(
+        FilledButton.tonalIcon(
           onPressed: () {
             Navigator.pop(context, ImageSource.gallery);
           },
-          style: util.outlinedPageButtonStyle(),
+          style: util.tonalPageButtonStyle(context),
           icon: const Icon(Icons.photo_rounded),
           label: const Text('圖庫'),
         ),

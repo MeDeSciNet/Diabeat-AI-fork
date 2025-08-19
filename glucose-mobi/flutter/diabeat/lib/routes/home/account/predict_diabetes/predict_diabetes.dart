@@ -42,7 +42,7 @@ class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+        padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
         child: IndexedStack(
           index: _index,
           children: [

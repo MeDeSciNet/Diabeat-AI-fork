@@ -37,7 +37,7 @@ class RecordPageState extends State<RecordPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 50),
+        padding: const EdgeInsets.symmetric(horizontal: 60),
         child: Form(
           key: _formKey,
           child: Column(
@@ -55,24 +55,21 @@ class RecordPageState extends State<RecordPage> {
                 children: [
                   _uDoubleFormField(0),
                   const SizedBox(height: 20),
-                  IntrinsicHeight(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Expanded(child: _uDoubleFormField(1)),
-                        const SizedBox(width: 10),
-                        FilledButton.icon(
-                          onPressed: _waitingPredictCarbs ? null : _tryPredict,
-                          style: util.filledPageButtonStyle(),
-                          icon: _waitingPredictCarbs
-                              ? util.smallCircularProgressIndicator()
-                              : const Icon(Icons.camera_alt_rounded),
-                          label: _waitingPredictCarbs
-                              ? const Text('估算中')
-                              : const Text('AI 估算'),
-                        ),
-                      ],
-                    ),
+                  Row(
+                    children: [
+                      Expanded(child: _uDoubleFormField(1)),
+                      const SizedBox(width: 10),
+                      FilledButton.icon(
+                        onPressed: _waitingPredictCarbs ? null : _tryPredict,
+                        style: util.filledPageButtonStyle(),
+                        icon: _waitingPredictCarbs
+                            ? util.smallCircularProgressIndicator()
+                            : const Icon(Icons.camera_alt_rounded),
+                        label: _waitingPredictCarbs
+                            ? const Text('估算中')
+                            : const Text('AI 估算'),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 20),
                   _uDoubleFormField(2),

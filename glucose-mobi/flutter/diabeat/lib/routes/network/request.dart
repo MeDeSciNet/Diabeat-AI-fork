@@ -63,7 +63,7 @@ Future<(bool, dynamic)> postRecord(
     final res = await _timeout(
       http.post(
         connection.makeUrl('/records'),
-        headers: _configHeaders({}, json: true, auth: true),
+        headers: _configHeaders({}, auth: true, json: true),
         body: jsonEncode({
           'blood_glucose': glucose,
           'carbohydrate_intake': carbohydrate,
@@ -128,7 +128,7 @@ Future<(bool, dynamic)> predictDiabetes(
     final res = await _timeout(
       http.post(
         connection.makeUrl('/predictform'),
-        headers: _configHeaders({}, json: true, auth: true),
+        headers: _configHeaders({}, auth: true, json: true),
         body: jsonEncode({
           'gender': gender,
           'age': age,
@@ -157,20 +157,52 @@ Future<(bool, dynamic)> consult(BuildContext context) {
   }, refreshFirst: true);
 }
 
+Future<(bool, dynamic)> getInfo(BuildContext context) {
+  return _handle(context, () async {
+    final res = await _timeout(
+      http.get(
+        connection.makeUrl('/info/get'),
+        headers: _configHeaders({}, auth: true),
+      ),
+    );
+
+    return (res.statusCode, res.body);
+  });
+}
+
+Future<(bool, dynamic)> updateInfo(
+  BuildContext context, {
+  required int age,
+  required double height,
+  required double weight,
+}) {
+  return _handle(context, () async {
+    final res = await _timeout(
+      http.post(
+        connection.makeUrl('/info/update'),
+        headers: _configHeaders({}, auth: true, json: true),
+        body: jsonEncode({'age': age, 'height': height, 'weight': weight}),
+      ),
+    );
+
+    return (res.statusCode, res.body);
+  });
+}
+
 /* */
 /* */
 /* */
 
 Map<String, String> _configHeaders(
   Map<String, String> origin, {
-  bool json = false,
   bool auth = false,
+  bool json = false,
 }) {
-  if (json) {
-    origin['Content-Type'] = 'application/json';
-  }
   if (auth) {
     origin['Authorization'] = 'Bearer ${session.accessToken}';
+  }
+  if (json) {
+    origin['Content-Type'] = 'application/json';
   }
   return origin;
 }
@@ -210,6 +242,7 @@ Future<bool> _refresh(BuildContext context) async {
   return false;
 }
 
+/// arg "refreshFirst" used in "consult"
 Future<(bool, dynamic)> _handle(
   BuildContext context,
   Future<(int, String)> Function() request, {
