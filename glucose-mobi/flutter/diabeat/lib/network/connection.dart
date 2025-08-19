@@ -1,4 +1,4 @@
-import 'package:diabeat/routes/network/prefs.dart' as prefs;
+import 'package:diabeat/network/prefs.dart' as prefs;
 
 String? _addr;
 

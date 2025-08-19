@@ -1,5 +1,5 @@
-import 'package:diabeat/routes/network/connection.dart' as connection;
-import 'package:diabeat/routes/network/dialog/confirm_scan_dialog.dart';
+import 'package:diabeat/network/connection.dart' as connection;
+import 'package:diabeat/routes/dialog/confirm_scan_dialog.dart';
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -9,10 +9,6 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 /// disconnected : null
 class ScannerPage extends StatefulWidget {
   const ScannerPage({super.key});
-
-  static Future<dynamic> push(BuildContext context) {
-    return Navigator.of(context, rootNavigator: true).pushNamed('/scanner');
-  }
 
   @override
   State<ScannerPage> createState() => _ScannerPageState();

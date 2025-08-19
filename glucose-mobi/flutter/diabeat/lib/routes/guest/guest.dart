@@ -1,3 +1,5 @@
+import 'package:diabeat/routes/guest/login.dart';
+import 'package:diabeat/routes/guest/register.dart';
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -55,15 +57,7 @@ class _GuestPageState extends State<GuestPage> {
                             ),
                     ),
                     IconButton(
-                      onPressed: () {
-                        launchUrl(
-                          Uri.parse(
-                            _appOrOrgName
-                                ? 'https://github.com/MeDeSciNet/Diabeat-AI-fork'
-                                : 'https://github.com/MeDeSciNet',
-                          ),
-                        );
-                      },
+                      onPressed: _launchUrl,
                       iconSize: 55,
                       color: Colors.red,
                       icon: _appOrOrgName
@@ -74,18 +68,14 @@ class _GuestPageState extends State<GuestPage> {
                 ),
               ),
               FilledButton.icon(
-                onPressed: () {
-                  Navigator.of(context).pushNamed('/guest/login');
-                },
+                onPressed: _goLogin,
                 style: util.filledPageButtonStyle(),
                 icon: const Icon(Icons.login_rounded),
                 label: const Text('登入'),
               ),
               const SizedBox(height: 10),
               FilledButton.tonalIcon(
-                onPressed: () {
-                  Navigator.of(context).pushNamed('/guest/register');
-                },
+                onPressed: _goRegister,
                 style: util.tonalPageButtonStyle(context),
                 icon: const Icon(Icons.create_rounded),
                 label: const Text('註冊'),
@@ -94,6 +84,30 @@ class _GuestPageState extends State<GuestPage> {
           ),
         ),
       ),
+    );
+  }
+
+  void _launchUrl() {
+    launchUrl(
+      Uri.parse(
+        _appOrOrgName
+            ? 'https://github.com/MeDeSciNet/Diabeat-AI-fork'
+            : 'https://github.com/MeDeSciNet',
+      ),
+    );
+  }
+
+  void _goLogin() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginPage()),
+    );
+  }
+
+  void _goRegister() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const RegisterPage()),
     );
   }
 }

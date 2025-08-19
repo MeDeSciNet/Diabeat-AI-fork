@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:csv/csv.dart';
 import 'package:diabeat/routes/home/history/pdf_csv_dialog.dart';
-import 'package:diabeat/routes/network/request.dart' as request;
-import 'package:diabeat/routes/network/session.dart' as session;
+import 'package:diabeat/network/request.dart' as request;
+import 'package:diabeat/network/session.dart' as session;
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';

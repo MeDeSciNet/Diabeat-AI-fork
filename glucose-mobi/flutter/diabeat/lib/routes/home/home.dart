@@ -1,6 +1,6 @@
 import 'package:diabeat/routes/home/account/account.dart';
 import 'package:diabeat/routes/home/account/consult/consult.dart';
-import 'package:diabeat/routes/home/account/info.dart';
+import 'package:diabeat/routes/home/account/info/info.dart';
 import 'package:diabeat/routes/home/account/predict_diabetes/predict_diabetes.dart';
 import 'package:diabeat/routes/home/history/history.dart';
 import 'package:diabeat/routes/home/record/record.dart';

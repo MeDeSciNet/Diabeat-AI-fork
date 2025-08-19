@@ -1,4 +1,3 @@
-import 'package:diabeat/routes/network/scanner.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -43,7 +42,7 @@ Widget scanIconButton(BuildContext context, {required bool waiting}) {
     onPressed: waiting
         ? null
         : () {
-            ScannerPage.push(context);
+            Navigator.of(context, rootNavigator: true).pushNamed('/scanner');
           },
     icon: const Icon(Icons.qr_code_scanner_rounded),
   );
@@ -84,7 +83,7 @@ Widget figureCard(String title, List<(String, dynamic, String?)> rows) {
           final (col1, col2, col3) = e;
           final haveCol2 = col2 != null;
           final haveCol3 = col3 != null;
-          
+
           return TableRow(
             children: [
               Text(col1),

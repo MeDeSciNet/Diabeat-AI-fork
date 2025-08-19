@@ -1,4 +1,3 @@
-import 'package:diabeat/routes/network/scanner.dart';
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 
@@ -19,7 +18,10 @@ class TimeoutDialog extends StatelessWidget {
     if (!context.mounted) return null;
 
     return switch (nav) {
-      _TimeoutDialogNav.scan => await ScannerPage.push(context),
+      _TimeoutDialogNav.scan => Navigator.of(
+        context,
+        rootNavigator: true,
+      ).pushNamed('/scanner'),
       _TimeoutDialogNav.retry => true,
       _ => null,
     };

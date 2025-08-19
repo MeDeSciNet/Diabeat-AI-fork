@@ -1,5 +1,5 @@
 import 'package:diabeat/routes/home/record/image_picker_dialog.dart';
-import 'package:diabeat/routes/network/request.dart' as request;
+import 'package:diabeat/network/request.dart' as request;
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';

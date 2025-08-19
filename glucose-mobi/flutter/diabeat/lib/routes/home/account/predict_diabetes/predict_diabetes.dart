@@ -3,7 +3,7 @@ import 'package:diabeat/routes/home/account/predict_diabetes/page0.dart';
 import 'package:diabeat/routes/home/account/predict_diabetes/page1.dart';
 import 'package:diabeat/routes/home/account/predict_diabetes/page2.dart';
 import 'package:diabeat/routes/home/account/predict_diabetes/page3.dart';
-import 'package:diabeat/routes/network/request.dart' as request;
+import 'package:diabeat/network/request.dart' as request;
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';

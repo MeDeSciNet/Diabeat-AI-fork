@@ -1,8 +1,6 @@
-import 'package:diabeat/routes/guest/login.dart';
-import 'package:diabeat/routes/guest/register.dart';
-import 'package:diabeat/routes/network/connection.dart' as connection;
-import 'package:diabeat/routes/network/session.dart' as session;
-import 'package:diabeat/routes/network/scanner.dart';
+import 'package:diabeat/network/connection.dart' as connection;
+import 'package:diabeat/network/session.dart' as session;
+import 'package:diabeat/routes/scanner/scanner.dart';
 import 'package:diabeat/routes/guest/guest.dart';
 import 'package:diabeat/routes/home/home.dart';
 import 'package:flutter/material.dart';
@@ -42,8 +40,6 @@ class _MainApp extends StatelessWidget {
           routes: {
             '/home': (context) => const Home(),
             '/guest': (context) => const GuestPage(),
-            '/guest/login': (context) => const LoginPage(),
-            '/guest/register': (context) => const RegisterPage(),
             '/scanner': (context) => const ScannerPage(),
           },
           theme: ThemeData(useMaterial3: true, colorScheme: lightDynamic),

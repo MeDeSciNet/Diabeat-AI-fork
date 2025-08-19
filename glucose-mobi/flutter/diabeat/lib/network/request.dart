@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:diabeat/routes/network/connection.dart' as connection;
-import 'package:diabeat/routes/network/dialog/disconnected_dialog.dart';
-import 'package:diabeat/routes/network/dialog/refresh_failed_dialog.dart';
-import 'package:diabeat/routes/network/session.dart' as session;
-import 'package:diabeat/routes/network/dialog/timeout_dialog.dart';
+import 'package:diabeat/network/connection.dart' as connection;
+import 'package:diabeat/routes/dialog/disconnected_dialog.dart';
+import 'package:diabeat/routes/dialog/refresh_failed_dialog.dart';
+import 'package:diabeat/network/session.dart' as session;
+import 'package:diabeat/routes/dialog/timeout_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';

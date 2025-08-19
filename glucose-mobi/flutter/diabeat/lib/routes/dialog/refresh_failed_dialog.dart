@@ -1,4 +1,4 @@
-import 'package:diabeat/routes/network/session.dart' as session;
+import 'package:diabeat/network/session.dart' as session;
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 
