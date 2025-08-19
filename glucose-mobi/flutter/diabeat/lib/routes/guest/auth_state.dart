@@ -37,11 +37,11 @@ abstract class AuthState<T extends StatefulWidget> extends State<T> {
 
         if (value == null || value.isEmpty) {
           return 'Email 不能為空';
-        } else if (!regex.hasMatch(value)) {
-          return 'Email 格式不正確';
-        } else {
-          return null;
         }
+        if (!regex.hasMatch(value)) {
+          return 'Email 格式不正確';
+        }
+        return null;
       },
       onSaved: (newValue) => email = newValue!,
       forceErrorText: emailErr,

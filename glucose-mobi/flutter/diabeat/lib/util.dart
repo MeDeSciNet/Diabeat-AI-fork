@@ -127,7 +127,7 @@ class U64Formatter extends TextInputFormatter {
 }
 
 String? nonEmptyValidator(String? value) {
-  return value == null || value.isEmpty ? '必填' : null;
+  return value != null && value.isNotEmpty ? null : '必填';
 }
 
 String pad2Zero(dynamic obj) {
