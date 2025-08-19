@@ -1,27 +1,20 @@
 import 'package:diabeat/routes/home/account/account.dart';
-import 'package:diabeat/routes/home/account/consult/consult.dart';
-import 'package:diabeat/routes/home/account/info/info.dart';
-import 'package:diabeat/routes/home/account/predict_diabetes/predict_diabetes.dart';
 import 'package:diabeat/routes/home/history/history.dart';
 import 'package:diabeat/routes/home/record/record.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class Home extends StatefulWidget {
-  const Home({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
-  State<Home> createState() => _HomeState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _HomeState extends State<Home> {
-  final _navigatorKeys = [
-    GlobalKey<NavigatorState>(),
-    GlobalKey<NavigatorState>(),
-    GlobalKey<NavigatorState>(),
-  ];
+class _HomePageState extends State<HomePage> {
   final _recordKey = GlobalKey<RecordPageState>();
   final _historyKey = GlobalKey<HistoryPageState>();
+  final _accountNavigatorKey = GlobalKey<NavigatorState>();
   int _index = 0;
 
   @override
@@ -31,7 +24,14 @@ class _HomeState extends State<Home> {
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
 
-        final navigator = _navigatorKeys[_index].currentState!;
+        final navigator = Navigator.of(
+          switch (_index) {
+            0 => _recordKey,
+            1 => _historyKey,
+            _ => _accountNavigatorKey,
+          }.currentContext!,
+        );
+
         if (navigator.canPop()) {
           navigator.pop();
         } else if (_index != 0) {
@@ -44,49 +44,14 @@ class _HomeState extends State<Home> {
         body: IndexedStack(
           index: _index,
           children: [
+            RecordPage(key: _recordKey),
+            HistoryPage(key: _historyKey),
             Navigator(
-              key: _navigatorKeys[0],
-              initialRoute: '/',
+              key: _accountNavigatorKey,
               onGenerateRoute: (settings) {
-                return switch (settings.name) {
-                  '/' => MaterialPageRoute(
-                    builder: (context) => RecordPage(key: _recordKey),
-                  ),
-                  _ => null,
-                };
-              },
-            ),
-            Navigator(
-              key: _navigatorKeys[1],
-              initialRoute: '/',
-              onGenerateRoute: (settings) {
-                return switch (settings.name) {
-                  '/' => MaterialPageRoute(
-                    builder: (context) => HistoryPage(key: _historyKey),
-                  ),
-                  _ => null,
-                };
-              },
-            ),
-            Navigator(
-              key: _navigatorKeys[2],
-              initialRoute: '/',
-              onGenerateRoute: (settings) {
-                return switch (settings.name) {
-                  '/' => MaterialPageRoute(
-                    builder: (context) => const AccountPage(),
-                  ),
-                  '/predict' => MaterialPageRoute(
-                    builder: (context) => const PredictDiabetesRoot(),
-                  ),
-                  '/consult' => MaterialPageRoute(
-                    builder: (context) => const ConsultPage(),
-                  ),
-                  '/info' => MaterialPageRoute(
-                    builder: (context) => const InfoPage(),
-                  ),
-                  _ => null,
-                };
+                return MaterialPageRoute(
+                  builder: (context) => const AccountPage(),
+                );
               },
             ),
           ],
@@ -94,9 +59,7 @@ class _HomeState extends State<Home> {
         bottomNavigationBar: NavigationBar(
           selectedIndex: _index,
           onDestinationSelected: (value) {
-            // unfocus textfield of current navigator
-            // prevent keyboard pop up when dismiss dialog
-            _navigatorKeys[_index].currentState!.focusNode.unfocus();
+            primaryFocus?.unfocus();
 
             if (value == 1 && _recordKey.currentState!.shouldRefresh) {
               _recordKey.currentState!.shouldRefresh = false;

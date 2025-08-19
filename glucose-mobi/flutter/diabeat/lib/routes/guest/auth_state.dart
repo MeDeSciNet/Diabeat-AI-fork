@@ -9,6 +9,25 @@ abstract class AuthState<T extends StatefulWidget> extends State<T> {
   late String email;
   late String password;
 
+  AppBar buildAppBar() {
+    return AppBar(
+      leading: util.backIconButton(context),
+      actions: [
+        IconButton(
+          onPressed: waiting
+              ? null
+              : () {
+                  Navigator.of(
+                    context,
+                    rootNavigator: true,
+                  ).pushNamed('/scanner');
+                },
+          icon: const Icon(Icons.qr_code_scanner_rounded),
+        ),
+      ],
+    );
+  }
+
   Widget buildEmailField() {
     return TextFormField(
       validator: (value) {

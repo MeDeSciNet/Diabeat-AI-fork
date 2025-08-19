@@ -18,10 +18,7 @@ class _RegisterPageState extends AuthState<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: util.backIconButton(context),
-        actions: [util.scanIconButton(context, waiting: waiting)],
-      ),
+      appBar: buildAppBar(),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -92,7 +89,7 @@ class _RegisterPageState extends AuthState<RegisterPage> {
   Future<void> _tryRegister() async {
     if (!formKey.currentState!.validate()) return;
     formKey.currentState!.save();
-    util.formUnfocus(formKey);
+    primaryFocus?.unfocus();
     setState(() => waiting = true);
 
     final (ok, data) = await request.register(

@@ -12,7 +12,7 @@ class GuestPage extends StatefulWidget {
 }
 
 class _GuestPageState extends State<GuestPage> {
-  static const _medescinetImageProvider = ExactAssetImage(
+  final _medescinetImageProvider = const ExactAssetImage(
     'assets/medescinet.png',
     scale: 4,
   );
@@ -62,7 +62,7 @@ class _GuestPageState extends State<GuestPage> {
                       color: Colors.red,
                       icon: _appOrOrgName
                           ? const Icon(Icons.bloodtype_rounded)
-                          : const Image(image: _medescinetImageProvider),
+                          : Image(image: _medescinetImageProvider),
                     ),
                   ],
                 ),

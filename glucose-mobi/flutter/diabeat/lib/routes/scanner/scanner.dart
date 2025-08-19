@@ -1,5 +1,5 @@
 import 'package:diabeat/network/connection.dart' as connection;
-import 'package:diabeat/routes/dialog/confirm_scan_dialog.dart';
+import 'package:diabeat/routes/scanner/confirm_scan_dialog.dart';
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';

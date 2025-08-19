@@ -37,17 +37,6 @@ Widget backIconButton(BuildContext context) {
   );
 }
 
-Widget scanIconButton(BuildContext context, {required bool waiting}) {
-  return IconButton(
-    onPressed: waiting
-        ? null
-        : () {
-            Navigator.of(context, rootNavigator: true).pushNamed('/scanner');
-          },
-    icon: const Icon(Icons.qr_code_scanner_rounded),
-  );
-}
-
 Widget smallCircularProgressIndicator() {
   return Transform.scale(
     scale: 0.5,
@@ -57,10 +46,6 @@ Widget smallCircularProgressIndicator() {
 
 InputDecoration inputBorder(String label) {
   return InputDecoration(labelText: label, border: const OutlineInputBorder());
-}
-
-void formUnfocus(GlobalKey<FormState> formKey) {
-  FocusScope.of(formKey.currentContext!).unfocus();
 }
 
 /* */
@@ -119,7 +104,25 @@ class UdoubleFormatter extends TextInputFormatter {
     }
 
     final value = double.tryParse(newText);
-    return value == null || value < 0 ? oldValue : newValue;
+    return value != null && value >= 0 ? newValue : oldValue;
+  }
+}
+
+class U64Formatter extends TextInputFormatter {
+  const U64Formatter();
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final newText = newValue.text;
+    if (newText.isEmpty) {
+      return newValue;
+    }
+
+    final value = int.tryParse(newText);
+    return value != null && value >= 0 ? newValue : oldValue;
   }
 }
 

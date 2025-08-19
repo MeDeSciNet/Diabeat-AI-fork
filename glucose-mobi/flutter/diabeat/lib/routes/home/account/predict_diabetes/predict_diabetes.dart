@@ -8,14 +8,14 @@ import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 
-class PredictDiabetesRoot extends StatefulWidget {
-  const PredictDiabetesRoot({super.key});
+class PredictDiabetesPage extends StatefulWidget {
+  const PredictDiabetesPage({super.key});
 
   @override
-  State<PredictDiabetesRoot> createState() => _PredictDiabetesRootState();
+  State<PredictDiabetesPage> createState() => _PredictDiabetesPageState();
 }
 
-class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
+class _PredictDiabetesPageState extends State<PredictDiabetesPage> {
   final _formKeys = [
     GlobalKey<FormState>(),
     GlobalKey<FormState>(),
@@ -23,8 +23,8 @@ class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
   ];
   final _page3Key = GlobalKey<Page3State>();
   int _index = 0;
-
-  GlobalKey<FormState> get _thisFormKey => _formKeys[_index];
+  
+  FormState get _formState => _formKeys[_index].currentState!;
 
   @override
   Widget build(BuildContext context) {
@@ -105,7 +105,7 @@ class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
     return Expanded(
       child: OutlinedButton.icon(
         onPressed: () {
-          util.formUnfocus(_thisFormKey);
+          primaryFocus?.unfocus();
           setState(() => _index--);
         },
         style: util.outlinedPageButtonStyle(),
@@ -119,9 +119,9 @@ class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
     return Expanded(
       child: FilledButton.icon(
         onPressed: () {
-          if (_thisFormKey.currentState!.validate()) {
-            _thisFormKey.currentState!.save();
-            util.formUnfocus(_thisFormKey);
+          if (_formState.validate()) {
+            _formState.save();
+            primaryFocus?.unfocus();
             setState(() => _index++);
           }
         },
@@ -137,9 +137,9 @@ class _PredictDiabetesRootState extends State<PredictDiabetesRoot> {
     return Expanded(
       child: FilledButton.icon(
         onPressed: () async {
-          if (!_thisFormKey.currentState!.validate()) return;
-          _thisFormKey.currentState!.save();
-          util.formUnfocus(_thisFormKey);
+          if (!_formState.validate()) return;
+          _formState.save();
+          primaryFocus?.unfocus();
           setState(() => _index++);
 
           final heightInMeter = PredictDiabetesFields.height / 100;

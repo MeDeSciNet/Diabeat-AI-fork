@@ -50,6 +50,7 @@ class Page0 extends StatelessWidget {
         const SizedBox(height: 10),
         TextFormField(
           keyboardType: TextInputType.number,
+          inputFormatters: const [util.U64Formatter()],
           textInputAction: TextInputAction.next,
           onFieldSubmitted: (value) {
             _heightFocus.requestFocus();

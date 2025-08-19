@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:diabeat/network/connection.dart' as connection;
-import 'package:diabeat/routes/dialog/disconnected_dialog.dart';
-import 'package:diabeat/routes/dialog/refresh_failed_dialog.dart';
+import 'package:diabeat/network/dialog/disconnected_dialog.dart';
+import 'package:diabeat/network/dialog/refresh_failed_dialog.dart';
 import 'package:diabeat/network/session.dart' as session;
-import 'package:diabeat/routes/dialog/timeout_dialog.dart';
+import 'package:diabeat/network/dialog/timeout_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
@@ -155,38 +155,6 @@ Future<(bool, dynamic)> consult(BuildContext context) {
 
     return (res.statusCode, res.body);
   }, refreshFirst: true);
-}
-
-Future<(bool, dynamic)> getInfo(BuildContext context) {
-  return _handle(context, () async {
-    final res = await _timeout(
-      http.get(
-        connection.makeUrl('/info/get'),
-        headers: _configHeaders({}, auth: true),
-      ),
-    );
-
-    return (res.statusCode, res.body);
-  });
-}
-
-Future<(bool, dynamic)> updateInfo(
-  BuildContext context, {
-  required int age,
-  required double height,
-  required double weight,
-}) {
-  return _handle(context, () async {
-    final res = await _timeout(
-      http.post(
-        connection.makeUrl('/info/update'),
-        headers: _configHeaders({}, auth: true, json: true),
-        body: jsonEncode({'age': age, 'height': height, 'weight': weight}),
-      ),
-    );
-
-    return (res.statusCode, res.body);
-  });
 }
 
 /* */

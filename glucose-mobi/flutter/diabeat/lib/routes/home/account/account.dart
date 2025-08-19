@@ -1,4 +1,6 @@
 import 'package:diabeat/network/session.dart' as session;
+import 'package:diabeat/routes/home/account/consult/consult.dart';
+import 'package:diabeat/routes/home/account/predict_diabetes/predict_diabetes.dart';
 import 'package:diabeat/util.dart' as util;
 import 'package:flutter/material.dart';
 
@@ -39,43 +41,33 @@ class _AccountPageState extends State<AccountPage> {
               : const Icon(Icons.email_rounded),
         ),
         title: Text(_usernameOrEmail ? session.username : session.email),
-        actions: [util.scanIconButton(context, waiting: false)],
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.of(context, rootNavigator: true).pushNamed('/scanner');
+            },
+            icon: const Icon(Icons.qr_code_scanner_rounded),
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _card(_insulinImage, 'AI 糖尿病風險檢測', '/predict'),
+            _card(
+              _insulinImage,
+              'AI 糖尿病風險檢測',
+              (context) => const PredictDiabetesPage(),
+            ),
             const SizedBox(height: 20),
-            _card(_healthImage, 'AI 健康諮詢', '/consult'),
+            _card(_healthImage, 'AI 健康諮詢', (context) => const ConsultPage()),
             const Spacer(),
-            Row(
-              spacing: 20,
-              children: [
-                Expanded(
-                  child: FilledButton.tonalIcon(
-                    onPressed: () {},
-                    style: util.tonalPageButtonStyle(context),
-                    icon: const Icon(Icons.edit_rounded),
-                    label: const Text('個人資料'),
-                  ),
-                ),
-                Expanded(
-                  child: FilledButton.icon(
-                    onPressed: () {
-                      session.delete();
-                      Navigator.of(
-                        context,
-                        rootNavigator: true,
-                      ).pushReplacementNamed('/guest');
-                    },
-                    style: util.filledPageButtonStyle(),
-                    icon: const Icon(Icons.logout_rounded),
-                    label: const Text('登出'),
-                  ),
-                ),
-              ],
+            FilledButton.icon(
+              onPressed: _logOut,
+              style: util.filledPageButtonStyle(),
+              icon: const Icon(Icons.logout_rounded),
+              label: const Text('登出'),
             ),
           ],
         ),
@@ -83,12 +75,21 @@ class _AccountPageState extends State<AccountPage> {
     );
   }
 
-  Widget _card(ImageProvider image, String label, String route) {
+  void _logOut() {
+    session.delete();
+    Navigator.of(context, rootNavigator: true).pushReplacementNamed('/guest');
+  }
+
+  Widget _card(
+    ImageProvider image,
+    String label,
+    Widget Function(BuildContext context) builder,
+  ) {
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () {
-          Navigator.pushNamed(context, route);
+          Navigator.push(context, MaterialPageRoute(builder: builder));
         },
         child: AspectRatio(
           aspectRatio: 16 / 9,

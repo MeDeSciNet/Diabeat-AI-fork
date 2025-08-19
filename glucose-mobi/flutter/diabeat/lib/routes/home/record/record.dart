@@ -99,7 +99,7 @@ class RecordPageState extends State<RecordPage> {
   Future<void> _tryPostRecord() async {
     if (!_formKey.currentState!.validate()) return;
     _formKey.currentState!.save();
-    util.formUnfocus(_formKey);
+    primaryFocus?.unfocus();
     setState(() => _waitingPostRecord = true);
 
     final (ok, data) = await request.postRecord(
@@ -120,7 +120,7 @@ class RecordPageState extends State<RecordPage> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('送出成功'),
+          content: Text('傳送成功'),
           behavior: SnackBarBehavior.floating,
         ),
       );

@@ -17,10 +17,7 @@ class _LoginPageState extends AuthState<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: util.backIconButton(context),
-        actions: [util.scanIconButton(context, waiting: waiting)],
-      ),
+      appBar: buildAppBar(),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -77,7 +74,7 @@ class _LoginPageState extends AuthState<LoginPage> {
   Future<void> _tryLogIn() async {
     if (!formKey.currentState!.validate()) return;
     formKey.currentState!.save();
-    util.formUnfocus(formKey);
+    primaryFocus?.unfocus();
     setState(() => waiting = true);
 
     final (ok, data) = await request.logIn(
