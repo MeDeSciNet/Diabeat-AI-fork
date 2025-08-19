@@ -63,60 +63,24 @@ class Page3State extends State<Page3> {
                   ],
           ),
           const SizedBox(height: 20),
-          Card.outlined(
-            child: ListTile(
-              title: const Text('基本資料'),
-              subtitle: Table(
-                columnWidths: util.figureTableColumnWidths(),
-                children: [
-                  util.figureRow('性別', PredictDiabetesFields.genderText, null),
-                  util.figureRow('年齡', PredictDiabetesFields.age, '歲'),
-                  util.figureRow('身高', PredictDiabetesFields.height, 'cm'),
-                  util.figureRow('體重', PredictDiabetesFields.weight, 'kg'),
-                  util.figureRow('BMI', PredictDiabetesFields.bmi, 'kg/m^2'),
-                ],
-              ),
-            ),
-          ),
+          util.figureCard('基本資料', [
+            ('性別', PredictDiabetesFields.genderText, null),
+            ('年齡', PredictDiabetesFields.age, '歲'),
+            ('身高', PredictDiabetesFields.height, 'cm'),
+            ('體重', PredictDiabetesFields.weight, 'kg'),
+            ('BMI', PredictDiabetesFields.bmi, 'kg/m^2'),
+          ]),
           const SizedBox(height: 10),
-          Card.outlined(
-            child: ListTile(
-              title: const Text('疾病史 / 吸菸史'),
-              subtitle: Table(
-                columnWidths: util.figureTableColumnWidths(),
-                children: [
-                  util.figureRow(
-                    '高血壓',
-                    PredictDiabetesFields.hypertension ? '有' : '無',
-                    null,
-                  ),
-                  util.figureRow(
-                    '心臟病',
-                    PredictDiabetesFields.heartDisease ? '有' : '無',
-                    null,
-                  ),
-                  util.figureRow(
-                    '吸菸史',
-                    PredictDiabetesFields.smokingHistoryText,
-                    null,
-                  ),
-                ],
-              ),
-            ),
-          ),
+          util.figureCard('疾病史 / 吸菸史', [
+            ('高血壓', PredictDiabetesFields.hypertension ? '有' : '無', null),
+            ('心臟病', PredictDiabetesFields.heartDisease ? '有' : '無', null),
+            ('吸菸史', PredictDiabetesFields.smokingHistoryText, null),
+          ]),
           const SizedBox(height: 10),
-          Card.outlined(
-            child: ListTile(
-              title: const Text('血糖值 / 糖化血色素'),
-              subtitle: Table(
-                columnWidths: util.figureTableColumnWidths(),
-                children: [
-                  util.figureRow('血糖值', PredictDiabetesFields.glucose, 'mg/dL'),
-                  util.figureRow('糖化血色素', PredictDiabetesFields.hba1c, '%'),
-                ],
-              ),
-            ),
-          ),
+          util.figureCard('血糖值 / 糖化血色素', [
+            ('血糖值', PredictDiabetesFields.glucose, 'mg/dL'),
+            ('糖化血色素', PredictDiabetesFields.hba1c, '%'),
+          ]),
         ],
       ),
     };

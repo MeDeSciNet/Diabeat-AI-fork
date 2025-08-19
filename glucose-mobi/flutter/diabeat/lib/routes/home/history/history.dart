@@ -103,20 +103,12 @@ class HistoryPageState extends State<HistoryPage> {
                 if (thisDayRecord == null) return null;
                 final item = thisDayRecord[index];
 
-                return Card.outlined(
-                  child: ListTile(
-                    title: Text(_humanTime(item.dateTime)),
-                    subtitle: Table(
-                      columnWidths: util.figureTableColumnWidths(),
-                      children: [
-                        util.figureRow('血糖', item.glucose, 'mg/dL'),
-                        util.figureRow('碳水', item.carbs, 'g'),
-                        util.figureRow('運動', item.exercise, 'min'),
-                        util.figureRow('胰島素', item.insulin, 'U'),
-                      ],
-                    ),
-                  ),
-                );
+                return util.figureCard(_humanTime(item.dateTime), [
+                  ('血糖', item.glucose, 'mg/dL'),
+                  ('碳水', item.carbs, 'g'),
+                  ('運動', item.exercise, 'min'),
+                  ('胰島素', item.insulin, 'U'),
+                ]);
               },
             ),
             Positioned(

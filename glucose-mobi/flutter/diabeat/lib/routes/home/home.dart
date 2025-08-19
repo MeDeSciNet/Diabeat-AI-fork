@@ -1,5 +1,6 @@
 import 'package:diabeat/routes/home/account/account.dart';
 import 'package:diabeat/routes/home/account/consult/consult.dart';
+import 'package:diabeat/routes/home/account/info.dart';
 import 'package:diabeat/routes/home/account/predict_diabetes/predict_diabetes.dart';
 import 'package:diabeat/routes/home/history/history.dart';
 import 'package:diabeat/routes/home/record/record.dart';
@@ -81,13 +82,16 @@ class _HomeState extends State<Home> {
                   '/consult' => MaterialPageRoute(
                     builder: (context) => const ConsultPage(),
                   ),
+                  '/info' => MaterialPageRoute(
+                    builder: (context) => const InfoPage(),
+                  ),
                   _ => null,
                 };
               },
             ),
           ],
         ),
-        bottomNavigationBar:NavigationBar(
+        bottomNavigationBar: NavigationBar(
           selectedIndex: _index,
           onDestinationSelected: (value) {
             // unfocus textfield of current navigator

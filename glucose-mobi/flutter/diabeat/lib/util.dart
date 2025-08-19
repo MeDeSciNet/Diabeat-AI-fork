@@ -66,31 +66,40 @@ void formUnfocus(GlobalKey<FormState> formKey) {
 
 /* */
 /* */
-/* ===== Table ===== */
+/* ===== Card X ListTile X Table ===== */
 
-TableRow figureRow(String col1, dynamic col2, [String? col3]) {
-  final haveCol2 = col2 != null;
-  final haveCol3 = col3 != null;
-
-  return TableRow(
-    children: [
-      Text(col1),
-      const SizedBox(width: 20),
-      haveCol2 ? Text(col2.toString()) : const SizedBox(),
-      const SizedBox(width: 20),
-      haveCol3 ? (haveCol2 ? Text(col3) : const SizedBox()) : const SizedBox(),
-    ],
+Widget figureCard(String title, List<(String, dynamic, String?)> rows) {
+  return Card.outlined(
+    child: ListTile(
+      title: Text(title),
+      subtitle: Table(
+        columnWidths: const {
+          0: IntrinsicColumnWidth(),
+          1: IntrinsicColumnWidth(),
+          2: IntrinsicColumnWidth(),
+          3: IntrinsicColumnWidth(),
+          4: FlexColumnWidth(),
+        },
+        children: rows.map((e) {
+          final (col1, col2, col3) = e;
+          final haveCol2 = col2 != null;
+          final haveCol3 = col3 != null;
+          
+          return TableRow(
+            children: [
+              Text(col1),
+              const SizedBox(width: 20),
+              haveCol2 ? Text(col2.toString()) : const SizedBox(),
+              const SizedBox(width: 20),
+              haveCol3
+                  ? (haveCol2 ? Text(col3) : const SizedBox())
+                  : const SizedBox(),
+            ],
+          );
+        }).toList(),
+      ),
+    ),
   );
-}
-
-Map<int, TableColumnWidth> figureTableColumnWidths() {
-  return const {
-    0: IntrinsicColumnWidth(),
-    1: IntrinsicColumnWidth(),
-    2: IntrinsicColumnWidth(),
-    3: IntrinsicColumnWidth(),
-    4: FlexColumnWidth(),
-  };
 }
 
 /* */
