@@ -20,12 +20,10 @@ class _AccountPageState extends State<AccountPage> {
   bool _usernameOrEmail = true;
 
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      precacheImage(_insulinImage, context);
-      precacheImage(_healthImage, context);
-    });
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    precacheImage(_insulinImage, context);
+    precacheImage(_healthImage, context);
   }
 
   @override

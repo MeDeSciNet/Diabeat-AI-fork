@@ -22,11 +22,9 @@ class _GuestPageState extends State<GuestPage> {
   bool _appOrOrgName = true;
 
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      precacheImage(_medescinetImageProvider, context);
-    });
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    precacheImage(_medescinetImageProvider, context);
   }
 
   @override
