@@ -29,11 +29,11 @@ class PdfCsvDialog extends StatelessWidget {
             child: const Text('PDF'),
           ),
           const SizedBox(height: 10),
-          OutlinedButton(
+          FilledButton.tonal(
             onPressed: () {
               Navigator.pop(context, PdfCsvEnum.csv);
             },
-            style: util.outlinedPageButtonStyle(),
+            style: util.tonalPageButtonStyle(context),
             child: const Text('CSV'),
           ),
         ],
