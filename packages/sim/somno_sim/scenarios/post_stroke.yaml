@@ -1,0 +1,36 @@
+scenario: post_stroke
+description: >
+  Post-stroke dysphagia pattern: markedly reduced swallow frequency with long
+  swallow-free intervals, prolonged swallow apnea, and swallows that have come
+  uncoupled from arousals. Drives the sfi_burden and arousal_decoupling paths.
+duration_min: 480
+
+sleep:
+  stage_ratios: { N1: 0.15, N2: 0.52, N3: 0.05, REM: 0.20 }
+  arousal_index: 22
+
+swallow:
+  rates_per_hour: { N1: 3.0, N2: 0.7, N3: 0.05, REM: 1.0 }
+  rate_sd_per_hour: { N1: 0.3, N2: 0.08, N3: 0.02, REM: 0.2 }
+  rate_scale: 6.0
+  # Swallowing has decoupled from arousal - well below the 0.43-0.98 range
+  # reported in healthy sleepers.
+  arousal_coupling_ratio: 0.30
+  coordination_distribution: { "E-E": 0.45, "E-I": 0.30, "I-E": 0.15, "I-I": 0.10 }
+  apnea_ms: { mean: 1600, sd: 400 }
+
+resp:
+  rate_per_min: 15
+
+posture:
+  ratios: { supine: 0.62, left: 0.08, right: 0.28, prone: 0.02 }
+  turns_per_hour: 1.0
+  hob_angle_deg: 20
+
+artifacts:
+  snoring: { enabled: true, intensity: 0.4 }
+  cardiac: { enabled: true, intensity: 0.25 }
+  body_movement: { enabled: true, intensity: 0.25 }
+  speech: { enabled: false }
+  sweat_drift: { enabled: false }
+  electrode_detach: { enabled: false }

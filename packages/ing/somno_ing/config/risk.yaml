@@ -1,0 +1,51 @@
+# Reference ranges for the overnight signal index.
+#
+# These are provisional literature-derived values, NOT validated reference
+# ranges from this system's own cohort. Any change here must bump
+# algorithm_version; historical NightlyRisk rows are never recomputed with a new
+# version. See docs/open-questions.md OQ-2.
+
+algorithm_version: risk-v1.0.0
+
+quality:
+  # Below either of these the night gets no score and produces no alerts.
+  min_signal_coverage: 0.6
+  max_artifact_ratio: 0.4
+
+# Burke et al., PNAS 2020: 43-98% of nocturnal swallows occur during arousal.
+# The lower bound is what "decoupled" is measured against.
+arousal_coupling_reference:
+  low: 0.43
+  high: 0.98
+  # Below this many detected events the coupling ratio is not measurable, and
+  # the component contributes nothing rather than a spurious maximum.
+  min_events: 10
+
+components:
+  sfi_burden:
+    weight: 0.30
+    # Share of the night spent inside swallow-free intervals longer than
+    # sfi_reference_s (600 s). 0 is unremarkable; 0.5 is the top of the scale.
+    low: 0.00
+    high: 0.50
+  coordination_anomaly:
+    weight: 0.30
+    # Share of swallows followed by inspiration. Healthy adults run around
+    # 0.10-0.15 given an E-E dominance of ~0.85.
+    low: 0.15
+    high: 0.50
+  supine_burden:
+    weight: 0.20
+    # Share of analysable time supine with head of bed below 30 degrees.
+    low: 0.30
+    high: 0.80
+  arousal_decoupling:
+    weight: 0.20
+    # Shortfall below the 0.43 lower bound, normalised. 0.6 means coupling has
+    # fallen to about 0.17.
+    low: 0.00
+    high: 0.60
+
+features:
+  # An interval longer than this counts towards sfi_burden.
+  sfi_reference_s: 600.0

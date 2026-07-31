@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Node
+node_modules/
+.vite/
+*.tsbuildinfo
+
+# Build output
+packages/care-web/dist/
+packages/station-web/dist/
+
+# Generated types under packages/shared-schemas/generated/ are COMMITTED on
+# purpose: nothing at build time should depend on the generator running. CI
+# re-runs `make schemas` and fails if the tree drifts.
+
+# Runtime data
+out/
+data/
+*.edf
+*.npz
+.env
+.env.local
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+
+# npm workspace root lockfile is committed; per-package locks are not
+packages/*/package-lock.json

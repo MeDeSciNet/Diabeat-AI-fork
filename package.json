@@ -1,0 +1,20 @@
+{
+  "name": "somnoswallow",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SomnoSwallow monorepo - frontend workspaces",
+  "workspaces": [
+    "packages/web-shared",
+    "packages/care-web",
+    "packages/station-web"
+  ],
+  "scripts": {
+    "lint:terms": "node packages/web-shared/scripts/lint-terms.mjs packages/care-web/src packages/station-web/src packages/web-shared/src",
+    "build": "npm run build --workspace @somno/care-web && npm run build --workspace @somno/station-web",
+    "dev:care": "npm run dev --workspace @somno/care-web",
+    "dev:station": "npm run dev --workspace @somno/station-web"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.2"
+  }
+}

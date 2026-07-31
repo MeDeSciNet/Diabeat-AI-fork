@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://somnoswallow.dev/schemas/mattress.json",
+  "title": "Mattress",
+  "type": "object",
+  "$defs": {
+    "MattressState": {
+      "title": "MattressState",
+      "type": "object",
+      "required": ["bed_id", "hob_angle_deg", "lateral_side", "lateral_deg", "occupied", "mode", "moving", "link_ok"],
+      "properties": {
+        "bed_id": { "type": "string" },
+        "hob_angle_deg": { "type": "number", "minimum": 0, "maximum": 45 },
+        "lateral_side": { "$ref": "common.json#/$defs/LateralSide" },
+        "lateral_deg": { "type": "number", "minimum": 0, "maximum": 30 },
+        "occupied": { "type": "boolean" },
+        "mode": { "$ref": "common.json#/$defs/MattressMode" },
+        "moving": { "type": "boolean" },
+        "link_ok": { "type": "boolean", "description": "False puts PAM into the safe state (PAM-S8): hold position, run nothing scheduled." },
+        "pending_command_id": { "type": ["string", "null"] },
+        "last_motion_at": { "type": ["string", "null"], "format": "date-time" },
+        "schedule": { "$ref": "#/$defs/TurnSchedule" }
+      },
+      "additionalProperties": false
+    },
+    "TurnSchedule": {
+      "title": "TurnSchedule",
+      "type": "object",
+      "required": ["enabled", "interval_min", "cycle"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "interval_min": { "type": "integer", "minimum": 20, "description": "Floor mirrors PAM-S6 (minimum 20 minutes between motions)." },
+        "cycle": { "type": "array", "items": { "$ref": "common.json#/$defs/LateralSide" } },
+        "next_at": { "type": ["string", "null"], "format": "date-time" }
+      },
+      "additionalProperties": false
+    },
+    "MattressCommand": {
+      "title": "MattressCommand",
+      "type": "object",
+      "required": ["id", "bed_id", "type", "source", "status", "created_at"],
+      "properties": {
+        "id": { "$ref": "common.json#/$defs/Uuid" },
+        "bed_id": { "type": "string" },
+        "type": { "$ref": "common.json#/$defs/CommandType" },
+        "source": { "$ref": "common.json#/$defs/CommandSource" },
+        "status": { "$ref": "common.json#/$defs/CommandStatus" },
+        "actor_id": { "type": ["string", "null"] },
+        "params": { "type": "object", "additionalProperties": true },
+        "reject_reason": { "type": ["string", "null"] },
+        "created_at": { "type": "string", "format": "date-time" },
+        "completed_at": { "type": ["string", "null"], "format": "date-time" }
+      },
+      "additionalProperties": false
+    },
+    "AuditLogEntry": {
+      "title": "AuditLogEntry",
+      "type": "object",
+      "required": ["id", "at", "actor_id", "action", "detail"],
+      "properties": {
+        "id": { "type": "integer" },
+        "at": { "type": "string", "format": "date-time" },
+        "actor_id": { "type": "string" },
+        "bed_id": { "type": ["string", "null"] },
+        "action": { "type": "string" },
+        "detail": { "type": "object", "additionalProperties": true },
+        "prev_hash": { "type": ["string", "null"] },
+        "hash": { "type": "string", "description": "sha256 over (prev_hash, at, actor_id, action, detail) - makes the log tamper-evident (PAM-S7)." }
+      },
+      "additionalProperties": false
+    }
+  }
+}

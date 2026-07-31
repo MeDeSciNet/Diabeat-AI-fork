@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://somnoswallow.dev/schemas/session.json",
+  "title": "Session",
+  "description": "One overnight recording.",
+  "type": "object",
+  "required": ["id", "subject_code", "device_id", "status", "started_at"],
+  "properties": {
+    "id": { "$ref": "common.json#/$defs/Uuid" },
+    "subject_code": {
+      "type": "string",
+      "description": "Pseudonymous subject code. Never a name, ID number or date of birth."
+    },
+    "device_id": { "type": "string" },
+    "bed_id": { "type": ["string", "null"] },
+    "status": { "enum": ["recording", "closed", "analyzing", "analyzed", "failed"] },
+    "started_at": { "type": "string", "format": "date-time" },
+    "ended_at": { "type": ["string", "null"], "format": "date-time" },
+    "duration_ms": { "type": ["integer", "null"] },
+    "scenario": {
+      "type": ["string", "null"],
+      "description": "Populated when the session was produced by SIM. Null for real device data."
+    },
+    "seed": { "type": ["integer", "null"] },
+    "gaps": {
+      "type": "array",
+      "description": "Missing chunk ranges detected from sequence numbers.",
+      "items": {
+        "type": "object",
+        "title": "SessionGap",
+        "required": ["from_seq", "to_seq"],
+        "properties": {
+          "from_seq": { "type": "integer" },
+          "to_seq": { "type": "integer" },
+          "t_start_ms": { "type": ["integer", "null"] },
+          "t_end_ms": { "type": ["integer", "null"] }
+        },
+        "additionalProperties": false
+      }
+    },
+    "sample_rates": {
+      "type": "object",
+      "title": "SampleRates",
+      "properties": {
+        "acoustic_hz": { "type": "number" },
+        "imu_hz": { "type": "number" },
+        "semg_hz": { "type": "number" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

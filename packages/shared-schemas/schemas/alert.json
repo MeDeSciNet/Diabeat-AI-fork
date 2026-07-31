@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://somnoswallow.dev/schemas/alert.json",
+  "title": "Alert",
+  "description": "A next-morning observation prompt. Never an emergency notification - see PRD 2.1 R1.",
+  "type": "object",
+  "required": ["id", "session_id", "subject_code", "rule_id", "severity", "status", "title", "recommended_actions", "dedup_key", "created_at"],
+  "properties": {
+    "id": { "$ref": "common.json#/$defs/Uuid" },
+    "session_id": { "$ref": "common.json#/$defs/Uuid" },
+    "subject_code": { "type": "string" },
+    "bed_id": { "type": ["string", "null"] },
+    "rule_id": { "type": "string" },
+    "severity": { "$ref": "common.json#/$defs/AlertSeverity" },
+    "status": { "$ref": "common.json#/$defs/AlertStatus" },
+    "title": { "type": "string" },
+    "body": { "type": "string" },
+    "recommended_actions": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Never empty. An alert without at least one actionable item must not be produced (PRD 2.3).",
+      "items": { "$ref": "common.json#/$defs/RecommendedAction" }
+    },
+    "dedup_key": { "type": "string", "description": "sha256(subject_code, rule_id) - drives repeat suppression." },
+    "repeat_nights": { "type": "integer", "minimum": 1, "description": "Consecutive nights this dedup_key has fired." },
+    "created_at": { "type": "string", "format": "date-time" },
+    "deliver_after": { "type": ["string", "null"], "format": "date-time", "description": "Quiet-hours aware delivery time." },
+    "acknowledged_by": { "type": ["string", "null"] },
+    "acknowledged_at": { "type": ["string", "null"], "format": "date-time" },
+    "dismissed_by": { "type": ["string", "null"] },
+    "dismissed_at": { "type": ["string", "null"], "format": "date-time" },
+    "dismiss_reason": { "oneOf": [{ "$ref": "common.json#/$defs/DismissReason" }, { "type": "null" }] },
+    "dismiss_note": { "type": ["string", "null"] },
+    "context": {
+      "type": "object",
+      "description": "Values that were substituted into the rendered title/body.",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

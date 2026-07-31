@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://somnoswallow.dev/schemas/common.json",
+  "title": "Common",
+  "description": "Shared enumerations and primitives. Single source of truth for all SomnoSwallow types.",
+  "$defs": {
+    "Uuid": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "SleepStage": {
+      "title": "SleepStage",
+      "enum": ["W", "N1", "N2", "N3", "REM", "UNKNOWN"]
+    },
+    "RespPhase": {
+      "title": "RespPhase",
+      "description": "I = inspiration, E = expiration.",
+      "enum": ["I", "E", "UNKNOWN"]
+    },
+    "CoordinationPattern": {
+      "title": "CoordinationPattern",
+      "description": "E-E is the dominant pattern in healthy adults; swallow followed by inspiration (*-I) is treated as the risk-associated pattern.",
+      "enum": ["E-E", "E-I", "I-E", "I-I", "UNKNOWN"]
+    },
+    "Posture": {
+      "title": "Posture",
+      "enum": ["supine", "left", "right", "prone", "upright", "UNKNOWN"]
+    },
+    "EventSource": {
+      "title": "EventSource",
+      "enum": ["detected", "ground_truth", "manual_annotation"]
+    },
+    "Modality": {
+      "title": "Modality",
+      "enum": ["acoustic", "imu", "semg"]
+    },
+    "RiskBand": {
+      "title": "RiskBand",
+      "enum": ["low", "moderate", "elevated", "insufficient_data"]
+    },
+    "AlertSeverity": {
+      "title": "AlertSeverity",
+      "description": "There is deliberately no 'critical'/'emergency' level. See PRD 2.1 R1 - this system is not an active patient monitor.",
+      "enum": ["info", "advisory", "attention"]
+    },
+    "AlertStatus": {
+      "title": "AlertStatus",
+      "enum": ["open", "acknowledged", "dismissed", "superseded"]
+    },
+    "RecommendedAction": {
+      "title": "RecommendedAction",
+      "description": "Closed dictionary of evidence-backed, non-diagnostic care actions.",
+      "enum": [
+        "ACTION_HOB30",
+        "ACTION_LATERAL",
+        "ACTION_ORAL_CARE",
+        "ACTION_SUCTION_ASSESS",
+        "ACTION_CLINICIAN_REVIEW"
+      ]
+    },
+    "DismissReason": {
+      "title": "DismissReason",
+      "enum": ["poor_data_quality", "known_condition", "false_positive", "other"]
+    },
+    "MattressMode": {
+      "title": "MattressMode",
+      "description": "'autonomous' is intentionally absent - PRD 2.1 R2 forbids closed-loop actuation without human confirmation.",
+      "enum": ["manual", "scheduled", "advisory_confirm"]
+    },
+    "CommandSource": {
+      "title": "CommandSource",
+      "enum": ["manual", "scheduled", "advisory", "safety"]
+    },
+    "CommandType": {
+      "title": "CommandType",
+      "enum": ["set_hob_angle", "set_lateral_tilt", "emergency_flat"]
+    },
+    "CommandStatus": {
+      "title": "CommandStatus",
+      "enum": ["pending", "notifying", "running", "completed", "rejected", "cancelled", "failed"]
+    },
+    "LateralSide": {
+      "title": "LateralSide",
+      "enum": ["left", "right", "flat"]
+    },
+    "Role": {
+      "title": "Role",
+      "enum": ["caregiver", "nurse", "researcher", "admin"]
+    }
+  }
+}

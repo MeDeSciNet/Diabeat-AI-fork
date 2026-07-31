@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "somno-sim"
+version = "1.0.0"
+description = "SomnoSwallow device simulator - synthetic overnight signals plus ground truth"
+requires-python = ">=3.11"
+dependencies = [
+  "somno-schemas",
+  "numpy>=1.26",
+  "scipy>=1.11",
+  "pyyaml>=6.0",
+  "paho-mqtt>=2.0",
+  "pyedflib>=0.1.36",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+somno-sim = "somno_sim.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["somno_sim*"]
+
+[tool.setuptools.package-data]
+somno_sim = ["scenarios/*.yaml"]

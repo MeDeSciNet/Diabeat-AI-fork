@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://somnoswallow.dev/schemas/swallow_event.json",
+  "title": "SwallowEvent",
+  "type": "object",
+  "required": ["id", "session_id", "t_start_ms", "t_end_ms", "confidence", "source"],
+  "properties": {
+    "id": { "$ref": "common.json#/$defs/Uuid" },
+    "session_id": { "$ref": "common.json#/$defs/Uuid" },
+    "t_start_ms": {
+      "type": "integer",
+      "description": "Milliseconds relative to session start."
+    },
+    "t_end_ms": { "type": "integer" },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "source": { "$ref": "common.json#/$defs/EventSource" },
+
+    "modality_votes": {
+      "type": "object",
+      "title": "ModalityVotes",
+      "properties": {
+        "acoustic": { "type": "number", "minimum": 0, "maximum": 1 },
+        "imu": { "type": "number", "minimum": 0, "maximum": 1 },
+        "semg": { "type": "number", "minimum": 0, "maximum": 1 }
+      },
+      "additionalProperties": false
+    },
+
+    "sleep_stage": { "$ref": "common.json#/$defs/SleepStage" },
+    "arousal_linked": { "type": "boolean" },
+    "arousal_id": { "oneOf": [{ "$ref": "common.json#/$defs/Uuid" }, { "type": "null" }] },
+
+    "resp_phase_before": { "$ref": "common.json#/$defs/RespPhase" },
+    "resp_phase_after": { "$ref": "common.json#/$defs/RespPhase" },
+    "coordination_pattern": { "$ref": "common.json#/$defs/CoordinationPattern" },
+    "swallow_apnea_ms": {
+      "type": "integer",
+      "description": "Respiratory pause associated with the swallow. Typically around 1000 ms."
+    },
+
+    "posture": { "$ref": "common.json#/$defs/Posture" },
+    "hob_angle_deg": { "type": ["number", "null"] }
+  },
+  "additionalProperties": false
+}

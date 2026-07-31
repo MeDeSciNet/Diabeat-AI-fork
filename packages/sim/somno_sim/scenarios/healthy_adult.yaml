@@ -1,0 +1,44 @@
+scenario: healthy_adult
+description: >
+  Healthy middle-aged adult, clean signal, normal sleep architecture, mostly
+  expiration-swallow-expiration coordination. This is the reference scenario for
+  detector accuracy (target F1 >= 0.85).
+duration_min: 480
+
+sleep:
+  stage_ratios: { N1: 0.05, N2: 0.50, N3: 0.20, REM: 0.25 }
+  arousal_index: 12
+
+swallow:
+  # Literature per-stage rates (PRD appendix A, Lichter & Muir series).
+  rates_per_hour: { N1: 7.2, N2: 2.0, N3: 0.2, REM: 2.7 }
+  # The literature spreads (N1 3.5, N2 0.7, N3 0.1, REM 2.2 - kept as the code
+  # defaults in config.py) are BETWEEN-subject. This scenario is one nominal
+  # subject recorded on different nights, so it uses within-subject spread
+  # instead; the between-subject figures would swing the whole-night total by
+  # +/-70 and make the count band below unmeetable.
+  rate_sd_per_hour: { N1: 0.7, N2: 0.2, N3: 0.03, REM: 0.5 }
+  # The per-stage rates above integrate to ~17 swallows over an 8-hour night,
+  # while PRD 5.3 requires healthy_adult to land in 60-140. The two cannot both
+  # be satisfied, so the literature rate *shape* is kept and reconciled with the
+  # count target by a single explicit multiplier. See docs/open-questions.md OQ-1.
+  rate_scale: 6.0
+  arousal_coupling_ratio: 0.70
+  coordination_distribution: { "E-E": 0.85, "E-I": 0.07, "I-E": 0.05, "I-I": 0.03 }
+  apnea_ms: { mean: 1000, sd: 200 }
+
+resp:
+  rate_per_min: 14
+
+posture:
+  ratios: { supine: 0.35, left: 0.30, right: 0.30, prone: 0.05 }
+  turns_per_hour: 2.0
+  hob_angle_deg: 0
+
+artifacts:
+  body_movement: { enabled: true, intensity: 0.35 }
+  cardiac: { enabled: true, intensity: 0.2 }
+  snoring: { enabled: false }
+  speech: { enabled: false }
+  electrode_detach: { enabled: false }
+  sweat_drift: { enabled: false }

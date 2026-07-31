@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://somnoswallow.dev/schemas/psg_annotations.json",
+  "title": "PsgAnnotations",
+  "description": "Sleep staging and arousal marks. In the research setting these come from the synchronised PSG; SIM emits the same structure so ING has one code path.",
+  "type": "object",
+  "required": ["session_id", "epochs", "arousals"],
+  "properties": {
+    "session_id": { "$ref": "common.json#/$defs/Uuid" },
+    "epoch_sec": { "type": "integer", "default": 30 },
+    "epochs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "title": "SleepEpoch",
+        "required": ["t_start_ms", "stage"],
+        "properties": {
+          "t_start_ms": { "type": "integer" },
+          "stage": { "$ref": "common.json#/$defs/SleepStage" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "arousals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "title": "ArousalEvent",
+        "required": ["id", "t_start_ms", "duration_ms"],
+        "properties": {
+          "id": { "$ref": "common.json#/$defs/Uuid" },
+          "t_start_ms": { "type": "integer" },
+          "duration_ms": { "type": "integer" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "postures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "title": "PostureSegment",
+        "required": ["t_start_ms", "t_end_ms", "posture"],
+        "properties": {
+          "t_start_ms": { "type": "integer" },
+          "t_end_ms": { "type": "integer" },
+          "posture": { "$ref": "common.json#/$defs/Posture" },
+          "hob_angle_deg": { "type": ["number", "null"] }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

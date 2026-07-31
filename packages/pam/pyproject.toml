@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "somno-pam"
+version = "1.0.0"
+description = "SomnoSwallow positioning-assist mattress controller"
+requires-python = ">=3.11"
+dependencies = [
+  "somno-schemas",
+  # Shares the monorepo data layer for the append-only audit log (PAM-S7).
+  "somno-ing",
+  "fastapi>=0.110",
+  "uvicorn[standard]>=0.29",
+  "pydantic>=2.7",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "pytest-asyncio>=0.23", "httpx>=0.27"]
+
+[project.scripts]
+somno-pam = "somno_pam.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["somno_pam*"]

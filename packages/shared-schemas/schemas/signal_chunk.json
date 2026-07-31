@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://somnoswallow.dev/schemas/signal_chunk.json",
+  "title": "SignalChunk",
+  "description": "Transport unit published by the device (or SIM) on somno/{device_id}/signal. Waveforms are base64 int16 to keep the MQTT payload compact.",
+  "type": "object",
+  "required": ["device_id", "session_id", "seq", "t_start_ms", "duration_ms", "channels"],
+  "properties": {
+    "device_id": { "type": "string" },
+    "session_id": { "$ref": "common.json#/$defs/Uuid" },
+    "seq": { "type": "integer", "minimum": 0 },
+    "t_start_ms": { "type": "integer" },
+    "duration_ms": { "type": "integer" },
+    "channels": {
+      "type": "object",
+      "title": "ChunkChannels",
+      "properties": {
+        "acoustic": { "$ref": "#/$defs/Waveform" },
+        "imu_ax": { "$ref": "#/$defs/Waveform" },
+        "imu_ay": { "$ref": "#/$defs/Waveform" },
+        "imu_az": { "$ref": "#/$defs/Waveform" },
+        "imu_gx": { "$ref": "#/$defs/Waveform" },
+        "imu_gy": { "$ref": "#/$defs/Waveform" },
+        "imu_gz": { "$ref": "#/$defs/Waveform" },
+        "semg": { "$ref": "#/$defs/Waveform" }
+      },
+      "additionalProperties": false
+    },
+    "device_state": {
+      "type": "object",
+      "title": "DeviceState",
+      "properties": {
+        "battery_pct": { "type": "number", "minimum": 0, "maximum": 100 },
+        "electrode_ok": { "type": "boolean" },
+        "storage_free_pct": { "type": "number", "minimum": 0, "maximum": 100 }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "Waveform": {
+      "title": "Waveform",
+      "type": "object",
+      "required": ["fs_hz", "scale", "data_b64"],
+      "properties": {
+        "fs_hz": { "type": "number" },
+        "scale": { "type": "number", "description": "physical_value = int16_value * scale" },
+        "unit": { "type": "string" },
+        "data_b64": { "type": "string", "contentEncoding": "base64" }
+      },
+      "additionalProperties": false
+    }
+  }
+}

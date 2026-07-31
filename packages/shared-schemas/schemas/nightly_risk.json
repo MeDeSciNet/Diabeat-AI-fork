@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://somnoswallow.dev/schemas/nightly_risk.json",
+  "title": "NightlyRisk",
+  "description": "Overnight signal index. NOT a diagnosis and NOT a pneumonia or aspiration risk. UI copy must call this the 'overnight swallowing signal index'.",
+  "type": "object",
+  "required": ["session_id", "band", "components", "data_quality", "algorithm_version"],
+  "properties": {
+    "session_id": { "$ref": "common.json#/$defs/Uuid" },
+    "score": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Null when band is insufficient_data. Higher means the signal indices deviate further from the configured reference ranges."
+    },
+    "band": { "$ref": "common.json#/$defs/RiskBand" },
+    "components": {
+      "type": "object",
+      "title": "RiskComponents",
+      "required": ["sfi_burden", "coordination_anomaly", "supine_burden", "arousal_decoupling"],
+      "properties": {
+        "sfi_burden": { "$ref": "#/$defs/RiskComponent" },
+        "coordination_anomaly": { "$ref": "#/$defs/RiskComponent" },
+        "supine_burden": { "$ref": "#/$defs/RiskComponent" },
+        "arousal_decoupling": { "$ref": "#/$defs/RiskComponent" }
+      },
+      "additionalProperties": false
+    },
+    "data_quality": {
+      "type": "object",
+      "title": "DataQuality",
+      "required": ["signal_coverage", "artifact_ratio"],
+      "properties": {
+        "signal_coverage": { "type": "number", "minimum": 0, "maximum": 1 },
+        "artifact_ratio": { "type": "number", "minimum": 0, "maximum": 1 },
+        "band": { "enum": ["ok", "insufficient_data"] }
+      },
+      "additionalProperties": false
+    },
+    "algorithm_version": { "type": "string", "pattern": "^risk-v[0-9]+\\.[0-9]+\\.[0-9]+$" }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "RiskComponent": {
+      "title": "RiskComponent",
+      "type": "object",
+      "required": ["value", "weight"],
+      "properties": {
+        "value": { "type": "number", "minimum": 0, "maximum": 1, "description": "Min-max normalised against the configured reference range." },
+        "weight": { "type": "number", "minimum": 0, "maximum": 1 },
+        "raw": { "type": ["number", "null"], "description": "Pre-normalisation measurement, kept for transparency." }
+      },
+      "additionalProperties": false
+    }
+  }
+}

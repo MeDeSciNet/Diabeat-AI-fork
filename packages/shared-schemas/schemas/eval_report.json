@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://somnoswallow.dev/schemas/eval_report.json",
+  "title": "EvalReport",
+  "description": "Detection performance of the detected events against SIM ground truth. Development instrument only.",
+  "type": "object",
+  "required": ["session_id", "tolerance_ms", "n_ground_truth", "n_detected", "true_positives", "false_positives", "false_negatives", "precision", "recall", "f1"],
+  "properties": {
+    "session_id": { "$ref": "common.json#/$defs/Uuid" },
+    "scenario": { "type": ["string", "null"] },
+    "detector_version": { "type": "string" },
+    "tolerance_ms": { "type": "integer" },
+    "n_ground_truth": { "type": "integer" },
+    "n_detected": { "type": "integer" },
+    "true_positives": { "type": "integer" },
+    "false_positives": { "type": "integer" },
+    "false_negatives": { "type": "integer" },
+    "precision": { "type": "number" },
+    "recall": { "type": "number" },
+    "f1": { "type": "number" },
+    "onset_error_ms": {
+      "type": "object",
+      "title": "OnsetError",
+      "properties": {
+        "mean": { "type": "number" },
+        "sd": { "type": "number" },
+        "p50": { "type": "number" },
+        "p90": { "type": "number" },
+        "max": { "type": "number" }
+      },
+      "additionalProperties": false
+    },
+    "by_sleep_stage": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "title": "StageBreakdown",
+        "properties": {
+          "n_ground_truth": { "type": "integer" },
+          "recall": { "type": "number" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "coordination_accuracy": {
+      "type": ["number", "null"],
+      "description": "Share of true positives whose coordination_pattern matches ground truth."
+    }
+  },
+  "additionalProperties": false
+}

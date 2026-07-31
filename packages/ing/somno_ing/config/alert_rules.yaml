@@ -1,0 +1,75 @@
+# Alert rules. Data-driven on purpose: adding or retuning a rule is a config
+# change, not a release.
+#
+# Wording constraints (PRD 2.1 R3): no rule may assert a diagnosis, a confirmed
+# aspiration, or a pneumonia risk. Titles and bodies describe what the signal
+# did and what a caregiver could do about it. The frontend lint enforces the
+# same vocabulary on the display side.
+
+quiet_hours:
+  enabled: true
+  start: "22:00"
+  end: "07:00"
+  # Wall-clock offset of the care setting (Asia/Taipei = +8).
+  utc_offset_hours: 8
+
+rules:
+  - id: prolonged_supine_low_hob
+    severity: attention
+    priority: 30
+    when:
+      supine_burden: { gte: 0.6 }
+      hob_angle_deg: { lt: 30 }
+    title: "Long stretches lying flat on the back"
+    body: >-
+      About {supine_burden_pct}% of this recording was spent supine with the head
+      of bed below 30 degrees.
+    actions: [ACTION_HOB30, ACTION_LATERAL]
+
+  - id: coordination_anomaly_high
+    severity: attention
+    priority: 40
+    when:
+      coordination_anomaly: { gte: 0.35 }
+      data_quality.signal_coverage: { gte: 0.7 }
+    title: "Swallow-breathing timing pattern outside the reference range"
+    body: >-
+      In this recording, {coordination_anomaly_pct}% of swallows were followed by
+      an inspiration rather than an expiration.
+    actions: [ACTION_ORAL_CARE, ACTION_CLINICIAN_REVIEW]
+
+  - id: low_swallow_frequency
+    severity: advisory
+    priority: 20
+    when:
+      sfi_burden: { gte: 0.5 }
+    title: "Long intervals without a detected swallow"
+    body: >-
+      The longest interval without a detected swallow was about {sfi_max_min}
+      minutes.
+    actions: [ACTION_ORAL_CARE]
+
+  - id: arousal_decoupling
+    severity: advisory
+    priority: 15
+    when:
+      arousal_coupling: { lt: 0.35 }
+      n_events: { gte: 20 }
+      data_quality.signal_coverage: { gte: 0.7 }
+    title: "Swallows less closely tied to brief awakenings than expected"
+    body: >-
+      {arousal_coupling_pct}% of detected swallows coincided with a brief
+      awakening, below the 43-98% range described in the literature.
+    actions: [ACTION_CLINICIAN_REVIEW]
+
+  - id: heavy_snoring_segment
+    severity: advisory
+    priority: 10
+    when:
+      snore_ratio: { gte: 0.35 }
+      supine_burden: { gte: 0.4 }
+    title: "Extended snoring while supine"
+    body: >-
+      Snoring was present in about {snore_ratio} of the recording, mostly while
+      lying on the back.
+    actions: [ACTION_LATERAL, ACTION_HOB30]

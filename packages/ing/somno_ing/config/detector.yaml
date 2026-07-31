@@ -1,0 +1,37 @@
+# Detection thresholds. Changing anything here changes results, so bump
+# DETECTOR_VERSION in detect/rule_based.py alongside any edit.
+
+gating:
+  # Hard gates - these windows are excluded from detection entirely.
+  movement_g: 0.08          # mean dynamic acceleration magnitude over the window, g
+  movement_window_s: 1.5
+  movement_pad_s: 1.5
+  speech_ratio: 0.42        # syllabic (3-6 Hz) modulation relative to envelope level
+  speech_window_s: 3.0
+  speech_pad_s: 1.0
+  # Soft flag - detection continues at a raised threshold. See detect/gating.py
+  # for why snoring is not a hard gate.
+  snore_ratio: 1.1          # snore-band to swallow-band energy
+  snore_window_s: 20.0
+
+candidates:
+  baseline_window_s: 30.0
+  acoustic_k: 5.0           # robust z above rolling baseline
+  acoustic_k_snoring: 7.5   # raised threshold inside snoring segments
+  acoustic_min_ms: 80.0
+  imu_ncc: 0.50             # normalised cross-correlation with the biphasic template
+  imu_template_ms: 900.0
+  semg_k: 4.0
+  semg_min_ms: 150.0        # PRD 6.2 stage 3: envelope sustained above threshold
+  merge_gap_ms: 150.0
+  max_event_ms: 2500.0
+
+fusion:
+  weights:
+    acoustic: 0.4
+    imu: 0.3
+    semg: 0.3
+  tolerance_ms: 300.0
+  confidence_threshold: 0.50
+  # Never let one modality carry an event while a second is available.
+  min_modalities: 2

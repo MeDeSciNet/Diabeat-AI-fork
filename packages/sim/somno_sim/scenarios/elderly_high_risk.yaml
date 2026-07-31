@@ -1,0 +1,36 @@
+scenario: elderly_high_risk
+description: >
+  Older adult, poor swallow-respiration coordination, long stretches supine with
+  the head of bed flat. Exercises the supine-burden and coordination-anomaly
+  paths in the risk engine.
+duration_min: 480
+
+sleep:
+  stage_ratios: { N1: 0.12, N2: 0.55, N3: 0.08, REM: 0.25 }
+  arousal_index: 28
+
+swallow:
+  rates_per_hour: { N1: 5.0, N2: 1.2, N3: 0.1, REM: 1.8 }
+  # Within-subject spread; see healthy_adult.yaml for why the literature
+  # between-subject figures are not used at scenario level.
+  rate_sd_per_hour: { N1: 0.5, N2: 0.15, N3: 0.02, REM: 0.4 }
+  rate_scale: 6.0
+  arousal_coupling_ratio: 0.85
+  coordination_distribution: { "E-E": 0.55, "E-I": 0.25, "I-E": 0.12, "I-I": 0.08 }
+  apnea_ms: { mean: 1400, sd: 350 }
+
+resp:
+  rate_per_min: 16
+
+posture:
+  ratios: { supine: 0.70, left: 0.15, right: 0.13, prone: 0.02 }
+  turns_per_hour: 0.8
+  hob_angle_deg: 10
+
+artifacts:
+  snoring: { enabled: true, intensity: 0.6 }
+  cardiac: { enabled: true, intensity: 0.3 }
+  body_movement: { enabled: true, intensity: 0.3 }
+  speech: { enabled: false }
+  sweat_drift: { enabled: true, intensity: 0.3 }
+  electrode_detach: { enabled: false }

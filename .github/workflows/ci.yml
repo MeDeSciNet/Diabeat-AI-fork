@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  schemas:
+    name: Generated types match the schemas
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Regenerate and diff
+        run: make schemas-check
+
+  python:
+    name: Python tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: |
+          python -m venv .venv
+          .venv/bin/pip install --upgrade pip
+          .venv/bin/pip install -e packages/shared-schemas -e packages/sim -e packages/ing -e packages/pam
+          .venv/bin/pip install pytest pytest-asyncio httpx
+      - name: SIM, ING and PAM tests
+        run: .venv/bin/python -m pytest packages/sim/tests packages/ing/tests packages/pam/tests -q
+
+  web:
+    name: Frontend build and terminology lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      # The lint also runs as prebuild; this step makes a failure obvious in the
+      # log rather than buried in a build step (PRD 12: it must block the build).
+      - name: Forbidden terminology lint
+        run: npm run lint:terms
+      - name: Shared tests
+        run: npm run test --workspace @somno/web-shared
+      - name: Build CARE and STATION
+        run: npm run build
+
+  e2e:
+    name: End-to-end walkthrough
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: |
+          python -m venv .venv
+          .venv/bin/pip install --upgrade pip
+          .venv/bin/pip install -e packages/shared-schemas -e packages/sim -e packages/ing -e packages/pam
+          .venv/bin/pip install httpx
+      - name: SIM -> ING -> dashboards -> PAM
+        run: .venv/bin/python scripts/demo.py --minutes 120
+
+  compose:
+    name: docker compose builds
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build images
+        run: docker compose build ing-api care-web station-web
