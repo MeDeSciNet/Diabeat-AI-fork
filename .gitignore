@@ -41,3 +41,9 @@ data/
 
 # npm workspace root lockfile is committed; per-package locks are not
 packages/*/package-lock.json
+
+# pitch demo verification deps
+pitch/node_modules/
+pitch/wrapped.html
+pitch/*.png
+pitch/package-lock.json

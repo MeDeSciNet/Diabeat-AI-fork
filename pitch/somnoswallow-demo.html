@@ -1,0 +1,1252 @@
+<title>SomnoSwallow — 動態模型</title>
+
+<style>
+  :root {
+    --ground: #0E1119; --surface: #161B26; --surface-2: #1D2431;
+    --line: #2A3242; --line-soft: #212939;
+    --ink: #E8ECF4; --ink-2: #A3AEC2; --ink-3: #6B7689;
+    --accent: #8AA0FF;
+    --air: #4FD3E8; --bolus: #E8A33D; --risk: #FF6B5A; --ok: #56C79A;
+    --wall: #303A4D;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC",
+      "Noto Sans TC", "Microsoft JhengHei", "Helvetica Neue", sans-serif;
+    --serif: ui-serif, Georgia, "Iowan Old Style", serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, "Roboto Mono", monospace;
+    color-scheme: dark;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --ground: #F4F6FA; --surface: #FFFFFF; --surface-2: #EAEEF6;
+      --line: #D6DCE9; --line-soft: #E6EAF3;
+      --ink: #10151F; --ink-2: #47536B; --ink-3: #78849C;
+      --accent: #3B4FD4;
+      --air: #0B8DA6; --bolus: #B0700F; --risk: #D33B26; --ok: #0F7F63;
+      --wall: #CDD5E4; color-scheme: light;
+    }
+  }
+  :root[data-theme="light"] {
+    --ground: #F4F6FA; --surface: #FFFFFF; --surface-2: #EAEEF6;
+    --line: #D6DCE9; --line-soft: #E6EAF3;
+    --ink: #10151F; --ink-2: #47536B; --ink-3: #78849C;
+    --accent: #3B4FD4;
+    --air: #0B8DA6; --bolus: #B0700F; --risk: #D33B26; --ok: #0F7F63;
+    --wall: #CDD5E4; color-scheme: light;
+  }
+  :root[data-theme="dark"] {
+    --ground: #0E1119; --surface: #161B26; --surface-2: #1D2431;
+    --line: #2A3242; --line-soft: #212939;
+    --ink: #E8ECF4; --ink-2: #A3AEC2; --ink-3: #6B7689;
+    --accent: #8AA0FF;
+    --air: #4FD3E8; --bolus: #E8A33D; --risk: #FF6B5A; --ok: #56C79A;
+    --wall: #303A4D; color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--ground); color: var(--ink);
+    font-family: var(--sans); font-size: 16px; line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1020px; margin: 0 auto; padding: 0 22px 72px; }
+
+  header {
+    display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
+    padding: 40px 0 30px;
+  }
+  header h1 {
+    margin: 0; font-size: clamp(1.35rem, 3vw, 1.9rem);
+    letter-spacing: -.03em; font-weight: 800;
+  }
+  header .ruo {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--ink-3);
+    border: 1px solid var(--line); border-radius: 999px; padding: 4px 11px;
+    margin-left: auto;
+  }
+
+  .model { margin-bottom: 44px; }
+  .cap {
+    display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .cap .n {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .16em;
+    color: var(--accent); flex: none;
+  }
+  .cap h2 {
+    margin: 0; font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+    letter-spacing: -.022em; font-weight: 740;
+  }
+  .cap .sub { color: var(--ink-3); font-size: 13.5px; }
+
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .phead {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px;
+    padding: 11px 14px; border-bottom: 1px solid var(--line); background: var(--surface-2);
+  }
+  .ptitle { font-family: var(--mono); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); margin-right: auto; }
+
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 5px; overflow: hidden; background: var(--ground); }
+  .seg button {
+    appearance: none; border: 0; background: transparent; color: var(--ink-3);
+    font-family: var(--sans); font-size: 13px; font-weight: 650; padding: 7px 14px;
+    cursor: pointer; transition: background .15s, color .15s;
+  }
+  .seg button + button { border-left: 1px solid var(--line); }
+  .seg button[aria-pressed="true"] { background: var(--accent); color: var(--ground); }
+  .seg button:hover:not([aria-pressed="true"]) { color: var(--ink); }
+
+  .btn {
+    appearance: none; font-family: var(--sans); font-size: 13px; font-weight: 650;
+    padding: 7px 14px; border-radius: 5px; border: 1px solid var(--line);
+    background: var(--ground); color: var(--ink); cursor: pointer;
+    transition: border-color .15s, filter .15s, opacity .15s;
+  }
+  .btn:hover { border-color: var(--ink-3); }
+  .btn[disabled] { opacity: .4; cursor: not-allowed; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--ground); }
+  .btn.primary:hover { filter: brightness(1.08); }
+  :where(button, input, a, [tabindex]):focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  input[type="range"] { appearance: none; width: 100%; height: 20px; background: transparent; cursor: pointer; }
+  input[type="range"]::-webkit-slider-runnable-track { height: 3px; background: var(--line); border-radius: 2px; }
+  input[type="range"]::-moz-range-track { height: 3px; background: var(--line); border-radius: 2px; }
+  input[type="range"]::-webkit-slider-thumb { appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--accent); border: 0; margin-top: -5.5px; }
+  input[type="range"]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--accent); border: 0; }
+
+  .forkwrap { padding: 8px 10px 0; background: var(--ground); }
+  .forkwrap svg { width: 100%; height: auto; display: block; max-height: 430px; }
+  .verdict { display: flex; align-items: baseline; gap: 13px; flex-wrap: wrap; padding: 13px 16px; border-top: 1px solid var(--line-soft); font-size: 1rem; }
+  .verdict .tag { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; padding: 3px 9px; border-radius: 4px; flex: none; }
+  .verdict .tag.good { background: color-mix(in srgb, var(--ok) 18%, transparent); color: var(--ok); }
+  .verdict .tag.bad { background: color-mix(in srgb, var(--risk) 18%, transparent); color: var(--risk); }
+  .verdict .txt { color: var(--ink-2); flex: 1 1 280px; min-width: 0; }
+  .verdict .txt b { color: var(--ink); font-weight: 680; }
+  .scrub { padding: 2px 16px 14px; }
+  .trace { padding: 0 16px 4px; }
+  .trace canvas { width: 100%; height: 108px; display: block; }
+
+  .psg { padding: 12px 12px 4px; background: var(--ground); }
+  .psg canvas { width: 100%; height: 330px; display: block; }
+  .readout { padding: 14px 16px; border-top: 1px solid var(--line-soft); }
+  .readout .row { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .readout .tag {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .1em;
+    padding: 3px 9px; border-radius: 4px; flex: none;
+  }
+  .readout .tag.plain { background: color-mix(in srgb, var(--ink-3) 16%, transparent); color: var(--ink-2); }
+  .readout .tag.new { background: color-mix(in srgb, var(--bolus) 18%, transparent); color: var(--bolus); }
+  .readout .txt { flex: 1 1 320px; min-width: 0; color: var(--ink-2); font-size: .98rem; }
+  .readout .txt b { color: var(--ink); font-weight: 680; }
+  .readout .caveat {
+    margin-top: 10px; font-size: 12.5px; color: var(--ink-3);
+    border-left: 2px solid var(--line); padding-left: 12px;
+  }
+
+  .claims { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin-top: 8px; }
+  .claim { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px; }
+  .claim.no { border-style: dashed; background: transparent; }
+  .claim h3 { font-size: .98rem; margin-bottom: 10px; }
+  .claim .k { font-family: var(--mono); font-size: 10.5px; letter-spacing: .11em; text-transform: uppercase; display: block; margin-bottom: 8px; }
+  .claim.yes .k { color: var(--ok); }
+  .claim.maybe .k { color: var(--bolus); }
+  .claim.no .k { color: var(--ink-3); }
+  .claim ul { margin: 0; padding-left: 17px; }
+  .claim li { font-size: 13.5px; line-height: 1.65; color: var(--ink-2); }
+
+  .night { padding: 18px 14px 2px; background: var(--ground); }
+  .night svg { width: 100%; height: auto; display: block; }
+  .counters {
+    display: flex; flex-wrap: wrap; gap: 10px 34px;
+    padding: 13px 16px; border-top: 1px solid var(--line-soft);
+  }
+  .counter .k { font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); display: block; }
+  .counter .v {
+    font-family: var(--serif); font-size: 1.7rem; line-height: 1.1;
+    font-variant-numeric: lining-nums tabular-nums; letter-spacing: -.02em;
+  }
+  .counter .v small { font-family: var(--sans); font-size: .8rem; color: var(--ink-3); font-weight: 500; margin-left: 3px; }
+
+  .bed { padding: 16px 14px 4px; background: var(--ground); }
+  .bed svg { width: 100%; height: auto; display: block; max-height: 200px; }
+  .bedstate {
+    display: flex; flex-wrap: wrap; gap: 8px 22px; padding: 11px 16px;
+    border-top: 1px solid var(--line-soft);
+    font-family: var(--mono); font-size: 11.5px; color: var(--ink-3);
+  }
+  .bedstate b { color: var(--ink); font-weight: 600; }
+  .bedlog {
+    font-family: var(--mono); font-size: 11.5px; line-height: 1.85;
+    padding: 10px 16px 13px; border-top: 1px solid var(--line-soft);
+    color: var(--ink-3); max-height: 120px; overflow-y: auto;
+  }
+  .bedlog div { display: flex; gap: 10px; }
+  .bedlog .t { opacity: .6; flex: none; }
+  .bedlog .ok { color: var(--ok); }
+  .bedlog .no { color: var(--risk); }
+  .bedlog .warn { color: var(--bolus); }
+  .bedlog .info { color: var(--ink-2); }
+
+  .prompt {
+    border: 1px solid color-mix(in srgb, var(--bolus) 45%, var(--line));
+    background: color-mix(in srgb, var(--bolus) 8%, var(--surface));
+    border-radius: 7px; padding: 14px 16px; margin: 0 14px 14px; display: none;
+  }
+  .prompt.on { display: block; }
+  .prompt .when { font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em; color: var(--bolus); }
+  .prompt p { font-size: 14px; margin: 5px 0 11px; color: var(--ink); }
+
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 5px 16px;
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .06em;
+    color: var(--ink-3); padding: 0 16px 13px;
+  }
+  .legend i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 6px; }
+
+  footer {
+    border-top: 1px solid var(--line-soft); padding-top: 22px;
+    font-size: 12.5px; color: var(--ink-3); line-height: 1.7;
+  }
+
+  @media (prefers-reduced-motion: reduce) { * { animation-duration: .001ms !important; transition-duration: .001ms !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>SomnoSwallow</h1>
+    <span class="ruo">研究用途 · 模擬資料</span>
+  </header>
+
+  <!-- ── 1. 一次吞嚥 ── -->
+  <div class="model">
+    <div class="cap">
+      <span class="n">01</span>
+      <h2>一次吞嚥，兩種結局</h2>
+      <span class="sub">差別在吞完那一刻，是吐氣還是吸氣</span>
+    </div>
+
+    <div class="panel">
+      <div class="phead">
+        <span class="ptitle">1.4 秒</span>
+        <div class="seg" role="group" aria-label="吞嚥結局">
+          <button type="button" id="mSafe" aria-pressed="true">吞完吐氣</button>
+          <button type="button" id="mRisk" aria-pressed="false">吞完吸氣</button>
+        </div>
+        <button type="button" class="btn primary" id="play">播放</button>
+      </div>
+
+      <div class="forkwrap">
+        <svg viewBox="0 0 460 400" role="img"
+             aria-label="喉嚨往下分成兩條管路，一條通往肺，一條通往胃。吞嚥時會厭蓋住通往肺的入口。">
+          <text x="258" y="22" text-anchor="middle" font-family="var(--sans)"
+                font-size="15" font-weight="700" fill="var(--ink-3)">喉嚨</text>
+          <path d="M258 78 L258 208" stroke="var(--wall)" stroke-width="72" stroke-linecap="round" fill="none" />
+          <path d="M240 200 C222 254 196 280 156 306" stroke="var(--wall)" stroke-width="62" stroke-linecap="round" fill="none" />
+          <path d="M280 200 C300 254 326 280 366 306" stroke="var(--wall)" stroke-width="62" stroke-linecap="round" fill="none" />
+
+          <path d="M258 82 L258 208" stroke="var(--ground)" stroke-width="58" stroke-linecap="round" fill="none" />
+          <path id="lungLumen" d="M240 200 C222 254 196 280 156 306" stroke="var(--air)" stroke-width="48" stroke-linecap="round" fill="none" opacity="0.2" />
+          <path d="M280 200 C300 254 326 280 366 306" stroke="var(--ground)" stroke-width="48" stroke-linecap="round" fill="none" />
+
+          <g id="flow" opacity="0">
+            <path id="flowArrow" d="M258 168 L258 112" stroke="var(--air)" stroke-width="5" stroke-linecap="round" fill="none" />
+            <path id="flowHead" d="M258 104 L248 122 L268 122 Z" fill="var(--air)" />
+          </g>
+
+          <g id="flap"><rect x="237" y="148" width="15" height="46" rx="7.5" fill="var(--ink-2)" /></g>
+          <text x="176" y="214" text-anchor="end" font-family="ui-monospace, monospace"
+                font-size="10.5" fill="var(--ink-3)">會厭（蓋子）</text>
+          <line x1="182" y1="210" x2="230" y2="196" stroke="var(--line)" stroke-width="1.2" />
+
+          <path id="pathGut" d="M258 84 L258 184 Q262 196 280 204 C300 250 326 278 360 300" fill="none" stroke="none" />
+          <path id="pathLung" d="M250 198 Q236 208 228 220 C214 250 196 272 168 292" fill="none" stroke="none" />
+
+          <circle id="residue" cx="258" cy="198" r="10" fill="var(--bolus)" opacity="0" />
+          <circle id="bolus" cx="258" cy="84" r="19" fill="var(--bolus)" />
+          <circle id="aspBlob" cx="250" cy="198" r="10" fill="var(--risk)" opacity="0" />
+
+          <g>
+            <path d="M120 322 C104 322 96 336 96 352 C96 368 106 378 120 378 C132 378 138 368 138 352 L138 330 Z" fill="var(--wall)" />
+            <path d="M156 322 C172 322 180 336 180 352 C180 368 170 378 156 378 C144 378 138 368 138 352 L138 330 Z" fill="var(--wall)" />
+            <text x="138" y="360" text-anchor="middle" font-size="22" font-weight="700" font-family="var(--sans)" fill="var(--ground)">肺</text>
+          </g>
+          <g>
+            <path d="M366 320 C392 320 406 338 404 360 C402 380 386 390 368 386 C352 382 344 368 348 350 C351 334 356 322 366 320 Z" fill="var(--wall)" />
+            <text x="376" y="362" text-anchor="middle" font-size="22" font-weight="700" font-family="var(--sans)" fill="var(--ground)">胃</text>
+          </g>
+          <text id="lungLabel" x="138" y="398" text-anchor="middle" font-family="ui-monospace, monospace" font-size="11" fill="var(--ink-3)">不該進去</text>
+          <text x="376" y="398" text-anchor="middle" font-family="ui-monospace, monospace" font-size="11" fill="var(--ink-3)">該去的地方</text>
+
+          <g transform="translate(196,92)">
+            <rect x="0" y="0" width="34" height="56" rx="9" fill="var(--surface)" stroke="var(--line)" stroke-width="1.8" />
+            <circle id="dAc" cx="17" cy="15" r="4.2" fill="var(--ink-3)" />
+            <circle id="dIm" cx="17" cy="28" r="4.2" fill="var(--ink-3)" />
+            <circle id="dEm" cx="17" cy="41" r="4.2" fill="var(--ink-3)" />
+          </g>
+          <text x="176" y="126" text-anchor="end" font-family="ui-monospace, monospace" font-size="10.5" fill="var(--ink-3)">貼片</text>
+          <line x1="182" y1="122" x2="194" y2="122" stroke="var(--line)" stroke-width="1.2" />
+        </svg>
+      </div>
+
+      <div class="trace"><canvas id="cv" aria-label="呼吸曲線：吞嚥時的暫停，以及暫停之後的呼吸方向"></canvas></div>
+      <div class="scrub"><input type="range" id="scrub" min="0" max="2600" step="10" value="0" aria-label="時間軸，毫秒" /></div>
+      <div class="verdict">
+        <span class="tag good" id="vTag">安全</span>
+        <span class="txt" id="vTxt"><b>靜止</b> · 呼吸規律，兩條路都通</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 2. 疊上 PSG ── -->
+  <div class="model">
+    <div class="cap">
+      <span class="n">02</span>
+      <h2>同一段 PSG，多一個通道</h2>
+      <span class="sub">有些事件一直被歸錯類，因為沒有東西可以解釋它</span>
+    </div>
+
+    <div class="panel">
+      <div class="phead">
+        <span class="ptitle">90 秒 · N2 期</span>
+        <div class="seg" role="group" aria-label="通道設定">
+          <button type="button" id="pgOff" aria-pressed="true">現有 PSG</button>
+          <button type="button" id="pgOn" aria-pressed="false">＋吞嚥通道</button>
+        </div>
+        <button type="button" class="btn primary" id="psgPlay">播放</button>
+      </div>
+      <div class="psg"><canvas id="psg" aria-label="多通道 PSG：鼻氣流、胸腹起伏、血氧、鼾聲、微覺醒與咳嗽，以及可切換的吞嚥通道"></canvas></div>
+      <div class="readout">
+        <div class="row">
+          <span class="tag plain" id="pgTag">現有判讀</span>
+          <span class="txt" id="pgTxt"><b>低通氣事件</b> · 血氧下降 6%，歸因於呼吸事件</span>
+        </div>
+        <p class="caveat">
+          裝置能確認的是「有沒有吞嚥」以及吞嚥前後的生理情境。
+          它不能確認口水是否真的進入氣管，也不能確認是否發生無聲吸入。
+        </p>
+      </div>
+    </div>
+
+    <div class="claims" style="margin-top:16px">
+      <div class="claim yes">
+        <span class="k">現在做得到</span>
+        <ul>
+          <li>每一次吞嚥的時間</li>
+          <li>各睡眠分期的吞嚥率</li>
+          <li>最長多久沒有吞嚥</li>
+          <li>吞嚥落在吸氣、呼氣或呼吸轉換點</li>
+          <li>前後有無 apnea、微覺醒、咳嗽</li>
+        </ul>
+      </div>
+      <div class="claim maybe">
+        <span class="k">研究要驗證</span>
+        <ul>
+          <li>高齡者是否存在可重複的夜間吞嚥異常模式</li>
+          <li>長時間無吞嚥與殘留、鼾聲變化的關係</li>
+          <li>這些模式是否與無聲吸入風險相關</li>
+        </ul>
+      </div>
+      <div class="claim no">
+        <span class="k">還不能說</span>
+        <ul>
+          <li>口水是否已進入氣管</li>
+          <li>是否發生無聲吸入</li>
+          <li>是否會造成吸入性肺炎</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 2. 一整夜 ── -->
+  <div class="model">
+    <div class="cap">
+      <span class="n">03</span>
+      <h2>一整夜，每一次都算</h2>
+      <span class="sub">空白比次數更重要</span>
+    </div>
+
+    <div class="panel">
+      <div class="phead">
+        <span class="ptitle">8 小時</span>
+        <span id="clock" style="font-family:var(--mono);font-size:12px;color:var(--accent)">22:30</span>
+        <button type="button" class="btn primary" id="nightPlay">播放</button>
+      </div>
+      <div class="night">
+        <svg viewBox="0 0 900 196" role="img"
+             aria-label="整夜視圖：睡眠深淺、每次吞嚥、睡姿，以及當晚觸發的翻身提醒">
+          <g font-family="ui-monospace, monospace" font-size="10" fill="var(--ink-3)">
+            <text x="0" y="16">睡眠深淺</text>
+            <text x="0" y="76">每次吞嚥</text>
+            <text x="0" y="134">睡姿</text>
+          </g>
+          <g id="hypno" transform="translate(78,4)"></g>
+          <g id="events" transform="translate(78,54)"></g>
+          <g id="posture" transform="translate(78,120)"></g>
+
+          <!-- Placed from the real event spacing at build time, so the band and
+               the "longest gap" counter can never disagree. -->
+          <g id="gapBand" transform="translate(78,0)" opacity="0">
+            <rect id="gapRect" x="0" y="0" width="0" height="150" fill="var(--bolus)" opacity="0.10" />
+            <line id="gapL" x1="0" y1="0" x2="0" y2="150" stroke="var(--bolus)" stroke-width="1" opacity="0.5" />
+            <line id="gapR" x1="0" y1="0" x2="0" y2="150" stroke="var(--bolus)" stroke-width="1" opacity="0.5" />
+            <text id="gapText" x="0" y="168" text-anchor="middle" font-family="ui-monospace, monospace"
+                  font-size="10.5" fill="var(--bolus)">這段沒有任何吞嚥</text>
+          </g>
+
+          <g id="turnMark" transform="translate(78,0)" opacity="0">
+            <line x1="200" y1="108" x2="200" y2="150" stroke="var(--accent)" stroke-width="1.6" />
+            <circle cx="200" cy="108" r="4.5" fill="var(--accent)" />
+            <text x="208" y="104" font-family="ui-monospace, monospace" font-size="10.5" fill="var(--accent)">已仰躺 2 小時 → 建議翻身</text>
+          </g>
+
+          <g id="sweep" transform="translate(78,0)">
+            <line x1="0" y1="0" x2="0" y2="152" stroke="var(--accent)" stroke-width="1.6" />
+            <circle cx="0" cy="0" r="3.5" fill="var(--accent)" />
+          </g>
+
+          <g font-family="ui-monospace, monospace" font-size="9.5" fill="var(--ink-3)" transform="translate(78,194)">
+            <text x="0">22:30</text><text x="200">00:30</text><text x="400">02:30</text>
+            <text x="600">04:30</text><text x="778">06:30</text>
+          </g>
+        </svg>
+      </div>
+      <div class="counters">
+        <div class="counter"><span class="k">吞嚥</span><span class="v" id="cCount">0<small>次</small></span></div>
+        <div class="counter"><span class="k">吞完吸氣</span><span class="v" id="cRisk">0<small>次</small></span></div>
+        <div class="counter"><span class="k">仰躺</span><span class="v" id="cSupine">0<small>%</small></span></div>
+        <div class="counter"><span class="k">最長空白</span><span class="v" id="cGap">0<small>分</small></span></div>
+      </div>
+      <div class="legend">
+        <span><i style="background:#60a5fa"></i>睡眠深淺</span>
+        <span><i style="background:var(--air)"></i>吞完吐氣</span>
+        <span><i style="background:var(--bolus)"></i>吞完吸氣</span>
+        <span><i style="background:var(--bolus)"></i>仰躺</span>
+        <span><i style="background:#34d399"></i>側躺</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 3. 床墊 ── -->
+  <div class="model">
+    <div class="cap">
+      <span class="n">04</span>
+      <h2>當晚偵測到，當晚就處理</h2>
+      <span class="sub">系統只建議，人確認才動</span>
+    </div>
+
+    <div class="panel">
+      <div class="phead">
+        <span class="ptitle">體位輔助床墊</span>
+        <button type="button" class="btn" id="simDetect">模擬：偵測到持續仰躺</button>
+        <button type="button" class="btn" id="occToggle">切換：離床</button>
+        <button type="button" class="btn" id="resetBed">重設</button>
+      </div>
+
+      <div class="prompt" id="prompt">
+        <span class="when">00:30</span>
+        <p>已仰躺 2 小時，床頭維持在 0 度。建議協助抬高床頭至 30 度。</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button type="button" class="btn primary" id="confirmBtn">確認執行</button>
+          <button type="button" class="btn" id="declineBtn">這次不用</button>
+        </div>
+      </div>
+
+      <div class="bed">
+        <svg viewBox="0 0 620 190" role="img" aria-label="病床側視圖，床頭區段可抬升至 30 度">
+          <rect x="40" y="140" width="540" height="9" rx="4" fill="var(--wall)" />
+          <rect x="72" y="149" width="10" height="32" rx="3" fill="var(--wall)" opacity="0.7" />
+          <rect x="538" y="149" width="10" height="32" rx="3" fill="var(--wall)" opacity="0.7" />
+          <rect x="290" y="120" width="286" height="20" rx="6" fill="var(--surface-2)" stroke="var(--line)" />
+          <g id="headSect" transform="rotate(0 290 130)">
+            <rect x="44" y="120" width="248" height="20" rx="6" fill="var(--surface-2)" stroke="var(--line)" />
+            <g id="occupant">
+              <rect x="70" y="104" width="200" height="16" rx="8" fill="var(--accent)" opacity="0.42" />
+              <circle cx="80" cy="98" r="15" fill="var(--accent)" opacity="0.58" />
+            </g>
+          </g>
+          <g id="angleMark" opacity="0">
+            <path id="arc" d="M230 130 A 60 60 0 0 0 230 130" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-dasharray="3 3" />
+            <text id="angText" x="192" y="104" font-family="ui-monospace, monospace" font-size="13" fill="var(--accent)">0°</text>
+          </g>
+          <line x1="290" y1="130" x2="290" y2="186" stroke="var(--line)" stroke-width="1" stroke-dasharray="2 4" />
+        </svg>
+      </div>
+
+      <div class="bedstate">
+        <span>床頭 <b id="sAngle">0°</b></span>
+        <span>在床 <b id="sOcc">是</b></span>
+        <span>睡姿 <b id="sPost">仰躺</b></span>
+        <span>距上次動作 <b id="sSince">—</b></span>
+      </div>
+      <div class="bedlog" id="log" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <footer>
+    所有波形與夜間資料皆由模擬器產生，非人體記錄。本系統為研究用途，不得作為診斷或治療決策依據。
+  </footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function css(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+  function clamp01(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
+  function ramp(x, a, b) { return clamp01((x - a) / (b - a)); }
+  function ease(x) { return x * x * (3 - 2 * x); }
+  function svgEl(n) { return document.createElementNS("http://www.w3.org/2000/svg", n); }
+  function title(txt) { var e = svgEl("title"); e.textContent = txt; return e; }
+
+  /* ══════════════ MODEL 1 — one swallow ══════════════ */
+  var T_END = 2600, T_ON = 200, APNEA_A = 160, APNEA_B = 1300;
+  var mode = "safe", t = 0, playing = false, raf = null, last = 0;
+
+  var F = 0.235;
+  function phase(ms) { return (0.62 + F * ms / 1000) % 1; }
+  function vol(p) { return 0.5 * (1 - Math.cos(2 * Math.PI * p)); }
+  var vHold = vol(phase(APNEA_A));
+  var phiI = Math.acos(Math.max(-1, Math.min(1, 1 - 2 * vHold))) / (2 * Math.PI);
+  function resp(ms) {
+    if (ms < APNEA_A) return vol(phase(ms));
+    if (ms < APNEA_B) return vHold;
+    var r = (mode === "risk") ? phiI : (1 - phiI);
+    return vol((r + F * (ms - APNEA_B) / 1000) % 1);
+  }
+  function flow(ms) {                      // positive = air coming in
+    if (ms >= APNEA_A && ms < APNEA_B) return 0;
+    return (resp(ms + 20) - resp(ms - 20)) * 25;
+  }
+
+  var cv = document.getElementById("cv"), ctx = cv.getContext("2d");
+  function sizeCanvas() {
+    var d = Math.min(window.devicePixelRatio || 1, 2), r = cv.getBoundingClientRect();
+    cv.width = Math.max(1, Math.round(r.width * d));
+    cv.height = Math.max(1, Math.round(r.height * d));
+    ctx.setTransform(d, 0, 0, d, 0, 0);
+  }
+  function drawTrace() {
+    var r = cv.getBoundingClientRect(), W = r.width, H = r.height;
+    if (W < 2) return;
+    ctx.clearRect(0, 0, W, H);
+    var padL = 8, iw = W - padL - 10, mid = H * 0.56, amp = H * 0.30;
+    function X(ms) { return padL + (ms / T_END) * iw; }
+
+    ctx.strokeStyle = css("--line-soft"); ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(padL, Math.round(mid) + .5);
+    ctx.lineTo(padL + iw, Math.round(mid) + .5); ctx.stroke();
+
+    ctx.fillStyle = css("--bolus"); ctx.globalAlpha = .11;
+    ctx.fillRect(X(APNEA_A), 8, X(APNEA_B) - X(APNEA_A), H - 28);
+    ctx.globalAlpha = 1;
+
+    ctx.strokeStyle = css("--air"); ctx.lineWidth = 2.4; ctx.beginPath();
+    for (var i = 0; i <= 500; i++) {
+      var ms = (i / 500) * T_END, y = mid - (resp(ms) - .5) * 2 * amp;
+      i ? ctx.lineTo(X(ms), y) : ctx.moveTo(X(ms), y);
+    }
+    ctx.stroke();
+
+    ctx.strokeStyle = mode === "risk" ? css("--risk") : css("--ok");
+    ctx.lineWidth = 3.4; ctx.beginPath();
+    for (var j = 0; j <= 140; j++) {
+      var m2 = APNEA_B + (j / 140) * 460, y2 = mid - (resp(m2) - .5) * 2 * amp;
+      j ? ctx.lineTo(X(m2), y2) : ctx.moveTo(X(m2), y2);
+    }
+    ctx.stroke();
+
+    ctx.font = "11px ui-monospace, SFMono-Regular, Menlo, monospace";
+    ctx.fillStyle = css("--bolus");
+    ctx.fillText("呼吸暫停 ≈1 秒", X(APNEA_A) + 6, H - 5);
+    ctx.fillStyle = mode === "risk" ? css("--risk") : css("--ok");
+    ctx.fillText(mode === "risk" ? "→ 開始吸氣" : "→ 繼續吐氣", X(APNEA_B) + 8, 17);
+    ctx.fillStyle = css("--ink-3");
+    ctx.fillText("呼吸", padL + 2, 17);
+
+    ctx.strokeStyle = css("--accent"); ctx.lineWidth = 1.4;
+    ctx.beginPath(); ctx.moveTo(X(t), 0); ctx.lineTo(X(t), H); ctx.stroke();
+  }
+
+  var E = {
+    flap: document.getElementById("flap"), bolus: document.getElementById("bolus"),
+    residue: document.getElementById("residue"), asp: document.getElementById("aspBlob"),
+    lung: document.getElementById("lungLumen"), lungLabel: document.getElementById("lungLabel"),
+    flow: document.getElementById("flow"), arrow: document.getElementById("flowArrow"),
+    head: document.getElementById("flowHead"),
+    pGut: document.getElementById("pathGut"), pLung: document.getElementById("pathLung"),
+    dAc: document.getElementById("dAc"), dIm: document.getElementById("dIm"), dEm: document.getElementById("dEm")
+  };
+  var lenGut = E.pGut.getTotalLength(), lenLung = E.pLung.getTotalLength();
+
+  function drawDiagram() {
+    var closed = clamp01(ease(ramp(t, T_ON, T_ON + 240)) - ease(ramp(t, APNEA_B - 120, APNEA_B + 120)));
+    E.flap.setAttribute("transform", "rotate(" + (-145 * closed).toFixed(2) + " 244 192)");
+
+    var travel = clamp01(ramp(t, T_ON - 80, T_ON + 1000));
+    var p = E.pGut.getPointAtLength(travel * lenGut);
+    E.bolus.setAttribute("cx", p.x.toFixed(1));
+    E.bolus.setAttribute("cy", p.y.toFixed(1));
+    E.bolus.setAttribute("r", (19 - 5 * ramp(t, T_ON + 500, T_ON + 1000)).toFixed(1));
+    E.bolus.setAttribute("opacity", (1 - .75 * ramp(t, T_ON + 850, T_ON + 1150)).toFixed(2));
+
+    var resid = ramp(t, T_ON + 420, T_ON + 700) * (1 - ramp(t, APNEA_B + 500, APNEA_B + 900));
+    E.residue.setAttribute("opacity", (.85 * resid).toFixed(2));
+
+    var f = flow(t), moving = Math.min(1, Math.abs(f) * 2.6);
+    E.flow.setAttribute("opacity", (.85 * moving).toFixed(2));
+    var goingIn = f > 0;
+    var col = (goingIn && mode === "risk" && t > APNEA_B) ? css("--risk") : css("--air");
+    E.arrow.setAttribute("stroke", col); E.head.setAttribute("fill", col);
+    if (goingIn) {
+      E.arrow.setAttribute("d", "M258 112 L258 168");
+      E.head.setAttribute("d", "M258 176 L248 158 L268 158 Z");
+    } else {
+      E.arrow.setAttribute("d", "M258 168 L258 112");
+      E.head.setAttribute("d", "M258 104 L248 122 L268 122 Z");
+    }
+
+    var asp = (mode === "risk") ? clamp01(ramp(t, APNEA_B, APNEA_B + 220)) : 0;
+    if (asp > .02) {
+      var q = E.pLung.getPointAtLength(clamp01(ramp(t, APNEA_B, APNEA_B + 950)) * lenLung);
+      E.asp.setAttribute("cx", q.x.toFixed(1));
+      E.asp.setAttribute("cy", q.y.toFixed(1));
+      E.asp.setAttribute("opacity", (.95 * asp).toFixed(2));
+      E.lung.setAttribute("stroke", css("--risk"));
+      E.lung.setAttribute("opacity", (.2 + .28 * asp).toFixed(2));
+      E.lungLabel.setAttribute("fill", css("--risk"));
+      E.lungLabel.textContent = "東西進去了";
+    } else {
+      E.asp.setAttribute("opacity", "0");
+      E.lung.setAttribute("stroke", css("--air"));
+      E.lung.setAttribute("opacity", (.2 - .13 * closed).toFixed(2));
+      E.lungLabel.setAttribute("fill", css("--ink-3"));
+      E.lungLabel.textContent = "不該進去";
+    }
+
+    var on = t > T_ON - 60 && t < T_ON + 700;
+    E.dAc.setAttribute("fill", on ? css("--ink") : css("--ink-3"));
+    E.dIm.setAttribute("fill", on ? css("--accent") : css("--ink-3"));
+    E.dEm.setAttribute("fill", (t > T_ON - 140 && t < T_ON + 620) ? css("--ink") : css("--ink-3"));
+  }
+
+  var vTag = document.getElementById("vTag"), vTxt = document.getElementById("vTxt");
+  function verdict() {
+    var s, good = true;
+    if (t < T_ON - 60) s = "<b>靜止</b> · 呼吸規律，兩條路都通";
+    else if (t < T_ON + 300) s = "<b>吞下去了</b> · 會厭蓋住通往肺的入口，呼吸暫停";
+    else if (t < APNEA_B) s = "<b>通過中</b> · 食團往胃走，咽部留下一點殘留";
+    else if (mode === "safe") s = "<b>吞完吐氣</b> · 氣流往外，把殘留推出去";
+    else { s = "<b>吞完吸氣</b> · 氣流往內，把殘留一起帶進肺 —— 沒有咳嗽，沒有人發現"; good = false; }
+    vTxt.innerHTML = s;
+    vTag.className = good ? "tag good" : "tag bad";
+    vTag.textContent = good ? "安全" : "走錯路";
+  }
+
+  function render() { drawDiagram(); drawTrace(); verdict(); scrub.value = String(Math.round(t)); }
+
+  var scrub = document.getElementById("scrub");
+  var playBtn = document.getElementById("play");
+  var mSafe = document.getElementById("mSafe"), mRisk = document.getElementById("mRisk");
+  scrub.addEventListener("input", function () { stop(); t = Number(scrub.value); render(); });
+  function setMode(m) {
+    mode = m;
+    mSafe.setAttribute("aria-pressed", String(m === "safe"));
+    mRisk.setAttribute("aria-pressed", String(m === "risk"));
+    render();
+  }
+  mSafe.addEventListener("click", function () { setMode("safe"); });
+  mRisk.addEventListener("click", function () { setMode("risk"); });
+  function step(ts) {
+    if (!playing) return;
+    if (!last) last = ts;
+    t += (ts - last) * .5; last = ts;
+    if (t >= T_END) { t = T_END; stop(); }
+    render(); raf = requestAnimationFrame(step);
+  }
+  function play() {
+    if (t >= T_END - 5) t = 0;
+    playing = true; last = 0; playBtn.textContent = "暫停";
+    raf = requestAnimationFrame(step);
+  }
+  function stop() { playing = false; if (raf) cancelAnimationFrame(raf); raf = null; playBtn.textContent = "播放"; }
+  playBtn.addEventListener("click", function () { playing ? stop() : play(); });
+
+  /* ══════════════ MODEL 2 — the same PSG, one more channel ══════════════ */
+  var PSG_T = 90;
+  var SW_T = 32.4, COUGH_T = 36.4, AR_T = 50.5;
+  var HYP_A = 34, HYP_B = 48;
+  var DESAT_A = 42, DESAT_N = 52, DESAT_B = 68;
+  var SNORE = [[5, 31.4], [57, 87]];
+  var PG_LANES = ["鼻氣流", "胸腹起伏", "血氧 SpO₂", "鼾聲", "微覺醒／咳嗽", "吞嚥（本裝置）"];
+  var PG_SHORT = ["鼻氣流", "胸腹", "SpO₂", "鼾聲", "覺醒·咳", "吞嚥"];
+
+  var pgMode = "off", pgT = PSG_T, pgPlaying = false, pgRaf = null, pgLast = 0;
+  var pgAuto = false, pgAutoTimer = null;
+
+  var psg = document.getElementById("psg"), pctx = psg.getContext("2d");
+  var pgNoise = (function () {
+    var k = 13, a = [];
+    for (var i = 0; i < 2048; i++) { k = (k * 1103515245 + 12345) % 2147483648; a.push(k / 2147483648 * 2 - 1); }
+    return a;
+  })();
+  function nz(i) { i = Math.round(i); return pgNoise[((i % 2048) + 2048) % 2048]; }
+
+  var BR = 0.216;                                   // breaths per second
+  function brPhase(s) { return 2 * Math.PI * (BR * s + .12); }
+  function pgFlow(s) {
+    var a = 1 - .58 * clamp01(ramp(s, HYP_A - 1.5, HYP_A + 1.5) - ramp(s, HYP_B - 2, HYP_B + 1.5));
+    if (s > SW_T - .5 && s < SW_T + .9) a *= .16;   // the swallow's own apnea
+    if (s > COUGH_T - .3 && s < COUGH_T + 1.1) a *= 1.9;
+    return Math.sin(brPhase(s)) * a + .035 * nz(s * 26);
+  }
+  function pgEffort(s) {
+    var a = 1 - .1 * clamp01(ramp(s, HYP_A, HYP_A + 2) - ramp(s, HYP_B - 2, HYP_B + 1));
+    return Math.sin(brPhase(s) - .45) * a + .03 * nz(s * 19 + 400);
+  }
+  function pgSpo2(s) {
+    if (s < DESAT_A) return 97;
+    if (s < DESAT_N) return 97 - 6 * ease(ramp(s, DESAT_A, DESAT_N));
+    return 91 + 6 * ease(ramp(s, DESAT_N, DESAT_B));
+  }
+  function pgSnore(s) {
+    var on = 0, i;
+    for (i = 0; i < SNORE.length; i++) if (s >= SNORE[i][0] && s <= SNORE[i][1]) on = 1;
+    var base = .05 * Math.abs(nz(s * 40 + 900));
+    if (!on) return base;
+    var e = Math.max(0, -Math.sin(brPhase(s)));
+    return base + (.2 + .8 * Math.pow(e, 1.7)) * (.72 + .28 * Math.abs(nz(s * 90)));
+  }
+
+  function pgSizeCanvas() {
+    var d = Math.min(window.devicePixelRatio || 1, 2), r = psg.getBoundingClientRect();
+    psg.width = Math.max(1, Math.round(r.width * d));
+    psg.height = Math.max(1, Math.round(r.height * d));
+    pctx.setTransform(d, 0, 0, d, 0, 0);
+  }
+
+  function drawPsg() {
+    var r = psg.getBoundingClientRect(), W = r.width, H = r.height;
+    if (W < 2) return;
+    pctx.clearRect(0, 0, W, H);
+
+    var narrow = W < 560;
+    var padL = narrow ? 66 : 94, padR = 12, padT = 6, padB = 22;
+    var iw = W - padL - padR;
+    var n = PG_LANES.length, lh = (H - padT - padB) / n;
+    var mono = (narrow ? 9.5 : 10.5) + "px ui-monospace, SFMono-Regular, Menlo, monospace";
+    var tiny = (narrow ? 9 : 10) + "px ui-monospace, SFMono-Regular, Menlo, monospace";
+    function X(s) { return padL + (s / PSG_T) * iw; }
+    function laneY(i) { return padT + i * lh; }
+    var seen = pgT;                                  // progressive reveal
+    var cut = X(Math.min(seen, PSG_T));
+
+    var cInk = css("--ink"), cInk2 = css("--ink-2"), cInk3 = css("--ink-3");
+    var cAir = css("--air"), cRisk = css("--risk"), cBolus = css("--bolus"),
+        cOk = css("--ok"), cLine = css("--line-soft"), cAcc = css("--accent");
+
+    // lane frames + labels
+    pctx.font = mono; pctx.textAlign = "right"; pctx.textBaseline = "middle";
+    for (var i = 0; i < n; i++) {
+      var y0 = laneY(i);
+      if (i) {
+        pctx.strokeStyle = cLine; pctx.lineWidth = 1;
+        pctx.beginPath(); pctx.moveTo(padL, Math.round(y0) + .5);
+        pctx.lineTo(padL + iw, Math.round(y0) + .5); pctx.stroke();
+      }
+      var isSw = (i === 5);
+      pctx.fillStyle = (isSw && pgMode === "off") ? cInk3 : (isSw ? cBolus : cInk3);
+      pctx.globalAlpha = (isSw && pgMode === "off") ? .5 : 1;
+      pctx.fillText((narrow ? PG_SHORT : PG_LANES)[i], padL - 9, y0 + lh / 2);
+      pctx.globalAlpha = 1;
+    }
+    pctx.textAlign = "left";
+
+    // ── context shading: the same 14 s, explained two ways
+    var shTop = laneY(0) + 3, shBot = laneY(2) - 3;
+    pctx.fillStyle = pgMode === "on" ? cBolus : cAir;
+    pctx.globalAlpha = .09;
+    pctx.fillRect(X(HYP_A), shTop, Math.min(X(HYP_B), cut) - X(HYP_A) > 0 ? Math.min(X(HYP_B), cut) - X(HYP_A) : 0, shBot - shTop);
+    pctx.globalAlpha = 1;
+
+    pctx.save();
+    pctx.beginPath(); pctx.rect(padL, 0, Math.max(0, cut - padL), H); pctx.clip();
+
+    // ── 0 flow, 1 effort
+    function trace(idx, fn, colour, lw, alpha) {
+      var y0 = laneY(idx), mid = y0 + lh / 2, amp = lh * .33;
+      pctx.strokeStyle = colour; pctx.lineWidth = lw; pctx.globalAlpha = alpha;
+      pctx.beginPath();
+      for (var k = 0; k <= 540; k++) {
+        var s = (k / 540) * PSG_T, y = mid - fn(s) * amp;
+        k ? pctx.lineTo(X(s), y) : pctx.moveTo(X(s), y);
+      }
+      pctx.stroke(); pctx.globalAlpha = 1;
+    }
+    trace(0, pgFlow, cAir, 1.7, 1);
+    trace(1, pgEffort, cAir, 1.6, .68);
+
+    // ── 2 SpO2
+    (function () {
+      var y0 = laneY(2), top = y0 + lh * .2, bot = y0 + lh * .82;
+      function Y(v) { return bot - (v - 88) / (99 - 88) * (bot - top); }
+      pctx.strokeStyle = cOk; pctx.lineWidth = 1.9; pctx.beginPath();
+      for (var k = 0; k <= 360; k++) {
+        var s = (k / 360) * PSG_T, y = Y(pgSpo2(s));
+        k ? pctx.lineTo(X(s), y) : pctx.moveTo(X(s), y);
+      }
+      pctx.stroke();
+      pctx.strokeStyle = cRisk; pctx.lineWidth = 2.6; pctx.beginPath();
+      for (var j = 0; j <= 200; j++) {
+        var s2 = DESAT_A + (j / 200) * (DESAT_B - DESAT_A), y2 = Y(pgSpo2(s2));
+        j ? pctx.lineTo(X(s2), y2) : pctx.moveTo(X(s2), y2);
+      }
+      pctx.stroke();
+      if (seen > DESAT_N) {
+        pctx.font = tiny; pctx.fillStyle = cRisk;
+        pctx.fillText("91%", X(DESAT_N) - 9, Y(91) - 7);
+      }
+    })();
+
+    // ── 3 snore
+    (function () {
+      var y0 = laneY(3), base = y0 + lh * .84, h = lh * .62;
+      pctx.fillStyle = cInk3; pctx.globalAlpha = .55;
+      for (var x = 0; x < iw; x += 2) {
+        var s = (x / iw) * PSG_T, v = pgSnore(s);
+        pctx.fillRect(padL + x, base - v * h, 1.4, v * h);
+      }
+      pctx.globalAlpha = 1;
+    })();
+
+    // ── 4 arousal / cough markers
+    (function () {
+      var y0 = laneY(4), top = y0 + lh * .22, hh = lh * .56;
+      if (seen > COUGH_T) {
+        pctx.fillStyle = cRisk; pctx.globalAlpha = .85;
+        pctx.fillRect(X(COUGH_T), top, Math.max(3, X(COUGH_T + 1.1) - X(COUGH_T)), hh);
+        pctx.globalAlpha = 1;
+        pctx.font = tiny; pctx.fillStyle = cRisk;
+        pctx.fillText("咳嗽", X(COUGH_T) + 7, top + hh / 2 + 3);
+      }
+      if (seen > AR_T) {
+        pctx.fillStyle = cAcc; pctx.globalAlpha = .55;
+        pctx.fillRect(X(AR_T), top, Math.max(3, X(AR_T + 3) - X(AR_T)), hh);
+        pctx.globalAlpha = 1;
+        pctx.font = tiny; pctx.fillStyle = cAcc;
+        pctx.fillText("微覺醒", X(AR_T + 3) + 6, top + hh / 2 + 3);
+      }
+    })();
+
+    // ── 5 the swallow channel
+    (function () {
+      var y0 = laneY(5), mid = y0 + lh * .52, amp = lh * .3;
+      if (pgMode === "off") return;
+      pctx.strokeStyle = cBolus; pctx.lineWidth = 2; pctx.beginPath();
+      for (var k = 0; k <= 900; k++) {
+        var s = (k / 900) * PSG_T;
+        var d = (s - SW_T) / .55;
+        var burst = Math.exp(-d * d) * Math.sin((s - SW_T) * 9.5) * 2.15;
+        var y = mid - (burst + .05 * nz(s * 33 + 111)) * amp;
+        k ? pctx.lineTo(X(s), y) : pctx.moveTo(X(s), y);
+      }
+      pctx.stroke();
+      if (seen > SW_T) {
+        pctx.font = tiny; pctx.fillStyle = cBolus;
+        pctx.fillText("吞嚥", X(SW_T) + 9, y0 + lh * .3);
+        pctx.textAlign = "right";
+        pctx.fillText(narrow ? "接吸氣" : "吞完接的是吸氣", padL + iw - 4, y0 + lh * .3);
+        pctx.textAlign = "left";
+      }
+    })();
+
+    pctx.restore();
+
+    // ── the empty slot, when the channel is not there
+    if (pgMode === "off") {
+      var y5 = laneY(5) + 5, h5 = lh - 10;
+      pctx.save();
+      pctx.setLineDash([4, 4]); pctx.strokeStyle = cLine; pctx.lineWidth = 1;
+      pctx.strokeRect(padL + .5, Math.round(y5) + .5, iw - 1, Math.round(h5));
+      pctx.restore();
+      pctx.font = tiny; pctx.fillStyle = cInk3; pctx.globalAlpha = .8;
+      pctx.textAlign = "center";
+      pctx.fillText("PSG 沒有這個通道", padL + iw / 2, y5 + h5 / 2 + 3);
+      pctx.textAlign = "left"; pctx.globalAlpha = 1;
+    }
+
+    // ── the links
+    function guide(s, colour, label, labelY) {
+      if (seen <= s) return;
+      pctx.save();
+      pctx.setLineDash([3, 4]); pctx.strokeStyle = colour; pctx.globalAlpha = .8; pctx.lineWidth = 1.2;
+      pctx.beginPath(); pctx.moveTo(X(s), padT); pctx.lineTo(X(s), H - padB + 2); pctx.stroke();
+      pctx.restore();
+      if (!label) return;
+      pctx.font = tiny; pctx.fillStyle = colour;
+      var w = pctx.measureText(label).width;
+      var lx = X(s) + 6;
+      if (lx + w > W - 4) { pctx.textAlign = "right"; lx = X(s) - 6; }
+      pctx.fillText(label, lx, labelY);
+      pctx.textAlign = "left";
+    }
+    if (pgMode === "on") {
+      guide(SW_T, cBolus, "", 0);
+      guide(COUGH_T, cRisk, "", 0);
+      guide(DESAT_A, cRisk, "吞嚥後 +9.6 秒", laneY(3) - 7);
+    } else if (seen > DESAT_A) {
+      pctx.font = tiny; pctx.fillStyle = cAir;
+      pctx.fillText("低通氣", X(HYP_A) + 6, laneY(1) - 5);
+    }
+
+    // ── axis
+    pctx.font = tiny; pctx.fillStyle = cInk3; pctx.globalAlpha = .85;
+    for (var a = 0; a <= 90; a += 30) {
+      pctx.textAlign = a === 0 ? "left" : (a === 90 ? "right" : "center");
+      pctx.fillText(a + " 秒", X(a), H - 6);
+    }
+    pctx.textAlign = "left"; pctx.globalAlpha = 1;
+
+    // ── playhead
+    if (seen < PSG_T) {
+      pctx.strokeStyle = cAcc; pctx.lineWidth = 1.5;
+      pctx.beginPath(); pctx.moveTo(cut, 0); pctx.lineTo(cut, H - padB + 4); pctx.stroke();
+    }
+  }
+
+  var pgTag = document.getElementById("pgTag"), pgTxt = document.getElementById("pgTxt");
+  function pgReadout() {
+    var s;
+    if (pgMode === "off") {
+      pgTag.className = "tag plain"; pgTag.textContent = "現有判讀";
+      if (pgT < HYP_A) s = "<b>N2 期</b> · 呼吸與血氧穩定";
+      else if (pgT < DESAT_A) s = "<b>氣流下降</b> · 胸腹仍在用力";
+      else s = "<b>低通氣事件</b> · 血氧下降 6%，歸因於呼吸事件";
+    } else {
+      pgTag.className = "tag new"; pgTag.textContent = "多一個通道";
+      if (pgT < SW_T) s = "<b>N2 期</b> · 呼吸與血氧穩定";
+      else if (pgT < COUGH_T) s = "<b>32.4 秒 一次吞嚥</b> · 吞完接的是吸氣，不是吐氣";
+      else if (pgT < DESAT_A) s = "<b>+4.0 秒 咳嗽</b> · 鼾聲在吞嚥當下停了";
+      else s = "<b>+9.6 秒 血氧開始下降</b> · 同一段訊號，另一種可能的解釋";
+    }
+    pgTxt.innerHTML = s;
+  }
+
+  function pgRender() { drawPsg(); pgReadout(); }
+
+  var pgOff = document.getElementById("pgOff"), pgOn = document.getElementById("pgOn"),
+      psgPlay = document.getElementById("psgPlay");
+
+  function pgStopAuto() { pgAuto = false; if (pgAutoTimer) { clearTimeout(pgAutoTimer); pgAutoTimer = null; } }
+  function setPg(m) {
+    pgMode = m;
+    pgOff.setAttribute("aria-pressed", String(m === "off"));
+    pgOn.setAttribute("aria-pressed", String(m === "on"));
+    pgRender();
+  }
+  function pgStep(ts) {
+    if (!pgPlaying) return;
+    if (!pgLast) pgLast = ts;
+    pgT += (ts - pgLast) / 1000 * (PSG_T / 11);
+    pgLast = ts;
+    if (pgT >= PSG_T) { pgT = PSG_T; pgHalt(); pgTail(); }
+    pgRender();
+    if (pgPlaying) pgRaf = requestAnimationFrame(pgStep);
+  }
+  function pgGo() {
+    if (pgT >= PSG_T - .2) pgT = 0;
+    pgPlaying = true; pgLast = 0; psgPlay.textContent = "暫停";
+    pgRaf = requestAnimationFrame(pgStep);
+  }
+  function pgHalt() {
+    pgPlaying = false;
+    if (pgRaf) cancelAnimationFrame(pgRaf);
+    pgRaf = null; psgPlay.textContent = "播放";
+  }
+  function pgTail() {
+    if (!pgAuto) return;
+    if (pgMode === "off") {
+      pgAutoTimer = setTimeout(function () { setPg("on"); pgT = 0; pgGo(); }, 1200);
+    } else { pgAuto = false; }
+  }
+  psgPlay.addEventListener("click", function () { pgStopAuto(); pgPlaying ? pgHalt() : pgGo(); });
+  pgOff.addEventListener("click", function () { pgStopAuto(); setPg("off"); });
+  pgOn.addEventListener("click", function () { pgStopAuto(); setPg("on"); });
+
+  function pgAutorun() {
+    if (reduced || !("IntersectionObserver" in window)) { setPg("on"); return; }
+    var fired = false;
+    var io = new IntersectionObserver(function (es) {
+      for (var i = 0; i < es.length; i++) {
+        if (es[i].isIntersecting && !fired) {
+          fired = true; io.disconnect();
+          pgAuto = true; pgT = 0; setPg("off"); pgGo();
+        }
+      }
+    }, { threshold: .45 });
+    io.observe(psg);
+  }
+
+  /* ══════════════ MODEL 2 — the whole night ══════════════ */
+  var NW = 800;                 // strip width in viewBox units
+  var nightEvents = [];         // {x, risky}
+  var posture = [];             // {x0, x1, supine}
+  var TURN_X = 200;             // 22:30 + 2 h, and where the posture strip turns
+  var gapA = 0, gapB = 0;       // the night's longest stretch without a swallow
+
+  function buildNight() {
+    var seed = 7;
+    function r2() { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; }
+    var stages = [["W",18],["N1",14],["N2",66],["N3",44],["N2",40],["REM",34],["N1",10],
+                  ["N2",72],["N3",26],["N2",46],["REM",46],["W",8],["N2",78],["N1",16],
+                  ["REM",56],["N2",62],["W",14],["N2",74],["REM",66],["N1",12],["W",8]];
+    var color = { W:"#cbd5e1", N1:"#93c5fd", N2:"#60a5fa", N3:"#2563eb", REM:"#a78bfa" };
+    var name = { W:"清醒", N1:"淺眠", N2:"淺眠", N3:"深眠", REM:"作夢期" };
+    var g = document.getElementById("hypno"), x = 0, tot = 0;
+    stages.forEach(function (s) { tot += s[1]; });
+    stages.forEach(function (s) {
+      var w = (s[1] / tot) * NW, r = svgEl("rect");
+      r.setAttribute("x", x.toFixed(1)); r.setAttribute("y", "0");
+      r.setAttribute("width", Math.max(.6, w - .6).toFixed(1)); r.setAttribute("height", "22");
+      r.setAttribute("fill", color[s[0]]); r.setAttribute("opacity", ".82");
+      r.appendChild(title(name[s[0]])); g.appendChild(r); x += w;
+    });
+
+    var ev = document.getElementById("events"), xs = [];
+    for (var i = 0; i < 100; i++) {
+      var pos = r2() * NW;
+      if (pos > 452 && pos < 578) continue;      // the deliberate gap
+      xs.push(pos);
+    }
+    xs.sort(function (a, b) { return a - b; });
+    xs.forEach(function (px) {
+      var h = .45 + r2() * .55, risky = r2() < .3, l = svgEl("rect");
+      l.setAttribute("x", px.toFixed(1));
+      l.setAttribute("y", (14 - h * 11).toFixed(1));
+      l.setAttribute("width", "2");
+      l.setAttribute("height", (h * 20 + 5).toFixed(1));
+      l.setAttribute("rx", "1");
+      l.setAttribute("fill", risky ? "var(--bolus)" : "var(--air)");
+      l.setAttribute("opacity", "0");           // revealed by the sweep
+      l.appendChild(title(risky ? "吞完吸氣" : "吞完吐氣"));
+      ev.appendChild(l);
+      nightEvents.push({ x: px, risky: risky, el: l, alpha: (.5 + h * .45) });
+    });
+
+    // Find the night's longest stretch without a swallow and draw the band there.
+    for (var k = 1; k < nightEvents.length; k++) {
+      if (nightEvents[k].x - nightEvents[k - 1].x > gapB - gapA) {
+        gapA = nightEvents[k - 1].x;
+        gapB = nightEvents[k].x;
+      }
+    }
+    document.getElementById("gapRect").setAttribute("x", gapA.toFixed(1));
+    document.getElementById("gapRect").setAttribute("width", (gapB - gapA).toFixed(1));
+    document.getElementById("gapL").setAttribute("x1", gapA.toFixed(1));
+    document.getElementById("gapL").setAttribute("x2", gapA.toFixed(1));
+    document.getElementById("gapR").setAttribute("x1", gapB.toFixed(1));
+    document.getElementById("gapR").setAttribute("x2", gapB.toFixed(1));
+    document.getElementById("gapText").setAttribute("x", ((gapA + gapB) / 2).toFixed(1));
+
+    // Supine until the prompt fires, side-lying after: the strip has to show
+    // that the overnight tier actually changed something.
+    var post = [["s",200],["l",120],["s",140],["l",120],["r",100],["s",80],["l",40]];
+    var pc = { s:"var(--bolus)", l:"#34d399", r:"#22d3ee" };
+    var pn = { s:"仰躺", l:"左側躺", r:"右側躺" };
+    var pg = document.getElementById("posture"), px2 = 0, pt = 0;
+    post.forEach(function (p) { pt += p[1]; });
+    post.forEach(function (p) {
+      var w = (p[1] / pt) * NW, r = svgEl("rect");
+      r.setAttribute("x", px2.toFixed(1)); r.setAttribute("y", "0");
+      r.setAttribute("width", Math.max(.6, w - .6).toFixed(1)); r.setAttribute("height", "16");
+      r.setAttribute("rx", "2"); r.setAttribute("fill", pc[p[0]]); r.setAttribute("opacity", "0");
+      r.appendChild(title(pn[p[0]])); pg.appendChild(r);
+      posture.push({ x0: px2, x1: px2 + w, supine: p[0] === "s", el: r });
+      px2 += w;
+    });
+  }
+
+  var nx = 0, nightPlaying = false, nraf = null, nlast = 0;
+  var sweep = document.getElementById("sweep"), turnMark = document.getElementById("turnMark");
+  var clock = document.getElementById("clock"), nightBtn = document.getElementById("nightPlay");
+  var cCount = document.getElementById("cCount"), cRisk = document.getElementById("cRisk");
+  var cSupine = document.getElementById("cSupine"), cGap = document.getElementById("cGap");
+
+  function paintNight() {
+    sweep.setAttribute("transform", "translate(" + (78 + nx).toFixed(1) + ",0)");
+
+    var n = 0, risky = 0, lastX = null, gap = 0;
+    nightEvents.forEach(function (e) {
+      var seen = e.x <= nx;
+      e.el.setAttribute("opacity", seen ? e.alpha.toFixed(2) : "0");
+      if (seen) {
+        n++; if (e.risky) risky++;
+        if (lastX !== null && e.x - lastX > gap) gap = e.x - lastX;
+        lastX = e.x;
+      }
+    });
+
+    var supine = 0;
+    posture.forEach(function (p) {
+      var vis = Math.max(0, Math.min(p.x1, nx) - p.x0);
+      p.el.setAttribute("opacity", vis > 0 ? ".72" : "0");
+      p.el.setAttribute("width", Math.max(.6, vis - .6).toFixed(1));
+      if (p.supine) supine += vis;
+    });
+
+    turnMark.setAttribute("opacity", nx >= TURN_X ? "1" : "0");
+    document.getElementById("gapBand").setAttribute("opacity", nx >= gapB ? "1" : "0");
+
+    cCount.innerHTML = n + "<small>次</small>";
+    cRisk.innerHTML = risky + "<small>次</small>";
+    cSupine.innerHTML = (nx > 0 ? Math.round(100 * supine / nx) : 0) + "<small>%</small>";
+    cGap.innerHTML = Math.round(gap / NW * 480) + "<small>分</small>";
+
+    var mins = (nx / NW) * 480 + 22 * 60 + 30;
+    clock.textContent = String(Math.floor(mins / 60) % 24).padStart(2, "0") + ":" +
+                        String(Math.floor(mins % 60)).padStart(2, "0");
+  }
+
+  function nstep(ts) {
+    if (!nightPlaying) return;
+    if (!nlast) nlast = ts;
+    nx += (ts - nlast) * (NW / 14000);      // a whole night in ~14 s
+    nlast = ts;
+    if (nx >= NW) { nx = NW; nightStop(); }
+    paintNight();
+    nraf = requestAnimationFrame(nstep);
+  }
+  function nightPlay() {
+    if (nx >= NW - 1) nx = 0;
+    nightPlaying = true; nlast = 0; nightBtn.textContent = "暫停";
+    nraf = requestAnimationFrame(nstep);
+  }
+  function nightStop() {
+    nightPlaying = false;
+    if (nraf) cancelAnimationFrame(nraf);
+    nraf = null; nightBtn.textContent = "播放";
+  }
+  nightBtn.addEventListener("click", function () { nightPlaying ? nightStop() : nightPlay(); });
+
+  /* ══════════════ MODEL 3 — the mattress ══════════════ */
+  var bed = { angle: 0, occupied: true, supine: true, lastMotion: null, busy: false };
+  var headSect = document.getElementById("headSect"), occupant = document.getElementById("occupant");
+  var angleMark = document.getElementById("angleMark"), angText = document.getElementById("angText");
+  var arc = document.getElementById("arc");
+  var sAngle = document.getElementById("sAngle"), sOcc = document.getElementById("sOcc");
+  var sPost = document.getElementById("sPost"), sSince = document.getElementById("sSince");
+  var logEl = document.getElementById("log"), promptEl = document.getElementById("prompt");
+  var confirmBtn = document.getElementById("confirmBtn"), declineBtn = document.getElementById("declineBtn");
+  var occBtn = document.getElementById("occToggle"), resetBtn = document.getElementById("resetBed");
+  var detectBtn = document.getElementById("simDetect");
+
+  function log(kind, msg) {
+    var row = document.createElement("div"), n = new Date();
+    var p2 = function (v) { return String(v).padStart(2, "0"); };
+    row.innerHTML = '<span class="t">' + p2(n.getHours()) + ":" + p2(n.getMinutes()) + ":" +
+      p2(n.getSeconds()) + '</span><span class="' + kind + '">' + msg + "</span>";
+    logEl.insertBefore(row, logEl.firstChild);
+    while (logEl.children.length > 18) logEl.removeChild(logEl.lastChild);
+  }
+
+  function paintBed() {
+    headSect.setAttribute("transform", "rotate(" + (-bed.angle).toFixed(2) + " 290 130)");
+    sAngle.textContent = Math.round(bed.angle) + "°";
+    sOcc.textContent = bed.occupied ? "是" : "否";
+    sPost.textContent = bed.supine ? "仰躺" : "側躺";
+    occupant.setAttribute("opacity", bed.occupied ? "1" : "0.12");
+    occBtn.textContent = bed.occupied ? "切換：離床" : "切換：在床";
+    if (bed.angle > .5) {
+      angleMark.setAttribute("opacity", "1");
+      angText.textContent = Math.round(bed.angle) + "°";
+      var rad = bed.angle * Math.PI / 180;
+      arc.setAttribute("d", "M230 130 A 60 60 0 0 1 " +
+        (290 - 60 * Math.cos(rad)).toFixed(1) + " " + (130 - 60 * Math.sin(rad)).toFixed(1));
+    } else angleMark.setAttribute("opacity", "0");
+    sSince.textContent = bed.lastMotion == null ? "—"
+      : Math.round((Date.now() - bed.lastMotion) / 1000) + " 秒";
+  }
+
+  function rampBed(target, done) {
+    // The real limit is 2 deg/s. Compressed so a demo stays watchable.
+    var rate = reduced ? 400 : 26, t0 = performance.now();
+    var dir = target > bed.angle ? 1 : -1;
+    function frame(ts) {
+      var dt = (ts - t0) / 1000; t0 = ts;
+      bed.angle += dir * rate * dt;
+      if ((dir > 0 && bed.angle >= target) || (dir < 0 && bed.angle <= target)) {
+        bed.angle = target; paintBed(); done && done(); return;
+      }
+      paintBed(); requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function showPrompt() {
+    promptEl.classList.add("on");
+    log("warn", "偵測 · 已仰躺 2 小時，床頭 0 度 → 提出建議");
+  }
+  detectBtn.addEventListener("click", function () { bed.supine = true; paintBed(); showPrompt(); });
+  declineBtn.addEventListener("click", function () {
+    promptEl.classList.remove("on");
+    log("info", "已記錄 · 護理師選擇這次不執行");
+  });
+
+  confirmBtn.addEventListener("click", function () {
+    if (bed.busy) return;
+    if (!bed.occupied) { log("no", "拒絕 · 床上沒有人，不執行任何動作"); return; }
+    if (bed.lastMotion && Date.now() - bed.lastMotion < 12000) {
+      var left = Math.ceil((12000 - (Date.now() - bed.lastMotion)) / 1000);
+      log("no", "拒絕 · 距上次動作太近，還需 " + left + " 秒（實際為 20 分鐘）");
+      return;
+    }
+    bed.busy = true; confirmBtn.disabled = true;
+    log("info", "已確認 · 操作者 護理師");
+    log("info", "預告 · 動作前提示，可取消（壓縮為 2 秒，實際 30 秒）");
+    setTimeout(function () {
+      if (!bed.occupied) {
+        log("no", "拒絕 · 預告期間床已淨空，重新檢查後中止");
+        bed.busy = false; confirmBtn.disabled = false; return;
+      }
+      var target = bed.angle < 15 ? 30 : 0;
+      log("ok", "執行 · 床頭 " + Math.round(bed.angle) + "° → " + target + "°，緩慢移動不驚醒");
+      rampBed(target, function () {
+        bed.lastMotion = Date.now(); bed.busy = false; confirmBtn.disabled = false;
+        bed.supine = target === 0;
+        promptEl.classList.remove("on");
+        log("ok", "完成 · 已寫入無法竄改的稽核紀錄");
+        paintBed();
+      });
+    }, reduced ? 60 : 2000);
+  });
+
+  occBtn.addEventListener("click", function () {
+    bed.occupied = !bed.occupied;
+    log("info", bed.occupied ? "感測 · 偵測到在床" : "感測 · 偵測到離床");
+    paintBed();
+  });
+  resetBtn.addEventListener("click", function () {
+    bed.lastMotion = null; bed.busy = false; bed.supine = true;
+    confirmBtn.disabled = false; promptEl.classList.remove("on");
+    rampBed(0); log("info", "重設 · 示範狀態已清除");
+  });
+
+  /* ══════════════ init ══════════════ */
+  function init() {
+    sizeCanvas(); pgSizeCanvas(); buildNight(); render(); pgRender(); paintNight(); paintBed();
+    log("info", "就緒 · 系統只提出建議，不會自行動作");
+    setTimeout(showPrompt, 1400);
+    setInterval(paintBed, 1000);
+    if (!reduced) { setTimeout(play, 600); setTimeout(nightPlay, 900); }
+    pgAutorun();
+  }
+  new ResizeObserver(function () { sizeCanvas(); drawTrace(); }).observe(cv);
+  new ResizeObserver(function () { pgSizeCanvas(); drawPsg(); }).observe(psg);
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function () { setTimeout(function () { render(); pgRender(); }, 30); });
+  new MutationObserver(function () { setTimeout(function () { render(); pgRender(); }, 30); })
+    .observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+</script>

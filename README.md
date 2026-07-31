@@ -109,6 +109,7 @@ session closes ──► Celery batch analysis (never on a live path)
 
 ## Documentation
 
+- [docs/handoff.md](docs/handoff.md) — **start here**: state, the constraints, the pitch argument, and what is not built yet
 - [docs/architecture.md](docs/architecture.md) — how the pieces fit, and why
 - [docs/detection.md](docs/detection.md) — the four-stage pipeline in detail
 - [docs/regulatory.md](docs/regulatory.md) — the three constraints and what they cost
@@ -124,6 +125,7 @@ somnoswallow/
 ├── docker-compose.yml
 ├── Makefile
 ├── scripts/demo.py                 end-to-end walkthrough and CI gate
+├── pitch/                          single-file animated demo page (not part of the product)
 ├── infra/                          Dockerfiles, mosquitto, nginx
 ├── packages/
 │   ├── shared-schemas/             JSON Schema + generated types
