@@ -112,6 +112,7 @@ session closes ──► Celery batch analysis (never on a live path)
 - [docs/handoff.md](docs/handoff.md) — **start here**: state, the constraints, the pitch argument, and what is not built yet
 - [docs/architecture.md](docs/architecture.md) — how the pieces fit, and why
 - [docs/detection.md](docs/detection.md) — the four-stage pipeline in detail
+- [docs/hardware-spec.md](docs/hardware-spec.md) — 功能、零件與感測規格表（軟體反推出的硬體需求，標注哪些是程式裡的實數、哪些還是提案）
 - [docs/regulatory.md](docs/regulatory.md) — the three constraints and what they cost
 - [docs/open-questions.md](docs/open-questions.md) — decisions still outstanding, including two places this implementation had to reconcile conflicting requirements
 - [docs/operations.md](docs/operations.md) — running, configuring, and retuning

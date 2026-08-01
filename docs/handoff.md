@@ -16,7 +16,11 @@ Two deliverables, both in this repository.
 tests passing, `make demo` runs the whole pipeline end to end with no database,
 broker, object store or browser. Structure and commands are in the
 [README](../README.md); the design reasoning is in
-[architecture.md](architecture.md) and [detection.md](detection.md).
+[architecture.md](architecture.md) and [detection.md](detection.md). The sensing
+and parts requirements the software implies — sample rates, bands, noise floors,
+the reusable-versus-per-night cost split, PAM's safety envelope — are tabulated in
+[hardware-spec.md](hardware-spec.md), with every row marked for whether it is a
+number the code actually runs on or a proposal nobody has priced yet.
 
 **The pitch artifact** — `pitch/somnoswallow-demo.html`, a single self-contained
 page with four animated models and almost no prose. See
